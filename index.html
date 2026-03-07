@@ -146,10 +146,11 @@ body{margin:0}
 .g-tor-violet500-purple600{background-image:linear-gradient(to right,#8b5cf6,#9333ea)}
 </style>
 
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
   <style>
-    *{font-family:'Outfit',sans-serif;box-sizing:border-box;}
+    *{font-family:'Outfit',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;box-sizing:border-box;}
     body{background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#0f172a 100%);min-height:100vh;}
     ::-webkit-scrollbar{width:5px;height:5px;}
     ::-webkit-scrollbar-thumb{background:rgba(99,102,241,.4);border-radius:3px;}
@@ -161,7 +162,7 @@ body{margin:0}
     body.js-ready .tab-content{}
     .stat-card{transition:transform .12s;}
     .stat-card:hover{transform:translateY(-2px);}
-    .tab-btn{transition:all .15s;background:transparent;color:rgba(255,255,255,0.45);border:none;}
+    .tab-btn{transition:all .15s;background:transparent;color:rgba(255,255,255,0.45);border:none;cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;}
     .tab-btn.active{background:rgba(255,255,255,0.18);color:#ffffff;box-shadow:0 2px 10px rgba(0,0,0,.2);font-weight:700;}
     .expand-content{max-height:0;overflow:hidden;transition:max-height .35s ease;}
     .expand-content.open{max-height:4000px;}
@@ -202,7 +203,7 @@ body{margin:0}
     <div class="flex-1 text-center min-w-0" style="line-height:1">
       <p id="hdr-company" class="font-black text-white truncate" style="font-size:13px;line-height:1"></p>
       <p id="hdr-engineer" class="text-amber-300 truncate" style="font-size:10px;line-height:1"></p>
-      <button onclick="openEditProfile()" class="bg-white/20 text-white rounded-full font-semibold" style="font-size:10px;padding:1px 8px">✏️ Edit</button>
+      <button onclick="openEditProfile()" class="bg-white/20 text-white rounded-full font-semibold" style="font-size:10px;padding:1px 8px;cursor:pointer;-webkit-tap-highlight-color:transparent;outline:none">✏️ Edit</button>
     </div>
     <!-- Right: date + spends -->
     <div class="text-right flex-shrink-0" style="line-height:1">
@@ -1151,6 +1152,8 @@ function applyProfile() {
   var el2 = document.getElementById('hdr-engineer');
   if (el1) el1.textContent = p ? p.company : 'Tap Edit Profile';
   if (el2) el2.textContent = p ? p.engineer : 'Set your name';
+  var hdEl = document.getElementById('header-date');
+  if (hdEl) hdEl.textContent = new Date().toLocaleDateString('en-IN', {timeZone:'Asia/Kolkata',day:'numeric',month:'short',year:'numeric'});
 }
 function openEditProfile() {
   var p = lprof() || {};
@@ -2727,22 +2730,20 @@ if (!safeLS.getItem(‘pwa_dismissed’)) document.getElementById(‘pwa-banner�
 // ============================================================
 // INIT
 // ============================================================
-document.addEventListener(‘DOMContentLoaded’, function() {
+var _booted = false;
+function _runBoot() {
+if (_booted) return;
+_booted = true;
 try { applyProfile(); } catch(e) { console.warn(‘applyProfile error’, e); }
 try { boot(); } catch(e) { console.error(‘boot error’, e); }
-});
-
-// Fallback: if DOMContentLoaded already fired or was missed (can happen on GitHub Pages)
+}
+document.addEventListener(‘DOMContentLoaded’, _runBoot);
+// Immediate fallback — covers GitHub Pages where DOMContentLoaded may already have fired
 if (document.readyState === ‘complete’ || document.readyState === ‘interactive’) {
-setTimeout(function() {
-// Only run if tabs are still all hidden (boot didn’t fire)
-var dash = document.getElementById(‘tab-dashboard’);
-if (dash && dash.style.display === ‘none’) {
-try { applyProfile(); } catch(e) {}
-try { boot(); } catch(e) { console.error(‘fallback boot error’, e); }
+setTimeout(_runBoot, 0);
 }
-}, 0);
-}
+// Belt-and-suspenders: window load as final fallback
+window.addEventListener(‘load’, _runBoot);
 </script>
 
 </body>
