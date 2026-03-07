@@ -812,18 +812,29 @@
 // STORAGE
 // ============================================================
 var DB='cm_data', META='cm_meta', MATS='cm_matstore', DEPT='cm_dept', PROF='cm_profile', PHKEYS='cm_phkeys';
-function ld(){try{return JSON.parse(localStorage.getItem(DB)||'[]');}catch(e){return [];}}
-function sd(d){localStorage.setItem(DB,JSON.stringify(d));}
-function lm(){try{return JSON.parse(localStorage.getItem(META)||'{}');}catch(e){return {};}}
-function sm(x){localStorage.setItem(META,JSON.stringify(x));}
-function lmat(){try{return JSON.parse(localStorage.getItem(MATS)||'[]');}catch(e){return [];}}
-function smat(x){localStorage.setItem(MATS,JSON.stringify(x));}
-function ldept(){try{return JSON.parse(localStorage.getItem(DEPT)||'{}');}catch(e){return {};}}
-function sdept(x){localStorage.setItem(DEPT,JSON.stringify(x));}
-function lprof(){try{return JSON.parse(localStorage.getItem(PROF)||'null');}catch(e){return null;}}
-function sprof(x){localStorage.setItem(PROF,JSON.stringify(x));}
-function lphkeys(){try{return JSON.parse(localStorage.getItem(PHKEYS)||'{}');}catch(e){return {};}}
-function sphkeys(x){localStorage.setItem(PHKEYS,JSON.stringify(x));}
+// Safe storage — falls back to in-memory when localStorage is blocked (incognito)
+var _memStore = {};
+var _ls = (function() {
+  try { localStorage.setItem('__t','1'); localStorage.removeItem('__t'); return localStorage; } catch(e) { return null; }
+})();
+var safeLS = {
+  getItem: function(k) { if (_ls) { try { return _ls.getItem(k); } catch(e) {} } return _memStore[k] !== undefined ? _memStore[k] : null; },
+  setItem: function(k, v) { if (_ls) { try { _ls.setItem(k, v); } catch(e) {} } _memStore[k] = v; },
+  removeItem: function(k) { if (_ls) { try { _ls.removeItem(k); } catch(e) {} } delete _memStore[k]; }
+};
+
+function ld(){try{return JSON.parse(safeLS.getItem(DB)||'[]');}catch(e){return [];}}
+function sd(d){safeLS.setItem(DB,JSON.stringify(d));}
+function lm(){try{return JSON.parse(safeLS.getItem(META)||'{}');}catch(e){return {};}}
+function sm(x){safeLS.setItem(META,JSON.stringify(x));}
+function lmat(){try{return JSON.parse(safeLS.getItem(MATS)||'[]');}catch(e){return [];}}
+function smat(x){safeLS.setItem(MATS,JSON.stringify(x));}
+function ldept(){try{return JSON.parse(safeLS.getItem(DEPT)||'{}');}catch(e){return {};}}
+function sdept(x){safeLS.setItem(DEPT,JSON.stringify(x));}
+function lprof(){try{return JSON.parse(safeLS.getItem(PROF)||'null');}catch(e){return null;}}
+function sprof(x){safeLS.setItem(PROF,JSON.stringify(x));}
+function lphkeys(){try{return JSON.parse(safeLS.getItem(PHKEYS)||'{}');}catch(e){return {};}}
+function sphkeys(x){safeLS.setItem(PHKEYS,JSON.stringify(x));}
 
 // ============================================================
 // INDEXEDDB
@@ -877,7 +888,7 @@ function idbGetAll(keys, cb) {
 }
 function migrateOldPhotos() {
   var old = null;
-  try { old = JSON.parse(localStorage.getItem('cm_photos') || 'null'); } catch(e) {}
+  try { old = JSON.parse(safeLS.getItem('cm_photos') || 'null'); } catch(e) {}
   if (!old) return;
   var idx = lphkeys();
   Object.keys(old).forEach(function(date) {
@@ -892,7 +903,7 @@ function migrateOldPhotos() {
     idx[date] = keys;
   });
   sphkeys(idx);
-  localStorage.removeItem('cm_photos');
+  safeLS.removeItem('cm_photos');
 }
 
 // ============================================================
@@ -943,11 +954,11 @@ function dedup(list) {
 var AD = [], WID = null, CID = null, MID = null;
 var VM = new Date(), DD = ist(), DTD = ist();
 var PDEL = null, DTMR = null, PWA = null;
-var NID = parseInt(localStorage.getItem('cm_nid') || '1');
+var NID = parseInt(safeLS.getItem('cm_nid') || '1');
 
 function gid() {
   var id = 'r' + NID++;
-  localStorage.setItem('cm_nid', NID);
+  safeLS.setItem('cm_nid', NID);
   return id;
 }
 
@@ -1044,7 +1055,7 @@ function installPWA(){
 }
 function dismissPWA(){
   document.getElementById('pwa-banner').style.display = 'none';
-  localStorage.setItem('pwa_dismissed','1');
+  safeLS.setItem('pwa_dismissed','1');
 }
 
 // ============================================================
@@ -2579,7 +2590,7 @@ if (el) el.href=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:‘applic
 })();
 window.addEventListener(‘beforeinstallprompt’,function(e){
 e.preventDefault(); PWA=e;
-if (!localStorage.getItem(‘pwa_dismissed’)) document.getElementById(‘pwa-banner’).style.display=‘flex’;
+if (!safeLS.getItem(‘pwa_dismissed’)) document.getElementById(‘pwa-banner’).style.display=‘flex’;
 });
 
 // ============================================================
