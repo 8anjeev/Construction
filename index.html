@@ -20,6 +20,9 @@
     @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
     .tab-content{animation:fadeIn .18s ease-out;}
+    /* Show dashboard by default if JS hasn't run yet */
+    body:not(.js-ready) #tab-dashboard{display:block!important;}
+    body.js-ready .tab-content{}
     .stat-card{transition:transform .12s;}
     .stat-card:hover{transform:translateY(-2px);}
     .tab-btn{transition:all .15s;}
@@ -1071,23 +1074,28 @@ function switchTab(name) {
     }
   });
 
-  AD = ld();
-  if      (name === 'dashboard')    updateDash();
-  else if (name === 'daily')        { loadMeta(); loadPhotos(); viewDaily(); viewDeptSummary(); }
-  else if (name === 'departmental') loadDeptTab();
-  else if (name === 'attendance')   viewWorkers();
-  else if (name === 'expenses')     viewExpenses();
-  else if (name === 'materials')    viewMaterials();
-  else if (name === 'tools')        viewTools();
-  else if (name === 'rentals')      viewRentals();
-  else if (name === 'contractors')  viewContractors();
-  updateDropdowns();
+  try {
+    AD = ld();
+    if      (name === 'dashboard')    updateDash();
+    else if (name === 'daily')        { loadMeta(); loadPhotos(); viewDaily(); viewDeptSummary(); }
+    else if (name === 'departmental') loadDeptTab();
+    else if (name === 'attendance')   viewWorkers();
+    else if (name === 'expenses')     viewExpenses();
+    else if (name === 'materials')    viewMaterials();
+    else if (name === 'tools')        viewTools();
+    else if (name === 'rentals')      viewRentals();
+    else if (name === 'contractors')  viewContractors();
+    updateDropdowns();
+  } catch(e) {
+    console.error('switchTab render error [' + name + ']', e);
+  }
 }
 
 // ============================================================
 // BOOT
 // ============================================================
 function boot() {
+  document.body.classList.add('js-ready');
   AD = ld();
 
   document.querySelectorAll('.tab-btn').forEach(function(b) {
@@ -2578,9 +2586,21 @@ if (!localStorage.getItem(‘pwa_dismissed’)) document.getElementById(‘pwa-b
 // INIT
 // ============================================================
 document.addEventListener(‘DOMContentLoaded’, function() {
-applyProfile();
-boot();
+try { applyProfile(); } catch(e) { console.warn(‘applyProfile error’, e); }
+try { boot(); } catch(e) { console.error(‘boot error’, e); }
 });
+
+// Fallback: if DOMContentLoaded already fired or was missed (can happen on GitHub Pages)
+if (document.readyState === ‘complete’ || document.readyState === ‘interactive’) {
+setTimeout(function() {
+// Only run if tabs are still all hidden (boot didn’t fire)
+var dash = document.getElementById(‘tab-dashboard’);
+if (dash && dash.style.display === ‘none’) {
+try { applyProfile(); } catch(e) {}
+try { boot(); } catch(e) { console.error(‘fallback boot error’, e); }
+}
+}, 0);
+}
 </script>
 
 </body>
