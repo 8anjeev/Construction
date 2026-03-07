@@ -625,7 +625,7 @@ table{border-collapse:collapse}
           <tr><td colspan="6" class="px-3 py-4 text-center text-gray-400 text-xs">No entries for this date</td></tr>
         </tbody>
         <tfoot>
-          <tr class="bg-indigo-50 font-bold text-indigo-700" style="font-size:11px;">
+          <tr id="dept-tab-foot" class="bg-indigo-50 font-bold text-indigo-700" style="font-size:11px;display:none">
             <td class="px-2 py-2 rounded-l-lg">Total</td>
             <td id="dept-foot-workers" class="px-2 py-2 text-center">0</td>
             <td id="dept-foot-hours" class="px-2 py-2 text-center">0h</td>
@@ -1175,8 +1175,10 @@ function migrateOldPhotos() {
 var CATS = ['Mason','Labour','Carpenter','Helper','Fitter','Fitter Helper','Supervisor'];
 
 function ist() {
-  var n = new Date();
-  return new Date(n.getTime() + 19800000).toISOString().split('T')[0];
+  return new Date().toLocaleDateString('en-CA', {timeZone:'Asia/Kolkata'});
+}
+function istNow() {
+  return new Date().toLocaleString('en-IN', {timeZone:'Asia/Kolkata'});
 }
 function fc(n) {
   return '\u20b9' + (parseFloat(n)||0).toLocaleString('en-IN', {maximumFractionDigits:2});
@@ -1188,7 +1190,7 @@ function fd(d) {
 }
 function fdl(d) {
   if (!d) return '';
-  return new Date(d+'T00:00:00').toLocaleDateString('en-IN', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  return new Date(d+'T00:00:00').toLocaleDateString('en-IN', {timeZone:'Asia/Kolkata',weekday:'long',day:'numeric',month:'long',year:'numeric'});
 }
 function daysb(d1, d2) {
   var diff = new Date(d2+'T00:00:00') - new Date(d1+'T00:00:00');
@@ -1389,9 +1391,8 @@ function boot() {
     var el = document.getElementById(id); if (el) el.value = t;
   });
 
-  var hd = new Date(new Date().getTime() + 19800000);
   var hdEl = document.getElementById('header-date');
-  if (hdEl) hdEl.textContent = hd.toLocaleDateString('en-IN', {weekday:'short',day:'numeric',month:'short',year:'numeric'});
+  if (hdEl) hdEl.textContent = new Date().toLocaleDateString('en-IN', {timeZone:'Asia/Kolkata',day:'numeric',month:'short',year:'numeric'});
 
   setupRentalTabs();
   migrateOldPhotos();
@@ -2526,10 +2527,10 @@ return ‘*{margin:0;padding:0;box-sizing:border-box;font-family:“Segoe UI”,
 +’@media print{.bar{display:none!important}.content{margin-top:0}body{padding:8px 12px}@page{margin:6mm;size:A4}}’;
 }
 function phdr(title, sub){
-var p=pp(), now=new Date(new Date().getTime()+19800000);
+var p=pp(), now=new Date();
 return ‘<div class="hdr"><div style="display:flex;align-items:center;gap:12px"><div class="logo">🏗</div><div><div class="cn">Sanjineer</div><div class="csub">Construction Manager</div></div></div>’
 +’<div style="flex:1;padding:0 12px;text-align:center"><div class="hcname">’+p.company+’</div><div class="hceng">’+p.engineer+’</div></div>’
-+’<div><div class="rt">’+title+’</div><div class="rd">’+sub+’</div><div class="rp">’+now.toLocaleString(‘en-IN’)+’</div></div></div>’;
++’<div><div class="rt">’+title+’</div><div class="rd">’+sub+’</div><div class="rp">’+now.toLocaleString(‘en-IN’,{timeZone:‘Asia/Kolkata’})+’</div></div></div>’;
 }
 function pftr(){
 return ‘<div class="footer">’
@@ -2818,7 +2819,7 @@ function exportExcel(){
 AD=ld(); var vms=mkey(VM), ctrs=AD.filter(function(d){ return d.type===‘contractor’; });
 if (!ctrs.length) { toast(‘No teams to export’,‘err’); return; }
 var wb=XLSX.utils.book_new();
-var data=[[‘Sanjineer — Payment Report’],[‘Month: ‘+mlabel(VM)],[‘Company: ‘+pp().company],[‘Generated: ‘+new Date().toLocaleDateString(‘en-IN’)],[],[‘Team’,‘Type’,‘Workers’,‘Payment (₹)’,‘Advances (₹)’,‘Balance (₹)’]];
+var data=[[‘Sanjineer — Payment Report’],[‘Month: ‘+mlabel(VM)],[‘Company: ‘+pp().company],[‘Generated: ‘+new Date().toLocaleDateString(‘en-IN’,{timeZone:‘Asia/Kolkata’})],[],[‘Team’,‘Type’,‘Workers’,‘Payment (₹)’,‘Advances (₹)’,‘Balance (₹)’]];
 ctrs.forEach(function(c){
 var tw=AD.filter(function(d){ return d.type===‘worker’&&d.team_name===c.contractor_name; });
 var ta=dedup(AD.filter(function(d){ return d.type===‘attendance’&&(d.date||’’).startsWith(vms)&&tw.some(function(w){ return w.name===d.name; }); }));
