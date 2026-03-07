@@ -274,7 +274,29 @@ table{border-collapse:collapse}
 .backdrop-blur-sm{backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
 .backdrop-blur-lg{backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
 
-  </style>
+/* === COMPILED GRADIENTS (no CSS vars, works everywhere) === */
+.g-tobr-amber500-orange500{background-image:linear-gradient(to bottom right,#f59e0b,#f97316)}
+.g-tobr-amber500-orange600{background-image:linear-gradient(to bottom right,#f59e0b,#ea580c)}
+.g-tobr-cyan500-sky500{background-image:linear-gradient(to bottom right,#06b6d4,#0ea5e9)}
+.g-tobr-emerald500-teal500{background-image:linear-gradient(to bottom right,#10b981,#14b8a6)}
+.g-tobr-green500-emerald500{background-image:linear-gradient(to bottom right,#22c55e,#10b981)}
+.g-tobr-indigo500-violet500{background-image:linear-gradient(to bottom right,#6366f1,#8b5cf6)}
+.g-tobr-red500-rose600{background-image:linear-gradient(to bottom right,#ef4444,#e11d48)}
+.g-tobr-rose500-pink500{background-image:linear-gradient(to bottom right,#f43f5e,#ec4899)}
+.g-tobr-violet500-purple500{background-image:linear-gradient(to bottom right,#8b5cf6,#a855f7)}
+.g-tor-amber500-orange500{background-image:linear-gradient(to right,#f59e0b,#f97316)}
+.g-tor-cyan500-sky500{background-image:linear-gradient(to right,#06b6d4,#0ea5e9)}
+.g-tor-emerald500-teal500{background-image:linear-gradient(to right,#10b981,#14b8a6)}
+.g-tor-indigo500-blue500{background-image:linear-gradient(to right,#6366f1,#3b82f6)}
+.g-tor-indigo500-purple500{background-image:linear-gradient(to right,#6366f1,#a855f7)}
+.g-tor-indigo500-purple600{background-image:linear-gradient(to right,#6366f1,#9333ea)}
+.g-tor-indigo600-vpurple600-pink500{background-image:linear-gradient(to right,#4f46e5,#9333ea,#ec4899)}
+.g-tor-purple600-indigo600{background-image:linear-gradient(to right,#9333ea,#4f46e5)}
+.g-tor-rose500-pink500{background-image:linear-gradient(to right,#f43f5e,#ec4899)}
+.g-tor-violet500-purple500{background-image:linear-gradient(to right,#8b5cf6,#a855f7)}
+.g-tor-violet500-purple600{background-image:linear-gradient(to right,#8b5cf6,#9333ea)}
+</style>
+
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
@@ -317,11 +339,11 @@ table{border-collapse:collapse}
 
 <!-- HEADER -->
 
-<header class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 shadow-2xl" style="padding:2px 8px">
+<header class="g-tor-indigo600-vpurple600-pink500 shadow-2xl" style="padding:2px 8px">
   <div class="flex items-center gap-1.5">
     <!-- Left: icon + app name stacked tight -->
     <div class="flex items-center gap-1 flex-shrink-0">
-      <div class="bg-gradient-to-br from-amber-500 to-orange-600 rounded-md flex items-center justify-center shadow" style="width:20px;height:20px;font-size:12px;line-height:1">🏗️</div>
+      <div class="g-tobr-amber500-orange600 rounded-md flex items-center justify-center shadow" style="width:20px;height:20px;font-size:12px;line-height:1">🏗️</div>
       <div style="line-height:1">
         <p class="font-black text-white" style="font-size:13px;line-height:1">Sanjineer</p>
         <p class="text-purple-200" style="font-size:10px;line-height:1">Site Manager</p>
@@ -364,19 +386,19 @@ table{border-collapse:collapse}
 
 <div id="tab-dashboard" class="tab-content" style="display:none">
   <div class="grid grid-cols-2 gap-2.5 mb-3">
-    <div class="stat-card bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl px-2 py-1 text-white shadow-xl"><p class="text-[10px] text-amber-100">Advances Given</p><p id="dash-advance" class="text-sm font-bold leading-none">₹0</p><p class="text-[10px] text-amber-200">This Month</p></div>
-    <div class="stat-card bg-gradient-to-br from-rose-500 to-pink-500 rounded-xl px-2 py-1 text-white shadow-xl"><p class="text-[10px] text-rose-100">Remaining</p><p id="dash-remaining" class="text-sm font-bold leading-none">₹0</p><p class="text-[10px] text-rose-200">After Advances</p></div>
+    <div class="g-tobr-amber500-orange500 stat-card rounded-xl px-2 py-1 text-white shadow-xl"><p class="text-[10px] text-amber-100">Advances Given</p><p id="dash-advance" class="text-sm font-bold leading-none">₹0</p><p class="text-[10px] text-amber-200">This Month</p></div>
+    <div class="g-tobr-rose500-pink500 stat-card rounded-xl px-2 py-1 text-white shadow-xl"><p class="text-[10px] text-rose-100">Remaining</p><p id="dash-remaining" class="text-sm font-bold leading-none">₹0</p><p class="text-[10px] text-rose-200">After Advances</p></div>
   </div>
   <div class="grid grid-cols-3 gap-2.5 mb-3">
-    <div class="stat-card bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl px-2 py-1 text-white shadow-xl"><p class="text-[10px] text-emerald-100">Material</p><p id="dash-material" class="text-sm font-bold leading-none">₹0</p></div>
-    <div class="stat-card bg-gradient-to-br from-cyan-500 to-sky-500 rounded-xl px-2 py-1 text-white shadow-xl"><p class="text-[10px] text-cyan-100">Cash In</p><p id="dash-petty" class="text-sm font-bold leading-none">₹0</p></div>
-    <div class="stat-card bg-gradient-to-br from-violet-500 to-purple-500 rounded-xl px-2 py-1 text-white shadow-xl"><p class="text-[10px] text-violet-100">Cash Left</p><p id="dash-petty-left" class="text-sm font-bold leading-none">₹0</p></div>
+    <div class="g-tobr-emerald500-teal500 stat-card rounded-xl px-2 py-1 text-white shadow-xl"><p class="text-[10px] text-emerald-100">Material</p><p id="dash-material" class="text-sm font-bold leading-none">₹0</p></div>
+    <div class="g-tobr-cyan500-sky500 stat-card rounded-xl px-2 py-1 text-white shadow-xl"><p class="text-[10px] text-cyan-100">Cash In</p><p id="dash-petty" class="text-sm font-bold leading-none">₹0</p></div>
+    <div class="g-tobr-violet500-purple500 stat-card rounded-xl px-2 py-1 text-white shadow-xl"><p class="text-[10px] text-violet-100">Cash Left</p><p id="dash-petty-left" class="text-sm font-bold leading-none">₹0</p></div>
   </div>
   <div class="grid grid-cols-2 gap-2.5 mb-3">
-    <div class="stat-card bg-gradient-to-br from-indigo-500 to-violet-500 rounded-xl px-2 py-1 text-white shadow-xl"><p class="text-[10px] text-indigo-100">Rental Expense</p><p id="dash-rental-out" class="text-sm font-bold leading-none">₹0</p></div>
-    <div class="stat-card bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl px-2 py-1 text-white shadow-xl"><p class="text-[10px] text-green-100">Rental Income</p><p id="dash-rental-in" class="text-sm font-bold leading-none">₹0</p></div>
+    <div class="g-tobr-indigo500-violet500 stat-card rounded-xl px-2 py-1 text-white shadow-xl"><p class="text-[10px] text-indigo-100">Rental Expense</p><p id="dash-rental-out" class="text-sm font-bold leading-none">₹0</p></div>
+    <div class="g-tobr-green500-emerald500 stat-card rounded-xl px-2 py-1 text-white shadow-xl"><p class="text-[10px] text-green-100">Rental Income</p><p id="dash-rental-in" class="text-sm font-bold leading-none">₹0</p></div>
   </div>
-  <div id="dash-low-stock" class="mb-3 hidden"><div class="bg-gradient-to-br from-red-500 to-rose-600 rounded-xl p-3 text-white shadow-xl"><p class="font-bold text-sm mb-1.5">⚠️ Low Stock Alert</p><div id="dash-low-list"></div></div></div>
+  <div id="dash-low-stock" class="mb-3 hidden"><div class="g-tobr-red500-rose600 rounded-xl p-3 text-white shadow-xl"><p class="font-bold text-sm mb-1.5">⚠️ Low Stock Alert</p><div id="dash-low-list"></div></div></div>
   <div class="bg-white rounded-xl p-3 shadow-xl"><h3 class="font-bold text-gray-800 mb-2">Teams This Month</h3><div id="team-details"><p class="text-gray-400 text-center py-4 text-sm">No teams yet</p></div></div>
 </div>
 
@@ -388,8 +410,8 @@ table{border-collapse:collapse}
       <p class="text-xs font-bold text-gray-700">📋 Daily Report</p>
       <div class="flex items-center gap-1.5">
         <input type="date" id="daily-date" class="border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-indigo-400" style="padding:3px 6px">
-        <button onclick="loadDailyReport()" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg text-xs font-semibold active:scale-95" style="padding:3px 8px">📂 Load</button>
-        <button onclick="printDailyReport()" class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg text-xs font-semibold active:scale-95" style="padding:3px 8px">🖨️ Print</button>
+        <button onclick="loadDailyReport()" class="g-tor-emerald500-teal500 text-white rounded-lg text-xs font-semibold active:scale-95" style="padding:3px 8px">📂 Load</button>
+        <button onclick="printDailyReport()" class="g-tor-indigo500-purple600 text-white rounded-lg text-xs font-semibold active:scale-95" style="padding:3px 8px">🖨️ Print</button>
       </div>
     </div>
     <p id="daily-label" class="text-gray-500 font-medium" style="font-size:9px;margin-top:1px"></p>
@@ -403,19 +425,19 @@ table{border-collapse:collapse}
       <button onclick="setWeather('🌧️ Rainy')" id="wbtn-rainy" class="wbtn flex-1 rounded-lg text-xs font-bold border-2 border-gray-200 bg-blue-50 text-blue-700" style="padding:3px 0">🌧️ Rainy</button>
     </div>
     <textarea id="daily-status" rows="2" placeholder="Site status / observations / instructions..." class="w-full border border-gray-200 rounded-lg text-xs mb-1.5 resize-none focus:outline-none focus:border-indigo-400" style="padding:4px 8px"></textarea>
-    <button onclick="saveDailyMeta()" class="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-lg text-xs font-semibold active:scale-95" style="padding:4px 0">💾 Save Site Status</button>
+    <button onclick="saveDailyMeta()" class="g-tor-indigo500-purple500 w-full text-white rounded-lg text-xs font-semibold active:scale-95" style="padding:4px 0">💾 Save Site Status</button>
   </div>
 
   <div class="grid grid-cols-2 gap-2 mb-2">
-    <div class="bg-gradient-to-br from-rose-500 to-pink-500 rounded-xl text-white" style="padding:5px 10px"><p class="text-[9px] text-rose-100 leading-none">Advances Today</p><p id="daily-advances" class="text-base font-bold leading-none mt-0.5">₹0</p></div>
-    <div class="bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl text-white" style="padding:5px 10px"><p class="text-[9px] text-amber-100 leading-none">Material Today</p><p id="daily-mat-cost" class="text-base font-bold leading-none mt-0.5">₹0</p></div>
+    <div class="g-tobr-rose500-pink500 rounded-xl text-white" style="padding:5px 10px"><p class="text-[9px] text-rose-100 leading-none">Advances Today</p><p id="daily-advances" class="text-base font-bold leading-none mt-0.5">₹0</p></div>
+    <div class="g-tobr-amber500-orange500 rounded-xl text-white" style="padding:5px 10px"><p class="text-[9px] text-amber-100 leading-none">Material Today</p><p id="daily-mat-cost" class="text-base font-bold leading-none mt-0.5">₹0</p></div>
   </div>
 
   <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
     <h3 class="font-bold text-gray-800 mb-3">👷 Labour Summary</h3>
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
-        <thead><tr class="bg-gradient-to-r from-indigo-500 to-purple-500 text-white"><th class="px-3 py-2 text-left rounded-l-lg">Type</th><th class="px-3 py-2 text-center">Count</th><th class="px-3 py-2 text-center">Hours</th><th class="px-3 py-2 text-left">Work Done</th><th class="px-3 py-2 text-center rounded-r-lg">✏️</th></tr></thead>
+        <thead><tr class="g-tor-indigo500-purple500 text-white"><th class="px-3 py-2 text-left rounded-l-lg">Type</th><th class="px-3 py-2 text-center">Count</th><th class="px-3 py-2 text-center">Hours</th><th class="px-3 py-2 text-left">Work Done</th><th class="px-3 py-2 text-center rounded-r-lg">✏️</th></tr></thead>
         <tbody id="daily-labour"><tr><td colspan="5" class="px-3 py-4 text-center text-gray-400">No attendance today</td></tr></tbody>
       </table>
     </div>
@@ -428,7 +450,7 @@ table{border-collapse:collapse}
     </div>
     <div class="overflow-x-auto">
       <table class="w-full text-xs">
-        <thead><tr class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white"><th class="px-2 py-2 text-left rounded-l-lg">Category</th><th class="px-2 py-2 text-center">Workers</th><th class="px-2 py-2 text-center">Hours</th><th class="px-2 py-2 text-left">Work Done</th><th class="px-2 py-2 text-right rounded-r-lg">Amount</th></tr></thead>
+        <thead><tr class="g-tor-purple600-indigo600 text-white"><th class="px-2 py-2 text-left rounded-l-lg">Category</th><th class="px-2 py-2 text-center">Workers</th><th class="px-2 py-2 text-center">Hours</th><th class="px-2 py-2 text-left">Work Done</th><th class="px-2 py-2 text-right rounded-r-lg">Amount</th></tr></thead>
         <tbody id="daily-dept-table"><tr><td colspan="5" class="px-3 py-3 text-center text-gray-400">No departmental work today</td></tr></tbody>
         <tfoot><tr id="daily-dept-foot" class="bg-purple-50 font-bold text-purple-700 text-xs" style="display:none"><td class="px-2 py-1.5 rounded-l-lg">Total</td><td id="daily-dept-foot-w" class="px-2 py-1.5 text-center">0</td><td id="daily-dept-foot-h" class="px-2 py-1.5 text-center">0h</td><td class="px-2 py-1.5"></td><td id="daily-dept-foot-a" class="px-2 py-1.5 text-right rounded-r-lg">₹0</td></tr></tfoot>
       </table>
@@ -439,7 +461,7 @@ table{border-collapse:collapse}
     <h3 class="font-bold text-gray-800 mb-3">🧱 Materials Purchased Today</h3>
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
-        <thead><tr class="bg-gradient-to-r from-amber-500 to-orange-500 text-white"><th class="px-3 py-2 text-left rounded-l-lg">Material</th><th class="px-3 py-2 text-center">Qty</th><th class="px-3 py-2 text-right rounded-r-lg">Amount</th></tr></thead>
+        <thead><tr class="g-tor-amber500-orange500 text-white"><th class="px-3 py-2 text-left rounded-l-lg">Material</th><th class="px-3 py-2 text-center">Qty</th><th class="px-3 py-2 text-right rounded-r-lg">Amount</th></tr></thead>
         <tbody id="daily-mat-table"><tr><td colspan="3" class="px-3 py-4 text-center text-gray-400">None today</td></tr></tbody>
       </table>
     </div>
@@ -448,7 +470,7 @@ table{border-collapse:collapse}
   <div class="bg-white rounded-2xl p-3 shadow-xl">
     <h3 class="text-sm font-bold text-gray-700 mb-3">📷 Site Photos (max 4)</h3>
     <div class="flex gap-2 flex-wrap mb-3" id="photo-previews"><p class="text-gray-400 text-xs">No photos yet</p></div>
-    <label class="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl text-sm font-semibold cursor-pointer active:scale-95 inline-flex items-center gap-2">
+    <label class="g-tor-amber500-orange500 px-4 py-2.5 text-white rounded-xl text-sm font-semibold cursor-pointer active:scale-95 inline-flex items-center gap-2">
       📷 Add Photo
       <input type="file" id="photo-input" accept="image/*" capture="environment" class="hidden" onchange="addPhoto(event)">
     </label>
@@ -467,7 +489,7 @@ table{border-collapse:collapse}
         <option value="">-- Select Worker --</option>
       </select>
       <select id="att-print-month" class="flex-1 min-w-0 px-3 py-2 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:border-indigo-400"></select>
-      <button onclick="printWorkerAttendance()" class="flex-shrink-0 px-4 py-2 bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-xl text-sm font-semibold active:scale-95">🖨️ Print</button>
+      <button onclick="printWorkerAttendance()" class="g-tor-violet500-purple600 flex-shrink-0 px-4 py-2 text-white rounded-xl text-sm font-semibold active:scale-95">🖨️ Print</button>
     </div>
   </div>
   <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
@@ -483,7 +505,7 @@ table{border-collapse:collapse}
         <option value="">Select Team</option>
       </select>
       <input type="number" id="w-wage" placeholder="Hourly Wage (₹)" step="any" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
-      <button onclick="addWorker()" class="col-span-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white py-2 rounded-xl font-semibold text-sm active:scale-95">Add Worker</button>
+      <button onclick="addWorker()" class="g-tor-emerald500-teal500 col-span-2 text-white py-2 rounded-xl font-semibold text-sm active:scale-95">Add Worker</button>
     </div>
   </div>
   <div class="bg-white rounded-2xl p-3 shadow-xl">
@@ -500,7 +522,7 @@ table{border-collapse:collapse}
     <div class="grid grid-cols-3 gap-3">
       <input type="number" id="petty-amount" placeholder="Amount (₹)" step="any" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
       <input type="date" id="petty-date" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
-      <button onclick="addPettyCash()" class="bg-gradient-to-r from-cyan-500 to-sky-500 text-white py-2 rounded-xl font-semibold text-sm active:scale-95">💰 Deposit</button>
+      <button onclick="addPettyCash()" class="g-tor-cyan500-sky500 text-white py-2 rounded-xl font-semibold text-sm active:scale-95">💰 Deposit</button>
     </div>
   </div>
   <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
@@ -542,19 +564,19 @@ table{border-collapse:collapse}
           </div>
         </div>
       </div>
-      <button onclick="addExpenseMaterial()" class="col-span-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white py-2.5 rounded-xl font-bold text-sm active:scale-95">🧱 Save Purchase</button>
+      <button onclick="addExpenseMaterial()" class="g-tor-amber500-orange500 col-span-2 text-white py-2.5 rounded-xl font-bold text-sm active:scale-95">🧱 Save Purchase</button>
     </div>
   </div>
   <div class="grid grid-cols-3 gap-2.5 mb-3">
-    <div class="bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl text-white" style="padding:4px 10px"><p class="text-[9px] text-emerald-100 leading-none">Material Cost</p><p id="exp-mat-total" class="text-sm font-bold leading-none mt-0.5">₹0</p></div>
-    <div class="bg-gradient-to-br from-cyan-500 to-sky-500 rounded-xl text-white" style="padding:4px 10px"><p class="text-[9px] text-cyan-100 leading-none">Cash In</p><p id="exp-petty-in" class="text-sm font-bold leading-none mt-0.5">₹0</p></div>
-    <div class="bg-gradient-to-br from-violet-500 to-purple-500 rounded-xl text-white" style="padding:4px 10px"><p class="text-[9px] text-violet-100 leading-none">Remaining</p><p id="exp-petty-left" class="text-sm font-bold leading-none mt-0.5">₹0</p></div>
+    <div class="g-tobr-emerald500-teal500 rounded-xl text-white" style="padding:4px 10px"><p class="text-[9px] text-emerald-100 leading-none">Material Cost</p><p id="exp-mat-total" class="text-sm font-bold leading-none mt-0.5">₹0</p></div>
+    <div class="g-tobr-cyan500-sky500 rounded-xl text-white" style="padding:4px 10px"><p class="text-[9px] text-cyan-100 leading-none">Cash In</p><p id="exp-petty-in" class="text-sm font-bold leading-none mt-0.5">₹0</p></div>
+    <div class="g-tobr-violet500-purple500 rounded-xl text-white" style="padding:4px 10px"><p class="text-[9px] text-violet-100 leading-none">Remaining</p><p id="exp-petty-left" class="text-sm font-bold leading-none mt-0.5">₹0</p></div>
   </div>
   <div class="bg-white rounded-2xl p-3 shadow-xl">
     <p class="text-xs font-semibold text-gray-500 mb-2">💰 Expense Ledger</p>
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
-        <thead><tr class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white"><th class="px-3 py-2 text-left rounded-l-lg">Date</th><th class="px-3 py-2 text-left">Description</th><th class="px-3 py-2 text-center">Qty</th><th class="px-3 py-2 text-right">Amount</th><th class="px-3 py-2 text-center rounded-r-lg">Del</th></tr></thead>
+        <thead><tr class="g-tor-emerald500-teal500 text-white"><th class="px-3 py-2 text-left rounded-l-lg">Date</th><th class="px-3 py-2 text-left">Description</th><th class="px-3 py-2 text-center">Qty</th><th class="px-3 py-2 text-right">Amount</th><th class="px-3 py-2 text-center rounded-r-lg">Del</th></tr></thead>
         <tbody id="expenses-table"><tr><td colspan="5" class="px-3 py-4 text-center text-gray-400">No expenses yet</td></tr></tbody>
       </table>
     </div>
@@ -572,7 +594,7 @@ table{border-collapse:collapse}
       <input type="number" id="mat-init-qty" placeholder="Opening Stock Qty" step="any" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
       <input type="number" id="mat-min-qty" placeholder="Min Stock Alert" step="any" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
     </div>
-    <button onclick="addMaterialItem()" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white py-2.5 rounded-xl font-bold text-sm active:scale-95">🧱 Add Material Item</button>
+    <button onclick="addMaterialItem()" class="g-tor-amber500-orange500 w-full text-white py-2.5 rounded-xl font-bold text-sm active:scale-95">🧱 Add Material Item</button>
   </div>
   <div id="materials-list" class="space-y-3">
     <p class="text-white/50 text-center py-4">No materials added yet</p>
@@ -589,8 +611,8 @@ table{border-collapse:collapse}
         <input type="date" id="dept-tab-date" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
       </div>
       <div class="flex gap-2 self-end">
-        <button onclick="loadDeptTab()" class="px-3 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl text-xs font-bold active:scale-95">📂 Load</button>
-        <button onclick="printDeptReport()" class="px-3 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl text-xs font-bold active:scale-95">🖨️ Day</button>
+        <button onclick="loadDeptTab()" class="g-tor-emerald500-teal500 px-3 py-2 text-white rounded-xl text-xs font-bold active:scale-95">📂 Load</button>
+        <button onclick="printDeptReport()" class="g-tor-indigo500-purple600 px-3 py-2 text-white rounded-xl text-xs font-bold active:scale-95">🖨️ Day</button>
       </div>
     </div>
     <p id="dept-tab-label" class="text-xs text-indigo-600 font-semibold mt-1.5"></p>
@@ -601,18 +623,18 @@ table{border-collapse:collapse}
       <span id="dept-total-amount" class="text-base font-black text-amber-600 truncate">₹0</span>
     </div>
     <select id="dept-print-month" class="px-2 py-1.5 border border-gray-200 rounded-lg text-xs bg-white focus:outline-none flex-shrink-0 max-w-[130px]"></select>
-    <button onclick="printDeptMonthly()" class="px-3 py-1.5 bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-lg text-xs font-bold active:scale-95 whitespace-nowrap flex-shrink-0">🖨️ Month</button>
+    <button onclick="printDeptMonthly()" class="g-tor-violet500-purple600 px-3 py-1.5 text-white rounded-lg text-xs font-bold active:scale-95 whitespace-nowrap flex-shrink-0">🖨️ Month</button>
   </div>
   <div style="display:none"><span id="dept-total-workers">0</span><span id="dept-total-hours">0</span></div>
   <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
     <div class="flex items-center justify-between mb-2">
       <p class="text-xs font-semibold text-gray-500">📋 Departmental Work Records</p>
-      <button onclick="openAddDeptModal()" class="px-3 py-1.5 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl text-xs font-bold active:scale-95">+ Add</button>
+      <button onclick="openAddDeptModal()" class="g-tor-indigo500-purple500 px-3 py-1.5 text-white rounded-xl text-xs font-bold active:scale-95">+ Add</button>
     </div>
     <div class="overflow-x-auto">
       <table class="w-full" style="font-size:11px;">
         <thead>
-          <tr class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
+          <tr class="g-tor-purple600-indigo600 text-white">
             <th class="px-2 py-2 text-left rounded-l-lg">Category</th>
             <th class="px-2 py-2 text-center">Workers</th>
             <th class="px-2 py-2 text-center">Hours</th>
@@ -649,12 +671,12 @@ table{border-collapse:collapse}
       <input type="number" id="tl-qty" placeholder="Quantity" step="any" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
       <input type="date" id="tl-date" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
       <input type="number" id="tl-cost" placeholder="Cost (Optional)" step="any" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
-      <button onclick="addTool()" class="col-span-2 bg-gradient-to-r from-violet-500 to-purple-500 text-white py-2 rounded-xl font-semibold text-sm active:scale-95">Add Tool</button>
+      <button onclick="addTool()" class="g-tor-violet500-purple500 col-span-2 text-white py-2 rounded-xl font-semibold text-sm active:scale-95">Add Tool</button>
     </div>
   </div>
   <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
     <p class="text-xs font-semibold text-gray-500 mb-2">🔧 Tools List</p>
-    <table class="w-full text-sm"><thead><tr class="bg-gradient-to-r from-violet-500 to-purple-500 text-white"><th class="px-3 py-2 text-left rounded-l-lg">Tool</th><th class="px-3 py-2 text-center">Qty</th><th class="px-3 py-2 text-center">Date</th><th class="px-3 py-2 text-right">Cost</th><th class="px-3 py-2 text-center rounded-r-lg">Del</th></tr></thead>
+    <table class="w-full text-sm"><thead><tr class="g-tor-violet500-purple500 text-white"><th class="px-3 py-2 text-left rounded-l-lg">Tool</th><th class="px-3 py-2 text-center">Qty</th><th class="px-3 py-2 text-center">Date</th><th class="px-3 py-2 text-right">Cost</th><th class="px-3 py-2 text-center rounded-r-lg">Del</th></tr></thead>
     <tbody id="tools-table"><tr><td colspan="5" class="px-3 py-4 text-center text-gray-400">No tools</td></tr></tbody></table>
   </div>
   <div class="bg-white rounded-2xl p-3 shadow-xl">
@@ -663,7 +685,7 @@ table{border-collapse:collapse}
       <select id="as-tool" class="px-3 py-2 border border-gray-200 rounded-xl bg-white text-sm focus:outline-none"><option value="">Select Tool</option></select>
       <select id="as-worker" class="px-3 py-2 border border-gray-200 rounded-xl bg-white text-sm focus:outline-none"><option value="">Select Worker</option></select>
       <input type="date" id="as-date" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none">
-      <button onclick="assignTool()" class="bg-gradient-to-r from-indigo-500 to-blue-500 text-white py-2 rounded-xl font-semibold text-sm active:scale-95">Assign</button>
+      <button onclick="assignTool()" class="g-tor-indigo500-blue500 text-white py-2 rounded-xl font-semibold text-sm active:scale-95">Assign</button>
     </div>
     <div id="tool-assignments"><p class="text-gray-400 text-center py-2 text-sm">No assignments</p></div>
   </div>
@@ -698,7 +720,7 @@ table{border-collapse:collapse}
 
 <p id="rental-client-no-data" class="text-xs text-rose-400 hidden mb-2">No rentals found for this client.</p>
 
-<button onclick="printRentalByClient()" class="w-full py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl text-sm font-bold active:scale-95">🖨️ Print Client Rental Report</button>
+<button onclick="printRentalByClient()" class="g-tor-indigo500-purple600 w-full py-2 text-white rounded-xl text-sm font-bold active:scale-95">🖨️ Print Client Rental Report</button>
 ```
 
   </div>
@@ -749,9 +771,9 @@ table{border-collapse:collapse}
           </div>
         </div>
       </div>
-      <button onclick="addRental('borrow')" class="w-full bg-gradient-to-r from-rose-500 to-pink-500 text-white py-2 rounded-xl font-semibold text-sm active:scale-95">Add Rental</button>
+      <button onclick="addRental('borrow')" class="g-tor-rose500-pink500 w-full text-white py-2 rounded-xl font-semibold text-sm active:scale-95">Add Rental</button>
       <div class="mt-4 overflow-x-auto">
-        <table class="w-full text-sm"><thead><tr class="bg-gradient-to-r from-rose-500 to-pink-500 text-white"><th class="px-2 py-2 text-left rounded-l-lg">Item</th><th class="px-2 py-2">Owner</th><th class="px-2 py-2">Qty</th><th class="px-2 py-2">From</th><th class="px-2 py-2">Days</th><th class="px-2 py-2 text-right">Total</th><th class="px-2 py-2 rounded-r-lg">Del</th></tr></thead>
+        <table class="w-full text-sm"><thead><tr class="g-tor-rose500-pink500 text-white"><th class="px-2 py-2 text-left rounded-l-lg">Item</th><th class="px-2 py-2">Owner</th><th class="px-2 py-2">Qty</th><th class="px-2 py-2">From</th><th class="px-2 py-2">Days</th><th class="px-2 py-2 text-right">Total</th><th class="px-2 py-2 rounded-r-lg">Del</th></tr></thead>
         <tbody id="rtable-borrow"><tr><td colspan="7" class="px-3 py-4 text-center text-gray-400">None yet</td></tr></tbody>
         <tfoot><tr class="bg-rose-50"><td colspan="5" class="px-3 py-2 font-bold text-rose-700">Total Expense</td><td id="rental-exp-total" class="px-3 py-2 text-right font-bold text-rose-700">₹0</td><td></td></tr></tfoot></table>
       </div>
@@ -795,9 +817,9 @@ table{border-collapse:collapse}
           </div>
         </div>
       </div>
-      <button onclick="addRental('given')" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white py-2 rounded-xl font-semibold text-sm active:scale-95">Add</button>
+      <button onclick="addRental('given')" class="g-tor-emerald500-teal500 w-full text-white py-2 rounded-xl font-semibold text-sm active:scale-95">Add</button>
       <div class="mt-4 overflow-x-auto">
-        <table class="w-full text-sm"><thead><tr class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white"><th class="px-2 py-2 text-left rounded-l-lg">Item</th><th>Qty</th><th>Client</th><th>From</th><th>Days</th><th class="text-right">Total</th><th class="rounded-r-lg">Del</th></tr></thead>
+        <table class="w-full text-sm"><thead><tr class="g-tor-emerald500-teal500 text-white"><th class="px-2 py-2 text-left rounded-l-lg">Item</th><th>Qty</th><th>Client</th><th>From</th><th>Days</th><th class="text-right">Total</th><th class="rounded-r-lg">Del</th></tr></thead>
         <tbody id="rtable-given"><tr><td colspan="7" class="px-3 py-4 text-center text-gray-400">None yet</td></tr></tbody>
         <tfoot><tr class="bg-emerald-50"><td colspan="5" class="px-3 py-2 font-bold text-emerald-700">Total Income</td><td id="rental-inc-total" class="px-3 py-2 text-right font-bold text-emerald-700">₹0</td><td></td></tr></tfoot></table>
       </div>
@@ -823,7 +845,7 @@ table{border-collapse:collapse}
       <select id="teams-print-filter" class="flex-1 min-w-0 px-3 py-2 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:border-indigo-400">
         <option value="all">All Teams</option>
       </select>
-      <button onclick="printMonthlyReport()" class="flex-shrink-0 px-4 py-2 bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-xl text-sm font-semibold active:scale-95">🖨️ Print</button>
+      <button onclick="printMonthlyReport()" class="g-tor-violet500-purple600 flex-shrink-0 px-4 py-2 text-white rounded-xl text-sm font-semibold active:scale-95">🖨️ Print</button>
     </div>
   </div>
   <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
@@ -834,7 +856,7 @@ table{border-collapse:collapse}
         <option value="Team">Team/Contractor</option><option value="Staff">Staff</option>
       </select>
       <input type="number" id="ct-total" placeholder="Contract Amount (Optional)" step="any" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none">
-      <button onclick="addContractor()" class="bg-gradient-to-r from-indigo-500 to-purple-500 text-white py-2 rounded-xl font-semibold text-sm active:scale-95">Add</button>
+      <button onclick="addContractor()" class="g-tor-indigo500-purple500 text-white py-2 rounded-xl font-semibold text-sm active:scale-95">Add</button>
     </div>
   </div>
   <div id="contractors-list" class="space-y-4"><p class="text-white/50 text-center py-4">No teams yet</p></div>
@@ -857,7 +879,7 @@ table{border-collapse:collapse}
     <div class="space-y-3">
       <div><label class="text-xs font-semibold text-gray-500 block mb-1">Company / Project Name</label><input id="edit-company" type="text" placeholder="e.g. Sanjeev Constructions" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400"></div>
       <div><label class="text-xs font-semibold text-gray-500 block mb-1">Engineer / Owner Name</label><input id="edit-engineer" type="text" placeholder="e.g. Er. Sanjeev Kumar" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400"></div>
-      <button onclick="saveProfile()" class="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white py-3 rounded-xl font-semibold active:scale-95">💾 Save Profile</button>
+      <button onclick="saveProfile()" class="g-tor-indigo500-purple500 w-full text-white py-3 rounded-xl font-semibold active:scale-95">💾 Save Profile</button>
     </div>
   </div>
 </div>
@@ -871,7 +893,7 @@ table{border-collapse:collapse}
       <div><label class="text-xs font-medium text-gray-600">Date</label><input type="date" id="att-date" class="w-full mt-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none"></div>
       <div><label class="text-xs font-medium text-gray-600">Hours Worked</label><input type="number" id="att-hours" placeholder="Hours" step="any" class="w-full mt-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none"></div>
       <div><label class="text-xs font-medium text-gray-600">Advance Payment (Optional)</label><input type="number" id="att-advance" placeholder="Amount" step="any" class="w-full mt-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none"></div>
-      <button onclick="saveAttendance()" class="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white py-3 rounded-xl font-semibold active:scale-95">Save</button>
+      <button onclick="saveAttendance()" class="g-tor-indigo500-purple500 w-full text-white py-3 rounded-xl font-semibold active:scale-95">Save</button>
     </div>
   </div>
 </div>
@@ -884,7 +906,7 @@ table{border-collapse:collapse}
     <div class="space-y-3">
       <div><label class="text-xs font-medium text-gray-600">Date</label><input type="date" id="ct-pay-date" class="w-full mt-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none"></div>
       <div><label class="text-xs font-medium text-gray-600">Amount (₹)</label><input type="number" id="ct-pay-amt" placeholder="Amount" step="any" class="w-full mt-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none"></div>
-      <button onclick="saveCTPayment()" class="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white py-3 rounded-xl font-semibold active:scale-95">Save</button>
+      <button onclick="saveCTPayment()" class="g-tor-indigo500-purple500 w-full text-white py-3 rounded-xl font-semibold active:scale-95">Save</button>
     </div>
   </div>
 </div>
@@ -932,7 +954,7 @@ table{border-collapse:collapse}
           </div>
         </div>
       </div>
-      <button onclick="saveMatPurchase()" class="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl font-bold text-base active:scale-95">💾 Save Purchase</button>
+      <button onclick="saveMatPurchase()" class="g-tor-emerald500-teal500 w-full py-3 text-white rounded-xl font-bold text-base active:scale-95">💾 Save Purchase</button>
     </div>
   </div>
 </div>
@@ -946,7 +968,7 @@ table{border-collapse:collapse}
       <div><label class="text-xs font-semibold text-gray-500 block mb-1">Date *</label><input type="date" id="mu-date" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400"></div>
       <div><label class="text-xs font-semibold text-gray-500 block mb-1">Quantity Used *</label><input type="number" id="mu-qty" placeholder="e.g. 10" step="any" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400"></div>
       <div><label class="text-xs font-semibold text-gray-500 block mb-1">Note</label><input type="text" id="mu-note" placeholder="Where/how used..." class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400"></div>
-      <button onclick="saveMatUse()" class="w-full py-3 bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-xl font-bold text-base active:scale-95">🔨 Mark Used</button>
+      <button onclick="saveMatUse()" class="g-tor-rose500-pink500 w-full py-3 text-white rounded-xl font-bold text-base active:scale-95">🔨 Mark Used</button>
     </div>
   </div>
 </div>
@@ -1028,7 +1050,7 @@ table{border-collapse:collapse}
         <label class="text-xs font-semibold text-gray-500 block mb-1">Amount (₹)</label>
         <input type="number" id="da-amount" placeholder="Total payment for this work" step="any" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
       </div>
-      <button onclick="saveDeptEntry()" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl font-bold text-sm active:scale-95">💾 Save Entry</button>
+      <button onclick="saveDeptEntry()" class="g-tor-indigo500-purple600 w-full py-3 text-white rounded-xl font-bold text-sm active:scale-95">💾 Save Entry</button>
     </div>
   </div>
 </div>
