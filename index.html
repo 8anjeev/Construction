@@ -9,7 +9,272 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <link rel="manifest" id="pwa-manifest">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <style id="tw">
+
+/* === RESET === */
+*,::before,::after{box-sizing:border-box}
+html{line-height:1.5;-webkit-text-size-adjust:100%}
+body{margin:0}
+button,input,select,textarea{font-family:inherit;font-size:100%;line-height:inherit;margin:0}
+button{cursor:pointer}
+img{display:block;max-width:100%}
+table{border-collapse:collapse}
+
+/* === DISPLAY === */
+.block{display:block}
+.flex{display:flex}
+.grid{display:grid}
+.hidden{display:none!important}
+.inline-flex{display:inline-flex}
+
+/* === POSITION === */
+.fixed{position:fixed}
+.sticky{position:sticky}
+.relative{position:relative}
+.inset-0{top:0;right:0;bottom:0;left:0;position:fixed}
+.top-0{top:0}
+.bottom-6{bottom:1.5rem}
+.left-1/2{left:50%}
+.-translate-x-1/2{transform:translateX(-50%)}
+.translate-x-1/2{transform:translateX(50%)}
+.z-30{z-index:30}
+.z-50{z-index:50}
+.z-[100]{z-index:100}
+
+/* === FLEX === */
+.flex-1{flex:1 1 0%}
+.flex-shrink-0{flex-shrink:0}
+.flex-col{flex-direction:column}
+.flex-wrap{flex-wrap:wrap}
+.items-center{align-items:center}
+.justify-between{justify-content:space-between}
+.justify-center{justify-content:center}
+.self-end{align-self:flex-end}
+.gap-1{gap:.25rem}
+.gap-1.5{gap:.375rem}
+.gap-2{gap:.5rem}
+.gap-2.5{gap:.625rem}
+.gap-3{gap:.75rem}
+
+/* === GRID === */
+.grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.col-span-2{grid-column:span 2/span 2}
+
+/* === SPACING === */
+.p-2{padding:.5rem}.p-3{padding:.75rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}
+.px-1{padding-left:.25rem;padding-right:.25rem}
+.px-2{padding-left:.5rem;padding-right:.5rem}
+.px-3{padding-left:.75rem;padding-right:.75rem}
+.px-4{padding-left:1rem;padding-right:1rem}
+.px-5{padding-left:1.25rem;padding-right:1.25rem}
+.py-0.5{padding-top:.125rem;padding-bottom:.125rem}
+.py-1{padding-top:.25rem;padding-bottom:.25rem}
+.py-1.5{padding-top:.375rem;padding-bottom:.375rem}
+.py-2{padding-top:.5rem;padding-bottom:.5rem}
+.py-2.5{padding-top:.625rem;padding-bottom:.625rem}
+.py-3{padding-top:.75rem;padding-bottom:.75rem}
+.py-4{padding-top:1rem;padding-bottom:1rem}
+.pb-6{padding-bottom:1.5rem}
+.mb-1{margin-bottom:.25rem}
+.mb-1.5{margin-bottom:.375rem}
+.mb-2{margin-bottom:.5rem}
+.mb-3{margin-bottom:.75rem}
+.mb-4{margin-bottom:1rem}
+.mt-0.5{margin-top:.125rem}
+.mt-1{margin-top:.25rem}
+.mt-1.5{margin-top:.375rem}
+.mt-2{margin-top:.5rem}
+.mt-4{margin-top:1rem}
+
+/* === SIZING === */
+.w-full{width:100%}
+.w-8{width:2rem}
+.w-10{width:2.5rem}
+.h-full{height:100%}
+.h-8{height:2rem}
+.h-10{height:2.5rem}
+.min-h-screen{min-height:100vh}
+.min-w-0{min-width:0}
+.max-w-sm{max-width:24rem}
+.max-w-md{max-width:28rem}
+.max-w-[130px]{max-width:130px}
+.max-h-[90vh]{max-height:90vh}
+
+/* === TYPOGRAPHY === */
+.font-normal{font-weight:400}
+.font-medium{font-weight:500}
+.font-semibold{font-weight:600}
+.font-bold{font-weight:700}
+.font-black{font-weight:900}
+.text-xs{font-size:.75rem;line-height:1rem}
+.text-sm{font-size:.875rem;line-height:1.25rem}
+.text-base{font-size:1rem;line-height:1.5rem}
+.text-lg{font-size:1.125rem;line-height:1.75rem}
+.text-xl{font-size:1.25rem;line-height:1.75rem}
+.text-2xl{font-size:1.5rem;line-height:2rem}
+.text-5xl{font-size:3rem;line-height:1}
+.text-[8px]{font-size:8px}
+.text-[9px]{font-size:9px}
+.text-[10px]{font-size:10px}
+.text-[11px]{font-size:11px}
+.text-left{text-align:left}
+.text-center{text-align:center}
+.text-right{text-align:right}
+.uppercase{text-transform:uppercase}
+.tracking-wide{letter-spacing:.025em}
+.leading-none{line-height:1}
+.leading-tight{line-height:1.25}
+.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.whitespace-nowrap{white-space:nowrap}
+
+/* === TEXT COLORS === */
+.text-white{color:#fff}
+.text-white/50{color:rgba(255,255,255,.5)}
+.text-white/60{color:rgba(255,255,255,.6)}
+.text-white/70{color:rgba(255,255,255,.7)}
+.text-white/80{color:rgba(255,255,255,.8)}
+.text-gray-400{color:#9ca3af}
+.text-gray-500{color:#6b7280}
+.text-gray-600{color:#4b5563}
+.text-gray-700{color:#374151}
+.text-gray-800{color:#1f2937}
+.text-amber-100{color:#fef3c7}
+.text-amber-200{color:#fde68a}
+.text-amber-300{color:#fcd34d}
+.text-amber-600{color:#d97706}
+.text-amber-700{color:#b45309}
+.text-rose-100{color:#ffe4e6}
+.text-rose-200{color:#fecdd3}
+.text-rose-300{color:#fda4af}
+.text-rose-400{color:#fb7185}
+.text-rose-600{color:#e11d48}
+.text-rose-700{color:#be123c}
+.text-emerald-100{color:#d1fae5}
+.text-emerald-700{color:#047857}
+.text-green-100{color:#dcfce7}
+.text-green-500{color:#22c55e}
+.text-green-700{color:#15803d}
+.text-indigo-100{color:#e0e7ff}
+.text-indigo-200{color:#c7d2fe}
+.text-indigo-600{color:#4f46e5}
+.text-indigo-700{color:#4338ca}
+.text-cyan-100{color:#cffafe}
+.text-violet-100{color:#ede9fe}
+.text-purple-200{color:#e9d5ff}
+.text-purple-300{color:#d8b4fe}
+.text-purple-700{color:#7e22ce}
+.text-blue-700{color:#1d4ed8}
+
+/* === BACKGROUND COLORS === */
+.bg-white{background-color:#fff}
+.bg-white/10{background-color:rgba(255,255,255,.1)}
+.bg-white/20{background-color:rgba(255,255,255,.2)}
+.bg-gray-50{background-color:#f9fafb}
+.bg-gray-100{background-color:#f3f4f6}
+.bg-gray-900{background-color:#111827}
+.bg-amber-50{background-color:#fffbeb}
+.bg-blue-50{background-color:#eff6ff}
+.bg-emerald-50{background-color:#ecfdf5}
+.bg-green-50{background-color:#f0fdf4}
+.bg-indigo-50{background-color:#eef2ff}
+.bg-indigo-100{background-color:#e0e7ff}
+.bg-indigo-500{background-color:#6366f1}
+.bg-purple-50{background-color:#faf5ff}
+.bg-rose-50{background-color:#fff1f2}
+.bg-rose-600{background-color:#e11d48}
+.bg-black/50{background-color:rgba(0,0,0,.5)}
+.bg-black/90{background-color:rgba(0,0,0,.9)}
+
+/* === GRADIENTS === */
+/* CSS custom property approach matching Tailwind exactly */
+.bg-gradient-to-r{background-image:linear-gradient(to right,var(–tw-from),var(–tw-via,var(–tw-to,transparent)),var(–tw-to,transparent))}
+.bg-gradient-to-br{background-image:linear-gradient(to bottom right,var(–tw-from),var(–tw-via,var(–tw-to,transparent)),var(–tw-to,transparent))}
+
+.from-amber-400{–tw-from:#fbbf24;–tw-to:rgba(251,191,36,0)}
+.from-amber-500{–tw-from:#f59e0b;–tw-to:rgba(245,158,11,0)}
+.from-cyan-500{–tw-from:#06b6d4;–tw-to:rgba(6,182,212,0)}
+.from-emerald-500{–tw-from:#10b981;–tw-to:rgba(16,185,129,0)}
+.from-green-500{–tw-from:#22c55e;–tw-to:rgba(34,197,94,0)}
+.from-indigo-500{–tw-from:#6366f1;–tw-to:rgba(99,102,241,0)}
+.from-indigo-600{–tw-from:#4f46e5;–tw-to:rgba(79,70,229,0)}
+.from-purple-600{–tw-from:#9333ea;–tw-to:rgba(147,51,234,0)}
+.from-red-500{–tw-from:#ef4444;–tw-to:rgba(239,68,68,0)}
+.from-rose-500{–tw-from:#f43f5e;–tw-to:rgba(244,63,94,0)}
+.from-violet-500{–tw-from:#8b5cf6;–tw-to:rgba(139,92,246,0)}
+
+.via-purple-600{–tw-via:#9333ea}
+
+.to-blue-500{–tw-to:#3b82f6}
+.to-emerald-500{–tw-to:#10b981}
+.to-indigo-600{–tw-to:#4f46e5}
+.to-orange-500{–tw-to:#f97316}
+.to-orange-600{–tw-to:#ea580c}
+.to-pink-500{–tw-to:#ec4899}
+.to-purple-500{–tw-to:#a855f7}
+.to-purple-600{–tw-to:#9333ea}
+.to-rose-600{–tw-to:#e11d48}
+.to-sky-500{–tw-to:#0ea5e9}
+.to-teal-500{–tw-to:#14b8a6}
+.to-violet-500{–tw-to:#8b5cf6}
+
+/* === BORDERS === */
+.border{border-width:1px;border-style:solid}
+.border-0{border-width:0}
+.border-2{border-width:2px;border-style:solid}
+.border-b{border-bottom-width:1px;border-bottom-style:solid}
+.border-dashed{border-style:dashed}
+.border-gray-100{border-color:#f3f4f6}
+.border-gray-200{border-color:#e5e7eb}
+.border-amber-300{border-color:#fcd34d}
+.border-green-200{border-color:#bbf7d0}
+.border-indigo-300{border-color:#a5b4fc}
+.border-rose-300{border-color:#fda4af}
+.border-white/10{border-color:rgba(255,255,255,.1)}
+
+/* === BORDER RADIUS === */
+.rounded-lg{border-radius:.5rem}
+.rounded-xl{border-radius:.75rem}
+.rounded-2xl{border-radius:1rem}
+.rounded-full{border-radius:9999px}
+.rounded-l-lg{border-top-left-radius:.5rem;border-bottom-left-radius:.5rem}
+.rounded-r-lg{border-top-right-radius:.5rem;border-bottom-right-radius:.5rem}
+
+/* === SHADOWS === */
+.shadow-lg{box-shadow:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -4px rgba(0,0,0,.1)}
+.shadow-xl{box-shadow:0 20px 25px -5px rgba(0,0,0,.1),0 8px 10px -6px rgba(0,0,0,.1)}
+.shadow-2xl{box-shadow:0 25px 50px -12px rgba(0,0,0,.25)}
+
+/* === OVERFLOW === */
+.overflow-hidden{overflow:hidden}
+.overflow-x-auto{overflow-x:auto}
+.overflow-y-auto{overflow-y:auto}
+
+/* === MISC === */
+.cursor-pointer{cursor:pointer}
+.pointer-events-none{pointer-events:none}
+.resize-none{resize:none}
+.object-contain{object-fit:contain}
+.opacity-0{opacity:0}
+.transition-all{transition:all .15s ease}
+.duration-300{transition-duration:.3s}
+.space-y-2.5>*+*{margin-top:.625rem}
+.space-y-3>*+*{margin-top:.75rem}
+.space-y-4>*+*{margin-top:1rem}
+
+/* === FOCUS === */
+.focus:outline-none:focus{outline:none}
+.focus:border-indigo-400:focus{border-color:#818cf8}
+.focus:border-amber-400:focus{border-color:#fbbf24}
+
+/* === ACTIVE === */
+.active:scale-95:active{transform:scale(.95)}
+
+/* === BACKDROP === */
+.backdrop-blur-sm{backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.backdrop-blur-lg{backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+
+  </style>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
@@ -25,8 +290,8 @@
     body.js-ready .tab-content{}
     .stat-card{transition:transform .12s;}
     .stat-card:hover{transform:translateY(-2px);}
-    .tab-btn{transition:all .15s;}
-    .tab-btn.active{background:rgba(255,255,255,.2);box-shadow:0 3px 14px rgba(0,0,0,.25);}
+    .tab-btn{transition:all .15s;background:transparent;color:rgba(255,255,255,0.45);border:none;}
+    .tab-btn.active{background:rgba(255,255,255,0.18);color:#ffffff;box-shadow:0 2px 10px rgba(0,0,0,.2);font-weight:700;}
     .expand-content{max-height:0;overflow:hidden;transition:max-height .35s ease;}
     .expand-content.open{max-height:4000px;}
     .calendar-day{transition:.1s;cursor:pointer;}
@@ -52,29 +317,27 @@
 
 <!-- HEADER -->
 
-<header class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 p-3 shadow-2xl">
-  <div class="flex items-center justify-between gap-2">
-    <div class="flex items-center gap-2 flex-shrink-0">
-      <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center shadow-xl text-xl">🏗️</div>
-      <div>
-        <h1 class="text-sm font-black text-white leading-tight">Sanjineer</h1>
-        <p class="text-purple-200 text-[9px] leading-tight">Construction Site Manager</p>
-        <p id="header-date" class="text-purple-300 text-[8px]"></p>
+<header class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 shadow-2xl" style="padding:2px 8px">
+  <div class="flex items-center gap-1.5">
+    <!-- Left: icon + app name stacked tight -->
+    <div class="flex items-center gap-1 flex-shrink-0">
+      <div class="bg-gradient-to-br from-amber-500 to-orange-600 rounded-md flex items-center justify-center shadow" style="width:20px;height:20px;font-size:12px;line-height:1">🏗️</div>
+      <div style="line-height:1">
+        <p class="font-black text-white" style="font-size:13px;line-height:1">Sanjineer</p>
+        <p class="text-purple-200" style="font-size:10px;line-height:1">Site Manager</p>
       </div>
     </div>
-    <div class="flex-1 text-center px-1">
-      <p id="hdr-company" class="text-white font-black text-sm leading-tight truncate"></p>
-      <p id="hdr-engineer" class="text-amber-300 font-bold text-[11px] leading-tight truncate"></p>
-      <button onclick="openEditProfile()" class="text-[9px] bg-white/20 text-white px-2 py-0.5 rounded-full mt-0.5">✏️ Edit Profile</button>
+    <!-- Center: company + engineer + edit -->
+    <div class="flex-1 text-center min-w-0" style="line-height:1">
+      <p id="hdr-company" class="font-black text-white truncate" style="font-size:13px;line-height:1"></p>
+      <p id="hdr-engineer" class="text-amber-300 truncate" style="font-size:10px;line-height:1"></p>
+      <button onclick="openEditProfile()" class="bg-white/20 text-white rounded-full font-semibold" style="font-size:10px;padding:1px 8px">✏️ Edit</button>
     </div>
-    <div class="flex items-center gap-1.5 flex-shrink-0">
-      <div class="text-right">
-        <p class="text-purple-200 text-[9px]">Total Spends</p>
-        <p id="header-spends" class="text-rose-300 font-bold text-lg leading-tight">₹0</p>
-      </div>
-      <button onclick="showApkModal()" class="w-8 h-8 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg active:scale-95">
-        <svg width="18" height="18" fill="none" stroke="white" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/></svg>
-      </button>
+    <!-- Right: date + spends -->
+    <div class="text-right flex-shrink-0" style="line-height:1">
+      <p id="header-date" class="text-purple-300" style="font-size:10px;line-height:1"></p>
+      <p class="text-purple-200" style="font-size:8px;line-height:1">Total Spends</p>
+      <p id="header-spends" class="text-rose-300 font-bold" style="font-size:13px;line-height:1">₹0</p>
     </div>
   </div>
 </header>
@@ -82,7 +345,7 @@
 <!-- NAV -->
 
 <nav class="bg-white/10 backdrop-blur-lg border-b border-white/10 sticky top-0 z-30 px-2">
-  <div class="flex overflow-x-auto gap-1 py-1.5" style="scrollbar-width:none;">
+  <div class="flex overflow-x-auto gap-0.5 py-1" style="scrollbar-width:none;">
     <button class="tab-btn flex-shrink-0 px-3 py-1.5 text-xs font-semibold text-white/70 rounded-lg" data-tab="dashboard">📊 Dashboard</button>
     <button class="tab-btn flex-shrink-0 px-3 py-1.5 text-xs font-semibold text-white/70 rounded-lg" data-tab="daily">📋 Report</button>
     <button class="tab-btn flex-shrink-0 px-3 py-1.5 text-xs font-semibold text-white/70 rounded-lg" data-tab="departmental">🏗️ Dept Work</button>
@@ -101,17 +364,17 @@
 
 <div id="tab-dashboard" class="tab-content" style="display:none">
   <div class="grid grid-cols-2 gap-2.5 mb-3">
-    <div class="stat-card bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl p-3 text-white shadow-xl"><p class="text-[10px] text-amber-100">Advances Given</p><p id="dash-advance" class="text-xl font-bold">₹0</p><p class="text-[10px] text-amber-200">This Month</p></div>
-    <div class="stat-card bg-gradient-to-br from-rose-500 to-pink-500 rounded-xl p-3 text-white shadow-xl"><p class="text-[10px] text-rose-100">Remaining</p><p id="dash-remaining" class="text-xl font-bold">₹0</p><p class="text-[10px] text-rose-200">After Advances</p></div>
+    <div class="stat-card bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl px-2 py-1 text-white shadow-xl"><p class="text-[10px] text-amber-100">Advances Given</p><p id="dash-advance" class="text-sm font-bold leading-none">₹0</p><p class="text-[10px] text-amber-200">This Month</p></div>
+    <div class="stat-card bg-gradient-to-br from-rose-500 to-pink-500 rounded-xl px-2 py-1 text-white shadow-xl"><p class="text-[10px] text-rose-100">Remaining</p><p id="dash-remaining" class="text-sm font-bold leading-none">₹0</p><p class="text-[10px] text-rose-200">After Advances</p></div>
   </div>
   <div class="grid grid-cols-3 gap-2.5 mb-3">
-    <div class="stat-card bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl p-3 text-white shadow-xl"><p class="text-[10px] text-emerald-100">Material</p><p id="dash-material" class="text-xl font-bold">₹0</p></div>
-    <div class="stat-card bg-gradient-to-br from-cyan-500 to-sky-500 rounded-xl p-3 text-white shadow-xl"><p class="text-[10px] text-cyan-100">Cash In</p><p id="dash-petty" class="text-xl font-bold">₹0</p></div>
-    <div class="stat-card bg-gradient-to-br from-violet-500 to-purple-500 rounded-xl p-3 text-white shadow-xl"><p class="text-[10px] text-violet-100">Cash Left</p><p id="dash-petty-left" class="text-xl font-bold">₹0</p></div>
+    <div class="stat-card bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl px-2 py-1 text-white shadow-xl"><p class="text-[10px] text-emerald-100">Material</p><p id="dash-material" class="text-sm font-bold leading-none">₹0</p></div>
+    <div class="stat-card bg-gradient-to-br from-cyan-500 to-sky-500 rounded-xl px-2 py-1 text-white shadow-xl"><p class="text-[10px] text-cyan-100">Cash In</p><p id="dash-petty" class="text-sm font-bold leading-none">₹0</p></div>
+    <div class="stat-card bg-gradient-to-br from-violet-500 to-purple-500 rounded-xl px-2 py-1 text-white shadow-xl"><p class="text-[10px] text-violet-100">Cash Left</p><p id="dash-petty-left" class="text-sm font-bold leading-none">₹0</p></div>
   </div>
   <div class="grid grid-cols-2 gap-2.5 mb-3">
-    <div class="stat-card bg-gradient-to-br from-indigo-500 to-violet-500 rounded-xl p-3 text-white shadow-xl"><p class="text-[10px] text-indigo-100">Rental Expense</p><p id="dash-rental-out" class="text-xl font-bold">₹0</p></div>
-    <div class="stat-card bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl p-3 text-white shadow-xl"><p class="text-[10px] text-green-100">Rental Income</p><p id="dash-rental-in" class="text-xl font-bold">₹0</p></div>
+    <div class="stat-card bg-gradient-to-br from-indigo-500 to-violet-500 rounded-xl px-2 py-1 text-white shadow-xl"><p class="text-[10px] text-indigo-100">Rental Expense</p><p id="dash-rental-out" class="text-sm font-bold leading-none">₹0</p></div>
+    <div class="stat-card bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl px-2 py-1 text-white shadow-xl"><p class="text-[10px] text-green-100">Rental Income</p><p id="dash-rental-in" class="text-sm font-bold leading-none">₹0</p></div>
   </div>
   <div id="dash-low-stock" class="mb-3 hidden"><div class="bg-gradient-to-br from-red-500 to-rose-600 rounded-xl p-3 text-white shadow-xl"><p class="font-bold text-sm mb-1.5">⚠️ Low Stock Alert</p><div id="dash-low-list"></div></div></div>
   <div class="bg-white rounded-xl p-3 shadow-xl"><h3 class="font-bold text-gray-800 mb-2">Teams This Month</h3><div id="team-details"><p class="text-gray-400 text-center py-4 text-sm">No teams yet</p></div></div>
@@ -120,35 +383,35 @@
 <!-- ===== DAILY / REPORT TAB ===== -->
 
 <div id="tab-daily" class="tab-content" style="display:none">
-  <div class="bg-white rounded-2xl p-4 mb-3 shadow-xl">
-    <div class="flex items-center justify-between flex-wrap gap-2">
-      <h3 class="text-lg font-bold text-gray-800">📋 Daily Report</h3>
-      <div class="flex items-center gap-2 flex-wrap">
-        <input type="date" id="daily-date" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
-        <button onclick="loadDailyReport()" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl text-sm font-semibold active:scale-95">📂 Load</button>
-        <button onclick="printDailyReport()" class="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl text-sm font-semibold active:scale-95">🖨️ Print</button>
+  <div class="bg-white rounded-xl mb-2 shadow-xl" style="padding:6px 10px">
+    <div class="flex items-center justify-between gap-2">
+      <p class="text-xs font-bold text-gray-700">📋 Daily Report</p>
+      <div class="flex items-center gap-1.5">
+        <input type="date" id="daily-date" class="border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-indigo-400" style="padding:3px 6px">
+        <button onclick="loadDailyReport()" class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg text-xs font-semibold active:scale-95" style="padding:3px 8px">📂 Load</button>
+        <button onclick="printDailyReport()" class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg text-xs font-semibold active:scale-95" style="padding:3px 8px">🖨️ Print</button>
       </div>
     </div>
-    <p id="daily-label" class="text-xs text-gray-500 mt-2 font-medium"></p>
+    <p id="daily-label" class="text-gray-500 font-medium" style="font-size:9px;margin-top:1px"></p>
   </div>
 
-  <div class="bg-white rounded-2xl p-4 mb-3 shadow-xl">
-    <h3 class="text-sm font-bold text-gray-700 mb-3">🌤️ Site Status</h3>
-    <div class="flex gap-2 mb-3">
-      <button onclick="setWeather('☀️ Sunny')" id="wbtn-sunny" class="wbtn flex-1 py-2 rounded-xl text-sm font-bold border-2 border-gray-200 bg-amber-50 text-amber-700">☀️ Sunny</button>
-      <button onclick="setWeather('☁️ Cloudy')" id="wbtn-cloudy" class="wbtn flex-1 py-2 rounded-xl text-sm font-bold border-2 border-gray-200 bg-gray-100 text-gray-700">☁️ Cloudy</button>
-      <button onclick="setWeather('🌧️ Rainy')" id="wbtn-rainy" class="wbtn flex-1 py-2 rounded-xl text-sm font-bold border-2 border-gray-200 bg-blue-50 text-blue-700">🌧️ Rainy</button>
+  <div class="bg-white rounded-xl mb-2 shadow-xl" style="padding:6px 10px">
+    <p class="text-xs font-bold text-gray-700 mb-1.5">🌤️ Site Status</p>
+    <div class="flex gap-1.5 mb-1.5">
+      <button onclick="setWeather('☀️ Sunny')" id="wbtn-sunny" class="wbtn flex-1 rounded-lg text-xs font-bold border-2 border-gray-200 bg-amber-50 text-amber-700" style="padding:3px 0">☀️ Sunny</button>
+      <button onclick="setWeather('☁️ Cloudy')" id="wbtn-cloudy" class="wbtn flex-1 rounded-lg text-xs font-bold border-2 border-gray-200 bg-gray-100 text-gray-700" style="padding:3px 0">☁️ Cloudy</button>
+      <button onclick="setWeather('🌧️ Rainy')" id="wbtn-rainy" class="wbtn flex-1 rounded-lg text-xs font-bold border-2 border-gray-200 bg-blue-50 text-blue-700" style="padding:3px 0">🌧️ Rainy</button>
     </div>
-    <textarea id="daily-status" rows="2" placeholder="Site status / observations / instructions..." class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm mb-2 resize-none focus:outline-none focus:border-indigo-400"></textarea>
-    <button onclick="saveDailyMeta()" class="w-full py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-xl text-sm font-semibold active:scale-95">💾 Save Site Status</button>
+    <textarea id="daily-status" rows="2" placeholder="Site status / observations / instructions..." class="w-full border border-gray-200 rounded-lg text-xs mb-1.5 resize-none focus:outline-none focus:border-indigo-400" style="padding:4px 8px"></textarea>
+    <button onclick="saveDailyMeta()" class="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-lg text-xs font-semibold active:scale-95" style="padding:4px 0">💾 Save Site Status</button>
   </div>
 
-  <div class="grid grid-cols-2 gap-3 mb-3">
-    <div class="bg-gradient-to-br from-rose-500 to-pink-500 rounded-xl p-3 text-white"><p class="text-xs text-rose-100">Advances Today</p><p id="daily-advances" class="text-xl font-bold">₹0</p></div>
-    <div class="bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl p-3 text-white"><p class="text-xs text-amber-100">Material Today</p><p id="daily-mat-cost" class="text-xl font-bold">₹0</p></div>
+  <div class="grid grid-cols-2 gap-2 mb-2">
+    <div class="bg-gradient-to-br from-rose-500 to-pink-500 rounded-xl text-white" style="padding:5px 10px"><p class="text-[9px] text-rose-100 leading-none">Advances Today</p><p id="daily-advances" class="text-base font-bold leading-none mt-0.5">₹0</p></div>
+    <div class="bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl text-white" style="padding:5px 10px"><p class="text-[9px] text-amber-100 leading-none">Material Today</p><p id="daily-mat-cost" class="text-base font-bold leading-none mt-0.5">₹0</p></div>
   </div>
 
-  <div class="bg-white rounded-2xl p-4 mb-3 shadow-xl">
+  <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
     <h3 class="font-bold text-gray-800 mb-3">👷 Labour Summary</h3>
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
@@ -158,7 +421,7 @@
     </div>
   </div>
 
-  <div id="daily-dept-section" class="bg-white rounded-2xl p-4 mb-3 shadow-xl">
+  <div id="daily-dept-section" class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
     <div class="flex items-center justify-between mb-3">
       <h3 class="font-bold text-gray-800 text-sm">🏗️ Departmental Work</h3>
       <button onclick="switchTab('departmental')" class="px-3 py-1 bg-indigo-100 text-indigo-600 rounded-lg text-xs font-semibold active:scale-95">+ Add →</button>
@@ -172,7 +435,7 @@
     </div>
   </div>
 
-  <div class="bg-white rounded-2xl p-4 mb-3 shadow-xl">
+  <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
     <h3 class="font-bold text-gray-800 mb-3">🧱 Materials Purchased Today</h3>
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
@@ -182,7 +445,7 @@
     </div>
   </div>
 
-  <div class="bg-white rounded-2xl p-4 shadow-xl">
+  <div class="bg-white rounded-2xl p-3 shadow-xl">
     <h3 class="text-sm font-bold text-gray-700 mb-3">📷 Site Photos (max 4)</h3>
     <div class="flex gap-2 flex-wrap mb-3" id="photo-previews"><p class="text-gray-400 text-xs">No photos yet</p></div>
     <label class="px-4 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl text-sm font-semibold cursor-pointer active:scale-95 inline-flex items-center gap-2">
@@ -282,10 +545,10 @@
       <button onclick="addExpenseMaterial()" class="col-span-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white py-2.5 rounded-xl font-bold text-sm active:scale-95">🧱 Save Purchase</button>
     </div>
   </div>
-  <div class="grid grid-cols-3 gap-3 mb-3">
-    <div class="bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl p-3 text-white"><p class="text-[10px] text-emerald-100">Material Cost</p><p id="exp-mat-total" class="text-xl font-bold">₹0</p></div>
-    <div class="bg-gradient-to-br from-cyan-500 to-sky-500 rounded-xl p-3 text-white"><p class="text-[10px] text-cyan-100">Cash In</p><p id="exp-petty-in" class="text-xl font-bold">₹0</p></div>
-    <div class="bg-gradient-to-br from-violet-500 to-purple-500 rounded-xl p-3 text-white"><p class="text-[10px] text-violet-100">Remaining</p><p id="exp-petty-left" class="text-xl font-bold">₹0</p></div>
+  <div class="grid grid-cols-3 gap-2.5 mb-3">
+    <div class="bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl text-white" style="padding:4px 10px"><p class="text-[9px] text-emerald-100 leading-none">Material Cost</p><p id="exp-mat-total" class="text-sm font-bold leading-none mt-0.5">₹0</p></div>
+    <div class="bg-gradient-to-br from-cyan-500 to-sky-500 rounded-xl text-white" style="padding:4px 10px"><p class="text-[9px] text-cyan-100 leading-none">Cash In</p><p id="exp-petty-in" class="text-sm font-bold leading-none mt-0.5">₹0</p></div>
+    <div class="bg-gradient-to-br from-violet-500 to-purple-500 rounded-xl text-white" style="padding:4px 10px"><p class="text-[9px] text-violet-100 leading-none">Remaining</p><p id="exp-petty-left" class="text-sm font-bold leading-none mt-0.5">₹0</p></div>
   </div>
   <div class="bg-white rounded-2xl p-3 shadow-xl">
     <p class="text-xs font-semibold text-gray-500 mb-2">💰 Expense Ledger</p>
@@ -303,7 +566,7 @@
 <div id="tab-materials" class="tab-content" style="display:none">
   <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
     <p class="text-xs font-semibold text-gray-500 mb-2">🧱 Add Material / Stock Item <span class="font-normal text-gray-400">— set min alert level</span></p>
-    <div class="grid grid-cols-2 gap-3 mb-3">
+    <div class="grid grid-cols-2 gap-2.5 mb-3">
       <input type="text" id="mat-name" placeholder="Material Name (e.g. Cement)" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
       <input type="text" id="mat-unit" placeholder="Unit (bags, kg, nos...)" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
       <input type="number" id="mat-init-qty" placeholder="Opening Stock Qty" step="any" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
@@ -396,7 +659,7 @@
   </div>
   <div class="bg-white rounded-2xl p-3 shadow-xl">
     <p class="text-xs font-semibold text-gray-500 mb-2">📋 Assign Tool</p>
-    <div class="grid grid-cols-2 gap-3 mb-3">
+    <div class="grid grid-cols-2 gap-2.5 mb-3">
       <select id="as-tool" class="px-3 py-2 border border-gray-200 rounded-xl bg-white text-sm focus:outline-none"><option value="">Select Tool</option></select>
       <select id="as-worker" class="px-3 py-2 border border-gray-200 rounded-xl bg-white text-sm focus:outline-none"><option value="">Select Worker</option></select>
       <input type="date" id="as-date" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none">
@@ -452,9 +715,9 @@
   <!-- We Rented Section -->
 
   <div id="rsec-borrow">
-    <div class="bg-white rounded-2xl p-4 mb-3 shadow-xl">
+    <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
       <p class="text-xs font-semibold text-gray-500 mb-2">📦 Equipment We Rented</p>
-      <div class="grid grid-cols-2 gap-3 mb-3">
+      <div class="grid grid-cols-2 gap-2.5 mb-3">
         <input type="text" id="rb-name" placeholder="Item Name" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none">
         <input type="text" id="rb-client" placeholder="Owner / Party Name" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none">
         <input type="number" id="rb-qty" placeholder="Quantity" step="any" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none">
@@ -498,9 +761,9 @@
   <!-- Given Out Section -->
 
   <div id="rsec-given" style="display:none">
-    <div class="bg-white rounded-2xl p-4 shadow-xl">
+    <div class="bg-white rounded-2xl p-3 shadow-xl">
       <p class="text-xs font-semibold text-gray-500 mb-2">💰 Given to Others</p>
-      <div class="grid grid-cols-2 gap-3 mb-3">
+      <div class="grid grid-cols-2 gap-2.5 mb-3">
         <input type="text" id="rg-name" placeholder="Item Name" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none">
         <input type="text" id="rg-client" placeholder="Client Name" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none">
         <input type="number" id="rg-qty" placeholder="Quantity" step="any" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none">
@@ -545,11 +808,11 @@
 <!-- ===== TEAMS ===== -->
 
 <div id="tab-contractors" class="tab-content" style="display:none">
-  <div class="bg-white rounded-2xl p-4 mb-3 shadow-xl">
+  <div class="bg-white rounded-xl mb-2 shadow-xl" style="padding:5px 10px">
     <div class="flex items-center justify-between gap-2">
-      <button onclick="changeViewMonth(-1)" class="px-4 py-2 bg-indigo-100 text-indigo-600 rounded-xl text-sm font-medium">← Prev</button>
-      <div class="text-center"><p class="text-xs text-gray-500">Period</p><p id="teams-period" class="font-bold text-gray-800"></p></div>
-      <button onclick="changeViewMonth(1)" class="px-4 py-2 bg-indigo-100 text-indigo-600 rounded-xl text-sm font-medium">Next →</button>
+      <button onclick="changeViewMonth(-1)" class="bg-indigo-100 text-indigo-600 rounded-lg text-xs font-medium" style="padding:3px 10px">← Prev</button>
+      <div class="text-center"><p class="text-[9px] text-gray-500 leading-none">Period</p><p id="teams-period" class="text-sm font-bold text-gray-800 leading-none mt-0.5"></p></div>
+      <button onclick="changeViewMonth(1)" class="bg-indigo-100 text-indigo-600 rounded-lg text-xs font-medium" style="padding:3px 10px">Next →</button>
     </div>
   </div>
   <!-- Monthly Payment Report Panel -->
@@ -584,7 +847,7 @@
 
 <!-- Edit Profile -->
 
-<div id="profile-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+<div id="profile-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 items-center justify-center p-4" style="display:none">
   <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl">
     <div class="flex items-center justify-between mb-1">
       <h3 class="font-bold text-gray-800">⚙️ Profile Settings</h3>
@@ -601,7 +864,7 @@
 
 <!-- Attendance Modal -->
 
-<div id="att-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+<div id="att-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 items-center justify-center p-4" style="display:none">
   <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl">
     <div class="flex items-center justify-between mb-4"><h3 id="att-modal-title" class="font-bold text-gray-800">Attendance</h3><button onclick="closeAttModal()" class="text-gray-400 text-xl">✕</button></div>
     <div class="space-y-3">
@@ -615,7 +878,7 @@
 
 <!-- Contractor Payment Modal -->
 
-<div id="ct-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+<div id="ct-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 items-center justify-center p-4" style="display:none">
   <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl">
     <div class="flex items-center justify-between mb-4"><h3 id="ct-modal-title" class="font-bold text-gray-800">Add Payment</h3><button onclick="closeCTModal()" class="text-gray-400 text-xl">✕</button></div>
     <div class="space-y-3">
@@ -628,7 +891,7 @@
 
 <!-- Material Purchase Modal -->
 
-<div id="mat-purchase-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+<div id="mat-purchase-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 items-center justify-center p-4" style="display:none">
   <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-2xl overflow-y-auto max-h-[90vh]">
     <div class="flex items-center justify-between mb-4"><h3 id="mat-modal-title" class="font-bold text-gray-800 text-base">📦 Record Purchase</h3><button onclick="closeMatModal()" class="text-gray-400 text-xl">✕</button></div>
     <div class="space-y-3">
@@ -676,7 +939,7 @@
 
 <!-- Material Use Modal -->
 
-<div id="mat-use-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+<div id="mat-use-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 items-center justify-center p-4" style="display:none">
   <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl">
     <div class="flex items-center justify-between mb-4"><h3 id="mat-use-title" class="font-bold text-gray-800">🔨 Mark as Used</h3><button onclick="closeMatUseModal()" class="text-gray-400 text-xl">✕</button></div>
     <div class="space-y-3">
@@ -690,7 +953,7 @@
 
 <!-- Bill Viewer Modal -->
 
-<div id="bill-view-modal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden z-50 flex items-center justify-center p-3" onclick="closeBillViewer()">
+<div id="bill-view-modal" class="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 items-center justify-center p-3" onclick="closeBillViewer()" style="display:none">
   <div class="w-full max-w-sm" style="max-height:92vh;display:flex;flex-direction:column;" onclick="event.stopPropagation()">
     <div class="flex justify-between items-center mb-2 flex-shrink-0">
       <div class="flex items-center gap-2">
@@ -722,7 +985,7 @@
 
 <!-- Departmental Work Add Modal -->
 
-<div id="dept-add-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+<div id="dept-add-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 items-center justify-center p-4" style="display:none">
   <div class="bg-white rounded-2xl p-5 w-full max-w-sm shadow-2xl">
     <div class="flex items-center justify-between mb-4">
       <h3 class="font-bold text-gray-800">🏗️ Add Departmental Work</h3>
@@ -1072,17 +1335,11 @@ function switchTab(name) {
   if (el) el.style.display = 'block';
 
   document.querySelectorAll('.tab-btn').forEach(function(b) {
-    if (b.dataset.tab === name) {
-      b.style.background = 'rgba(255,255,255,0.22)';
-      b.style.color = '#ffffff';
-      b.style.boxShadow = '0 3px 14px rgba(0,0,0,0.25)';
-      b.style.fontWeight = '700';
-    } else {
-      b.style.background = '';
-      b.style.color = 'rgba(255,255,255,0.65)';
-      b.style.boxShadow = '';
-      b.style.fontWeight = '600';
-    }
+    b.classList.toggle('active', b.dataset.tab === name);
+    b.style.background = '';
+    b.style.color = '';
+    b.style.boxShadow = '';
+    b.style.fontWeight = '';
   });
 
   try {
