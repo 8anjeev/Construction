@@ -6,6 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>Sanjineer</title>
   <meta name="theme-color" content="#4f46e5">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <link rel="manifest" id="pwa-manifest">
@@ -148,7 +151,6 @@ body{margin:0}
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
   <style>
     *{font-family:'Outfit',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;box-sizing:border-box;}
     body{background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#0f172a 100%);min-height:100vh;}
@@ -160,9 +162,14 @@ body{margin:0}
     /* Show dashboard by default if JS hasn't run yet */
     body:not(.js-ready) #tab-dashboard{display:block!important;}
     body.js-ready .tab-content{}
-    .stat-card{transition:transform .12s;}
-    .stat-card:hover{transform:translateY(-2px);}
-    .tab-btn{transition:all .15s;background:transparent;color:rgba(255,255,255,0.45);border:none;cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;}
+    .stat-card{transition:transform .12s,box-shadow .12s;box-shadow:0 8px 24px rgba(0,0,0,0.35),0 2px 8px rgba(0,0,0,0.2);}
+    .stat-card:active{transform:scale(0.97);}
+    .stat-card:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,0,0,0.45),0 4px 12px rgba(0,0,0,0.25);}
+    /* All colored gradient chips get shadow too */
+    [class*="g-tobr-"],[class*="g-tor-"]{box-shadow:0 6px 20px rgba(0,0,0,0.3),0 2px 6px rgba(0,0,0,0.15);}
+    [class*="g-tobr-"].stat-card,[class*="g-tor-"].stat-card{box-shadow:0 8px 24px rgba(0,0,0,0.35),0 2px 8px rgba(0,0,0,0.2);}
+    .tab-btn{transition:all .15s;background:transparent;color:rgba(255,255,255,0.45);border:none;cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;touch-action:manipulation;}
+    button{-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
     .tab-btn.active{background:rgba(255,255,255,0.18);color:#ffffff;box-shadow:0 2px 10px rgba(0,0,0,.2);font-weight:700;}
     .expand-content{max-height:0;overflow:hidden;transition:max-height .35s ease;}
     .expand-content.open{max-height:4000px;}
@@ -170,13 +177,19 @@ body{margin:0}
     .calendar-day:hover{transform:scale(1.06);}
     .low-badge{animation:pulse 1.6s infinite;}
     input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;}
+    /* Modal overlays - hidden by default, shown as flex via JS style.display="flex" */
+    .modal-overlay{display:none;align-items:center;justify-content:center;}
     #apk-modal{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:1rem;}
     #apk-modal.show{display:flex;}
+    /* Ensure fixed+inset+flex works for all modals */
+    [style*="display: flex"].fixed,[style*="display:flex"].fixed{display:flex!important;}
     .apk-card{background:linear-gradient(135deg,#1e1b4b,#312e81);border:1px solid rgba(255,255,255,.15);border-radius:1.5rem;padding:1.75rem;width:100%;max-width:420px;max-height:90vh;overflow-y:auto;}
     #pwa-banner{position:fixed;bottom:0;left:0;right:0;z-index:200;background:linear-gradient(135deg,#4f46e5,#7c3aed);padding:.75rem 1rem;display:none;align-items:center;justify-content:space-between;}
     .photo-thumb{width:72px;height:72px;object-fit:cover;border-radius:8px;border:2px solid rgba(99,102,241,.4);}
     .wbtn.selected{outline:3px solid #6366f1;background:#e0e7ff;}
     .month-chip{display:inline-flex;align-items:center;padding:5px 12px;border-radius:999px;font-size:11px;font-weight:600;cursor:pointer;border:2px solid #e5e7eb;background:#ffffff;color:#374151;transition:background .15s,color .15s,border-color .15s;user-select:none;-webkit-user-select:none;}
+    .white-card,.bg-white{--card-shadow:0 4px 16px rgba(0,0,0,0.12),0 1px 4px rgba(0,0,0,0.08);}
+    .rounded-2xl.shadow-xl,.rounded-xl.shadow-xl{box-shadow:0 8px 32px rgba(0,0,0,0.18),0 2px 8px rgba(0,0,0,0.1)!important;}
     .month-chip.selected{background:#4f46e5 !important;color:#ffffff !important;border-color:#4f46e5 !important;}
     .month-chip:not(.selected){background:#ffffff !important;color:#374151 !important;border-color:#e5e7eb !important;}
   </style>
@@ -218,15 +231,15 @@ body{margin:0}
 
 <nav class="bg-white/10 backdrop-blur-lg border-b border-white/10 sticky top-0 z-30 px-2">
   <div class="flex overflow-x-auto gap-0.5 py-1" style="scrollbar-width:none;">
-    <button class="tab-btn flex-shrink-0 px-3 py-1.5 text-xs font-semibold text-white/70 rounded-lg" data-tab="dashboard">📊 Dashboard</button>
-    <button class="tab-btn flex-shrink-0 px-3 py-1.5 text-xs font-semibold text-white/70 rounded-lg" data-tab="daily">📋 Report</button>
-    <button class="tab-btn flex-shrink-0 px-3 py-1.5 text-xs font-semibold text-white/70 rounded-lg" data-tab="departmental">🏗️ Dept Work</button>
-    <button class="tab-btn flex-shrink-0 px-3 py-1.5 text-xs font-semibold text-white/70 rounded-lg" data-tab="attendance">📅 Attendance</button>
-    <button class="tab-btn flex-shrink-0 px-3 py-1.5 text-xs font-semibold text-white/70 rounded-lg" data-tab="expenses">💰 Expenses</button>
-    <button class="tab-btn flex-shrink-0 px-3 py-1.5 text-xs font-semibold text-white/70 rounded-lg" data-tab="materials">🧱 Materials</button>
-    <button class="tab-btn flex-shrink-0 px-3 py-1.5 text-xs font-semibold text-white/70 rounded-lg" data-tab="tools">🔧 Tools</button>
-    <button class="tab-btn flex-shrink-0 px-3 py-1.5 text-xs font-semibold text-white/70 rounded-lg" data-tab="rentals">📦 Rentals</button>
-    <button class="tab-btn flex-shrink-0 px-3 py-1.5 text-xs font-semibold text-white/70 rounded-lg" data-tab="contractors">👥 Teams</button>
+    <button class="tab-btn flex-shrink-0 px-3 py-1.5 text-xs font-semibold text-white/70 rounded-lg" data-tab="dashboard" onclick="switchTab('dashboard')">📊 Dashboard</button>
+    <button class="tab-btn flex-shrink-0 px-3 py-1.5 text-xs font-semibold text-white/70 rounded-lg" data-tab="daily" onclick="switchTab('daily')">📋 Report</button>
+    <button class="tab-btn flex-shrink-0 px-3 py-1.5 text-xs font-semibold text-white/70 rounded-lg" data-tab="departmental" onclick="switchTab('departmental')">🏗️ Dept Work</button>
+    <button class="tab-btn flex-shrink-0 px-3 py-1.5 text-xs font-semibold text-white/70 rounded-lg" data-tab="attendance" onclick="switchTab('attendance')">📅 Attendance</button>
+    <button class="tab-btn flex-shrink-0 px-3 py-1.5 text-xs font-semibold text-white/70 rounded-lg" data-tab="expenses" onclick="switchTab('expenses')">💰 Expenses</button>
+    <button class="tab-btn flex-shrink-0 px-3 py-1.5 text-xs font-semibold text-white/70 rounded-lg" data-tab="materials" onclick="switchTab('materials')">🧱 Materials</button>
+    <button class="tab-btn flex-shrink-0 px-3 py-1.5 text-xs font-semibold text-white/70 rounded-lg" data-tab="tools" onclick="switchTab('tools')">🔧 Tools</button>
+    <button class="tab-btn flex-shrink-0 px-3 py-1.5 text-xs font-semibold text-white/70 rounded-lg" data-tab="rentals" onclick="switchTab('rentals')">📦 Rentals</button>
+    <button class="tab-btn flex-shrink-0 px-3 py-1.5 text-xs font-semibold text-white/70 rounded-lg" data-tab="contractors" onclick="switchTab('contractors')">👥 Teams</button>
   </div>
 </nav>
 
@@ -1270,6 +1283,7 @@ function boot() {
 
   setupRentalTabs();
   migrateOldPhotos();
+  _setupPWA();
   switchTab('dashboard');
 }
 
@@ -2241,67 +2255,67 @@ opw(html);
 // CONTRACTORS
 // ============================================================
 function addContractor(){
-var name=document.getElementById(‘ct-name’).value.trim(), type=document.getElementById(‘ct-type’).value, total=parseFloat(document.getElementById(‘ct-total’).value)||0;
-if (!name) { toast(‘Enter name’,‘err’); return; }
-ins({type:‘contractor’,contractor_name:name,contractor_type:type,total_contract:total});
-[‘ct-name’,‘ct-total’].forEach(function(id){ document.getElementById(id).value=’’; });
-AD=ld(); toast(‘Added’,‘ok’); viewContractors(); updateDropdowns();
+var name=document.getElementById('ct-name').value.trim(), type=document.getElementById('ct-type').value, total=parseFloat(document.getElementById('ct-total').value)||0;
+if (!name) { toast('Enter name','err'); return; }
+ins({type:'contractor',contractor_name:name,contractor_type:type,total_contract:total});
+['ct-name','ct-total'].forEach(function(id){ document.getElementById(id).value=''; });
+AD=ld(); toast('Added','ok'); viewContractors(); updateDropdowns();
 }
 function delContractor(id){
 var c=AD.find(function(d){ return d.__id===id; });
-askDel(‘Delete ‘+c.contractor_name+’?’, function(){ del(id); AD=ld(); toast(‘Deleted’,‘ok’); viewContractors(); });
+askDel('Delete '+c.contractor_name+'?', function(){ del(id); AD=ld(); toast('Deleted','ok'); viewContractors(); });
 }
 function openCTModal(cid){
 CID=cid; var c=AD.find(function(d){ return d.__id===cid; }); if(!c) return;
-document.getElementById(‘ct-modal-title’).textContent=‘Add Advance — ‘+c.contractor_name;
-document.getElementById(‘ct-pay-date’).value=ist(); document.getElementById(‘ct-pay-amt’).value=’’;
-document.getElementById(‘ct-modal’).style.display=‘flex’;
+document.getElementById('ct-modal-title').textContent='Add Advance — '+c.contractor_name;
+document.getElementById('ct-pay-date').value=ist(); document.getElementById('ct-pay-amt').value='';
+document.getElementById('ct-modal').style.display='flex';
 }
-function closeCTModal(){ document.getElementById(‘ct-modal’).style.display=‘none’; CID=null; }
+function closeCTModal(){ document.getElementById('ct-modal').style.display='none'; CID=null; }
 function saveCTPayment(){
-var date=document.getElementById(‘ct-pay-date’).value, amt=parseFloat(document.getElementById(‘ct-pay-amt’).value)||0;
-if (!amt) { toast(‘Enter amount’,‘err’); return; }
+var date=document.getElementById('ct-pay-date').value, amt=parseFloat(document.getElementById('ct-pay-amt').value)||0;
+if (!amt) { toast('Enter amount','err'); return; }
 var c=AD.find(function(d){ return d.__id===CID; }); if(!c) return;
-ins({type:‘contractor_payment’,contractor_name:c.contractor_name,payment:amt,date:date});
-AD=ld(); closeCTModal(); toast(‘Saved’,‘ok’); viewContractors(); updateDash();
+ins({type:'contractor_payment',contractor_name:c.contractor_name,payment:amt,date:date});
+AD=ld(); closeCTModal(); toast('Saved','ok'); viewContractors(); updateDash();
 }
-function delCTPay(id){ askDel(‘Delete payment?’, function(){ del(id); AD=ld(); toast(‘Deleted’,‘ok’); viewContractors(); updateDash(); }); }
+function delCTPay(id){ askDel('Delete payment?', function(){ del(id); AD=ld(); toast('Deleted','ok'); viewContractors(); updateDash(); }); }
 function viewContractors(){
 AD=ld(); var vms=mkey(VM);
-var tp=document.getElementById(‘teams-period’); if(tp) tp.textContent=mlabel(VM);
-var ctrs=AD.filter(function(d){ return d.type===‘contractor’; }), div=document.getElementById(‘contractors-list’);
+var tp=document.getElementById('teams-period'); if(tp) tp.textContent=mlabel(VM);
+var ctrs=AD.filter(function(d){ return d.type==='contractor'; }), div=document.getElementById('contractors-list');
 if (!div) return;
-if (!ctrs.length) { div.innerHTML=’<p style="color:rgba(255,255,255,0.5);text-align:center;padding:16px">No contractors yet</p>’; return; }
+if (!ctrs.length) { div.innerHTML='<p style="color:rgba(255,255,255,0.5);text-align:center;padding:16px">No contractors yet</p>'; return; }
 div.innerHTML=ctrs.map(function(c){
-var tw=AD.filter(function(d){ return d.type===‘worker’&&d.team_name===c.contractor_name; });
-var ta=dedup(AD.filter(function(d){ return d.type===‘attendance’&&(d.date||’’).startsWith(vms)&&tw.some(function(w){ return w.name===d.name; }); }));
+var tw=AD.filter(function(d){ return d.type==='worker'&&d.team_name===c.contractor_name; });
+var ta=dedup(AD.filter(function(d){ return d.type==='attendance'&&(d.date||'').startsWith(vms)&&tw.some(function(w){ return w.name===d.name; }); }));
 var wP=ta.reduce(function(s,a){ return s+(parseFloat(a.hours)||0)*(parseFloat(a.hourly_wage)||0); },0);
 var wA=ta.reduce(function(s,a){ return s+(parseFloat(a.advance)||0); },0);
-var pays=AD.filter(function(d){ return d.type===‘contractor_payment’&&d.contractor_name===c.contractor_name&&(d.date||’’).startsWith(vms); });
+var pays=AD.filter(function(d){ return d.type==='contractor_payment'&&d.contractor_name===c.contractor_name&&(d.date||'').startsWith(vms); });
 var cP=pays.reduce(function(s,p){ return s+(parseFloat(p.payment)||0); },0);
 var tp2=wP+(parseFloat(c.total_contract)||0), ta2=wA+cP, bal=tp2-ta2;
-return ‘<div style="background:white;border-radius:16px;padding:14px;box-shadow:0 2px 12px rgba(0,0,0,0.1);margin-bottom:12px">’
-+’<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">’
-+’<div style="display:flex;align-items:center;gap:8px">’
-+’<div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:16px">’+c.contractor_name[0].toUpperCase()+’</div>’
-+’<div><p style="font-weight:700;color:#1f2937;font-size:13px">’+c.contractor_name+’</p>’
-+’<p style="font-size:10px;color:#6b7280">’+(c.contractor_type||‘Team’)+’  |  Bal: <span style="font-weight:700;color:'+(bal>=0?'#059669':'#dc2626')+'">’+fc(bal)+’</span></p></div></div>’
-+’<div style="display:flex;gap:6px">’
-+’<button onclick="openCTModal(\''+c.__id+'\')" style="padding:5px 12px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer">+Advance</button>’
-+’<button onclick="delContractor(\''+c.__id+'\')" style="padding:5px 10px;background:#fee2e2;color:#dc2626;border:none;border-radius:10px;font-size:12px;cursor:pointer">Del</button>’
-+’</div></div>’
-+’<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">’
-+’<div style="background:#eff6ff;border-radius:10px;padding:8px;text-align:center"><p style="font-size:9px;color:#3b82f6">Payment</p><p style="font-size:13px;font-weight:700;color:#1d4ed8">’+fc(tp2)+’</p></div>’
-+’<div style="background:#fffbeb;border-radius:10px;padding:8px;text-align:center"><p style="font-size:9px;color:#d97706">Advances</p><p style="font-size:13px;font-weight:700;color:#b45309">’+fc(ta2)+’</p></div>’
-+’<div style="background:'+(bal>=0?'#f0fdf4':'#fff1f2')+';border-radius:10px;padding:8px;text-align:center"><p style="font-size:9px;color:'+(bal>=0?'#059669':'#dc2626')+'">Balance</p><p style="font-size:13px;font-weight:700;color:'+(bal>=0?'#047857':'#be123c')+'">’+fc(bal)+’</p></div>’
-+’</div>’
-+(tw.length ? ‘<div style="background:#f9fafb;border-radius:10px;padding:8px;margin-bottom:8px"><p style="font-size:10px;font-weight:700;color:#6b7280;margin-bottom:6px">Team (’+tw.length+’)</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">’+tw.map(function(w){ return ‘<div style="background:white;border-radius:8px;padding:6px"><p style="font-weight:600;color:#374151;font-size:12px">’+w.name+’</p><p style="font-size:9px;color:#9ca3af">’+w.category+’ · ‘+fc(w.hourly_wage)+’/hr</p></div>’; }).join(’’)+’</div></div>’ : ‘’)
-+(pays.length ? ‘<div style="background:#f9fafb;border-radius:10px;padding:8px"><p style="font-size:10px;font-weight:700;color:#6b7280;margin-bottom:6px">Advances (’+mlabel(VM)+’)</p><table style="width:100%;font-size:11px;border-collapse:collapse"><tbody>’
-+pays.sort(function(a,b){ return (a.date||’’).localeCompare(b.date||’’); }).map(function(p){ return ‘<tr style="border-bottom:1px solid #e5e7eb"><td style="padding:4px 6px;color:#6b7280">’+fd(p.date)+’</td><td style="padding:4px 6px;text-align:right;font-weight:600">’+fc(p.payment)+’</td><td style="padding:4px 6px;text-align:center"><button onclick="delCTPay(\''+p.__id+'\')" style="font-size:10px;padding:1px 6px;background:#fee2e2;color:#dc2626;border:none;border-radius:4px;cursor:pointer">Del</button></td></tr>’; }).join(’’)
-+’</tbody><tfoot><tr style="background:#fefce8"><td style="padding:5px 6px;font-weight:700;color:#b45309">Total</td><td style="padding:5px 6px;text-align:right;font-weight:700;color:#b45309">’+fc(cP)+’</td><td></td></tr></tfoot></table></div>’
-: ‘<p style="text-align:center;font-size:12px;color:#9ca3af;margin-top:6px">No advances this month</p>’)
-+’</div>’;
-}).join(’’);
+return '<div style="background:white;border-radius:16px;padding:14px;box-shadow:0 2px 12px rgba(0,0,0,0.1);margin-bottom:12px">'
++'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">'
++'<div style="display:flex;align-items:center;gap:8px">'
++'<div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:16px">'+c.contractor_name[0].toUpperCase()+'</div>'
++'<div><p style="font-weight:700;color:#1f2937;font-size:13px">'+c.contractor_name+'</p>'
++'<p style="font-size:10px;color:#6b7280">'+(c.contractor_type||'Team')+'  |  Bal: <span style="font-weight:700;color:'+(bal>=0?'#059669':'#dc2626')+'">'+fc(bal)+'</span></p></div></div>'
++'<div style="display:flex;gap:6px">'
++'<button onclick="openCTModal(\''+c.__id+'\')" style="padding:5px 12px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer">+Advance</button>'
++'<button onclick="delContractor(\''+c.__id+'\')" style="padding:5px 10px;background:#fee2e2;color:#dc2626;border:none;border-radius:10px;font-size:12px;cursor:pointer">Del</button>'
++'</div></div>'
++'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px">'
++'<div style="background:#eff6ff;border-radius:10px;padding:8px;text-align:center"><p style="font-size:9px;color:#3b82f6">Payment</p><p style="font-size:13px;font-weight:700;color:#1d4ed8">'+fc(tp2)+'</p></div>'
++'<div style="background:#fffbeb;border-radius:10px;padding:8px;text-align:center"><p style="font-size:9px;color:#d97706">Advances</p><p style="font-size:13px;font-weight:700;color:#b45309">'+fc(ta2)+'</p></div>'
++'<div style="background:'+(bal>=0?'#f0fdf4':'#fff1f2')+';border-radius:10px;padding:8px;text-align:center"><p style="font-size:9px;color:'+(bal>=0?'#059669':'#dc2626')+'">Balance</p><p style="font-size:13px;font-weight:700;color:'+(bal>=0?'#047857':'#be123c')+'">'+fc(bal)+'</p></div>'
++'</div>'
++(tw.length ? '<div style="background:#f9fafb;border-radius:10px;padding:8px;margin-bottom:8px"><p style="font-size:10px;font-weight:700;color:#6b7280;margin-bottom:6px">Team ('+tw.length+')</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">'+tw.map(function(w){ return '<div style="background:white;border-radius:8px;padding:6px"><p style="font-weight:600;color:#374151;font-size:12px">'+w.name+'</p><p style="font-size:9px;color:#9ca3af">'+w.category+' · '+fc(w.hourly_wage)+'/hr</p></div>'; }).join('')+'</div></div>' : '')
++(pays.length ? '<div style="background:#f9fafb;border-radius:10px;padding:8px"><p style="font-size:10px;font-weight:700;color:#6b7280;margin-bottom:6px">Advances ('+mlabel(VM)+')</p><table style="width:100%;font-size:11px;border-collapse:collapse"><tbody>'
++pays.sort(function(a,b){ return (a.date||'').localeCompare(b.date||''); }).map(function(p){ return '<tr style="border-bottom:1px solid #e5e7eb"><td style="padding:4px 6px;color:#6b7280">'+fd(p.date)+'</td><td style="padding:4px 6px;text-align:right;font-weight:600">'+fc(p.payment)+'</td><td style="padding:4px 6px;text-align:center"><button onclick="delCTPay(\''+p.__id+'\')" style="font-size:10px;padding:1px 6px;background:#fee2e2;color:#dc2626;border:none;border-radius:4px;cursor:pointer">Del</button></td></tr>'; }).join('')
++'</tbody><tfoot><tr style="background:#fefce8"><td style="padding:5px 6px;font-weight:700;color:#b45309">Total</td><td style="padding:5px 6px;text-align:right;font-weight:700;color:#b45309">'+fc(cP)+'</td><td></td></tr></tfoot></table></div>'
+: '<p style="text-align:center;font-size:12px;color:#9ca3af;margin-top:6px">No advances this month</p>')
++'</div>';
+}).join('');
 }
 function changeViewMonth(d){ VM=new Date(VM.getFullYear(),VM.getMonth()+d,1); viewContractors(); }
 
@@ -2309,116 +2323,116 @@ function changeViewMonth(d){ VM=new Date(VM.getFullYear(),VM.getMonth()+d,1); vi
 // DROPDOWNS & DASHBOARD
 // ============================================================
 function updateDropdowns(){
-var at=document.getElementById(‘as-tool’);
-if(at) at.innerHTML=’<option value="">Select Tool</option>’+AD.filter(function(d){ return d.type===‘tool’; }).map(function(t){ return ‘<option value="'+t.__id+'">’+t.tool_name+’</option>’; }).join(’’);
-var aw=document.getElementById(‘as-worker’);
-if(aw) aw.innerHTML=’<option value="">Select Worker</option>’+AD.filter(function(d){ return d.type===‘worker’; }).map(function(w){ return ‘<option value="'+w.__id+'">’+w.name+’ (’+w.category+’)</option>’; }).join(’’);
-var wt=document.getElementById(‘w-team’);
-if(wt) wt.innerHTML=’<option value="">Select Team</option>’+AD.filter(function(d){ return d.type===‘contractor’; }).map(function(t){ return ‘<option value="'+t.contractor_name+'">’+t.contractor_name+’</option>’; }).join(’’);
+var at=document.getElementById('as-tool');
+if(at) at.innerHTML='<option value="">Select Tool</option>'+AD.filter(function(d){ return d.type==='tool'; }).map(function(t){ return '<option value="'+t.__id+'">'+t.tool_name+'</option>'; }).join('');
+var aw=document.getElementById('as-worker');
+if(aw) aw.innerHTML='<option value="">Select Worker</option>'+AD.filter(function(d){ return d.type==='worker'; }).map(function(w){ return '<option value="'+w.__id+'">'+w.name+' ('+w.category+')</option>'; }).join('');
+var wt=document.getElementById('w-team');
+if(wt) wt.innerHTML='<option value="">Select Team</option>'+AD.filter(function(d){ return d.type==='contractor'; }).map(function(t){ return '<option value="'+t.contractor_name+'">'+t.contractor_name+'</option>'; }).join('');
 // Attendance print worker dropdown
-var apw=document.getElementById(‘att-print-worker’);
-if(apw){ var workers=AD.filter(function(d){ return d.type===‘worker’; }); apw.innerHTML=’<option value="">– Select Worker –</option>’+workers.map(function(w){ return ‘<option value="'+w.__id+'">’+w.name+’ — ‘+w.category+(w.team_name?’ (’+w.team_name+’)’:’’)+’</option>’; }).join(’’); }
+var apw=document.getElementById('att-print-worker');
+if(apw){ var workers=AD.filter(function(d){ return d.type==='worker'; }); apw.innerHTML='<option value="">– Select Worker –</option>'+workers.map(function(w){ return '<option value="'+w.__id+'">'+w.name+' — '+w.category+(w.team_name?' ('+w.team_name+')':'')+'</option>'; }).join(''); }
 // Teams print filter dropdown
-var tpf=document.getElementById(‘teams-print-filter’);
-if(tpf){ var teams=AD.filter(function(d){ return d.type===‘contractor’; }); tpf.innerHTML=’<option value="all">All Teams</option>’+teams.map(function(t){ return ‘<option value="'+t.contractor_name+'">’+t.contractor_name+’</option>’; }).join(’’); }
+var tpf=document.getElementById('teams-print-filter');
+if(tpf){ var teams=AD.filter(function(d){ return d.type==='contractor'; }); tpf.innerHTML='<option value="all">All Teams</option>'+teams.map(function(t){ return '<option value="'+t.contractor_name+'">'+t.contractor_name+'</option>'; }).join(''); }
 }
 function getLowStock(){ return lmat().filter(function(i){ return i.minQty>0&&getbal(i)<=i.minQty; }); }
 function updateDash(){
 AD=ld(); var cums=mkey(new Date()), today=ist();
-var att=dedup(AD.filter(function(d){ return d.type===‘attendance’&&(d.date||’’).startsWith(cums); }));
+var att=dedup(AD.filter(function(d){ return d.type==='attendance'&&(d.date||'').startsWith(cums); }));
 var wAdv=att.reduce(function(s,a){ return s+(parseFloat(a.advance)||0); },0);
-var ctPays=AD.filter(function(d){ return d.type===‘contractor_payment’&&(d.date||’’).startsWith(cums); }).reduce(function(s,d){ return s+(parseFloat(d.payment)||0); },0);
+var ctPays=AD.filter(function(d){ return d.type==='contractor_payment'&&(d.date||'').startsWith(cums); }).reduce(function(s,d){ return s+(parseFloat(d.payment)||0); },0);
 var totalAdv=wAdv+ctPays;
 var wPay=att.reduce(function(s,a){ return s+(parseFloat(a.hours)||0)*(parseFloat(a.hourly_wage)||0); },0);
-var ctContr=AD.filter(function(d){ return d.type===‘contractor’; }).reduce(function(s,c){ return s+(parseFloat(c.total_contract)||0); },0);
-var mats=AD.filter(function(d){ return d.type===‘material’&&!d.is_petty_cash; });
-var pIn=AD.filter(function(d){ return d.type===‘material’&&d.is_petty_cash; }).reduce(function(s,d){ return s+(parseFloat(d.cost)||0); },0);
+var ctContr=AD.filter(function(d){ return d.type==='contractor'; }).reduce(function(s,c){ return s+(parseFloat(c.total_contract)||0); },0);
+var mats=AD.filter(function(d){ return d.type==='material'&&!d.is_petty_cash; });
+var pIn=AD.filter(function(d){ return d.type==='material'&&d.is_petty_cash; }).reduce(function(s,d){ return s+(parseFloat(d.cost)||0); },0);
 var pOut=mats.reduce(function(s,d){ return s+(parseFloat(d.cost)||0); },0);
-var matMonth=mats.filter(function(m){ return (m.date||’’).startsWith(cums); }).reduce(function(s,m){ return s+(parseFloat(m.cost)||0); },0);
-var rExp=AD.filter(function(d){ return d.type===‘rental’&&!d.is_given; }).reduce(function(s,r){ return s+daysb(r.borrowed_date,today)*(parseFloat(r.rate)||0)*(parseFloat(r.qty)||1); },0);
-var rInc=AD.filter(function(d){ return d.type===‘rental’&&d.is_given; }).reduce(function(s,r){ return s+daysb(r.borrowed_date,today)*(parseFloat(r.rate)||0)*(parseFloat(r.qty)||1); },0);
-var allPay=dedup(AD.filter(function(d){ return d.type===‘attendance’; })).reduce(function(s,a){ return s+(parseFloat(a.hours)||0)*(parseFloat(a.hourly_wage)||0); },0);
+var matMonth=mats.filter(function(m){ return (m.date||'').startsWith(cums); }).reduce(function(s,m){ return s+(parseFloat(m.cost)||0); },0);
+var rExp=AD.filter(function(d){ return d.type==='rental'&&!d.is_given; }).reduce(function(s,r){ return s+daysb(r.borrowed_date,today)*(parseFloat(r.rate)||0)*(parseFloat(r.qty)||1); },0);
+var rInc=AD.filter(function(d){ return d.type==='rental'&&d.is_given; }).reduce(function(s,r){ return s+daysb(r.borrowed_date,today)*(parseFloat(r.rate)||0)*(parseFloat(r.qty)||1); },0);
+var allPay=dedup(AD.filter(function(d){ return d.type==='attendance'; })).reduce(function(s,a){ return s+(parseFloat(a.hours)||0)*(parseFloat(a.hourly_wage)||0); },0);
 function se(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; }
-se(‘dash-advance’,fc(totalAdv)); se(‘dash-remaining’,fc(Math.max(0,wPay+ctContr-totalAdv)));
-se(‘dash-material’,fc(matMonth)); se(‘dash-petty’,fc(pIn)); se(‘dash-petty-left’,fc(pIn-pOut));
-se(‘dash-rental-out’,fc(rExp)); se(‘dash-rental-in’,fc(rInc));
-se(‘header-spends’,fc(allPay+pOut+rExp));
-var low=getLowStock(), lsDiv=document.getElementById(‘dash-low-stock’);
-if (low.length) { lsDiv.classList.remove(‘hidden’); document.getElementById(‘dash-low-list’).innerHTML=low.map(function(i){ return ‘<p style="color:white;font-size:12px">• ‘+i.name+’: ‘+getbal(i)+’ ‘+i.unit+’ (min ‘+i.minQty+’)</p>’; }).join(’’); }
-else lsDiv.classList.add(‘hidden’);
-var ctrs=AD.filter(function(d){ return d.type===‘contractor’; });
-var td=document.getElementById(‘team-details’);
+se('dash-advance',fc(totalAdv)); se('dash-remaining',fc(Math.max(0,wPay+ctContr-totalAdv)));
+se('dash-material',fc(matMonth)); se('dash-petty',fc(pIn)); se('dash-petty-left',fc(pIn-pOut));
+se('dash-rental-out',fc(rExp)); se('dash-rental-in',fc(rInc));
+se('header-spends',fc(allPay+pOut+rExp));
+var low=getLowStock(), lsDiv=document.getElementById('dash-low-stock');
+if (low.length) { lsDiv.classList.remove('hidden'); document.getElementById('dash-low-list').innerHTML=low.map(function(i){ return '<p style="color:white;font-size:12px">• '+i.name+': '+getbal(i)+' '+i.unit+' (min '+i.minQty+')</p>'; }).join(''); }
+else lsDiv.classList.add('hidden');
+var ctrs=AD.filter(function(d){ return d.type==='contractor'; });
+var td=document.getElementById('team-details');
 if (!td) return;
 td.innerHTML=ctrs.length ? ctrs.map(function(c){
-var tw=AD.filter(function(d){ return d.type===‘worker’&&d.team_name===c.contractor_name; });
-var ta=dedup(AD.filter(function(d){ return d.type===‘attendance’&&(d.date||’’).startsWith(cums)&&tw.some(function(w){ return w.name===d.name; }); }));
+var tw=AD.filter(function(d){ return d.type==='worker'&&d.team_name===c.contractor_name; });
+var ta=dedup(AD.filter(function(d){ return d.type==='attendance'&&(d.date||'').startsWith(cums)&&tw.some(function(w){ return w.name===d.name; }); }));
 var pay=ta.reduce(function(s,a){ return s+(parseFloat(a.hours)||0)*(parseFloat(a.hourly_wage)||0); },0)+(parseFloat(c.total_contract)||0);
-var adv=ta.reduce(function(s,a){ return s+(parseFloat(a.advance)||0); },0)+AD.filter(function(d){ return d.type===‘contractor_payment’&&d.contractor_name===c.contractor_name&&(d.date||’’).startsWith(cums); }).reduce(function(s,p){ return s+(parseFloat(p.payment)||0); },0);
+var adv=ta.reduce(function(s,a){ return s+(parseFloat(a.advance)||0); },0)+AD.filter(function(d){ return d.type==='contractor_payment'&&d.contractor_name===c.contractor_name&&(d.date||'').startsWith(cums); }).reduce(function(s,p){ return s+(parseFloat(p.payment)||0); },0);
 var bal=pay-adv;
-return ‘<div style="background:#eff6ff;border-radius:10px;padding:10px;margin-bottom:8px">’
-+’<div style="display:flex;justify-content:space-between;margin-bottom:6px">’
-+’<div><p style="font-weight:700;color:#1f2937;font-size:13px">’+c.contractor_name+’</p><p style="font-size:10px;color:#6b7280">’+tw.length+’ workers</p></div>’
-+’<div style="text-align:right"><p style="font-size:10px;color:#6b7280">Balance</p><p style="font-weight:700;font-size:13px;color:'+(bal>=0?'#059669':'#dc2626')+'">’+fc(bal)+’</p></div></div>’
-+’<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">’
-+’<div style="background:white;border-radius:8px;padding:6px;text-align:center"><p style="font-size:9px;color:#3b82f6">Payment</p><p style="font-weight:700;font-size:13px;color:#1d4ed8">’+fc(pay)+’</p></div>’
-+’<div style="background:white;border-radius:8px;padding:6px;text-align:center"><p style="font-size:9px;color:#d97706">Advances</p><p style="font-weight:700;font-size:13px;color:#b45309">’+fc(adv)+’</p></div>’
-+’</div></div>’;
-}).join(’’) : ‘<p style="text-align:center;color:#9ca3af;padding:12px;font-size:13px">No teams yet</p>’;
+return '<div style="background:#eff6ff;border-radius:10px;padding:10px;margin-bottom:8px">'
++'<div style="display:flex;justify-content:space-between;margin-bottom:6px">'
++'<div><p style="font-weight:700;color:#1f2937;font-size:13px">'+c.contractor_name+'</p><p style="font-size:10px;color:#6b7280">'+tw.length+' workers</p></div>'
++'<div style="text-align:right"><p style="font-size:10px;color:#6b7280">Balance</p><p style="font-weight:700;font-size:13px;color:'+(bal>=0?'#059669':'#dc2626')+'">'+fc(bal)+'</p></div></div>'
++'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'
++'<div style="background:white;border-radius:8px;padding:6px;text-align:center"><p style="font-size:9px;color:#3b82f6">Payment</p><p style="font-weight:700;font-size:13px;color:#1d4ed8">'+fc(pay)+'</p></div>'
++'<div style="background:white;border-radius:8px;padding:6px;text-align:center"><p style="font-size:9px;color:#d97706">Advances</p><p style="font-weight:700;font-size:13px;color:#b45309">'+fc(adv)+'</p></div>'
++'</div></div>';
+}).join('') : '<p style="text-align:center;color:#9ca3af;padding:12px;font-size:13px">No teams yet</p>';
 }
 
 // ============================================================
 // PRINT HELPERS
 // ============================================================
-function pp(){ return lprof()||{company:’’,engineer:’’}; }
+function pp(){ return lprof()||{company:'',engineer:''}; }
 function pcs(){
-return ‘*{margin:0;padding:0;box-sizing:border-box;font-family:“Segoe UI”,Arial,sans-serif}’
-+‘body{background:#fff;color:#1f2937;font-size:12px;padding:20px 24px}’
-+’.bar{position:fixed;top:0;left:0;right:0;background:#4f46e5;color:white;display:flex;align-items:center;gap:12px;padding:10px 16px;z-index:9999}’
-+’.bar button{padding:6px 14px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:700}’
-+’.bb{background:rgba(255,255,255,.2);color:white}.bp{background:#f59e0b;color:#1f2937}’
-+’.content{margin-top:52px}’
-+’.hdr{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #4f46e5;padding-bottom:12px;margin-bottom:16px}’
-+’.logo{width:44px;height:44px;background:linear-gradient(135deg,#f59e0b,#ea580c);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px}’
-+’.cn{font-size:18px;font-weight:900;color:#4f46e5}.csub{font-size:9px;color:#7c3aed;font-weight:700}’
-+’.hcname{font-size:16px;font-weight:900;color:#1e1b4b;text-align:center}.hceng{font-size:11px;font-weight:700;color:#7c3aed;text-align:center}’
-+’.rt{font-size:14px;font-weight:800;color:#1e1b4b;text-align:right}.rd{font-size:12px;font-weight:700;text-align:right;margin-top:3px}’
-+’.rp{font-size:8px;color:#9ca3af;text-align:right;margin-top:2px}’
-+’.sumrow{display:flex;gap:10px;margin-bottom:16px}’
-+’.sc{flex:1;border:1.5px solid #e5e7eb;border-radius:8px;padding:10px 12px}’
-+’.scl{font-size:9px;color:#6b7280;font-weight:600;text-transform:uppercase}’
-+’.scv{font-size:18px;font-weight:900;margin-top:2px}’
-+’.sec{margin-bottom:16px}’
-+’.st{font-size:11px;font-weight:700;color:#374151;background:#f3f4f6;padding:4px 10px;border-left:3px solid #9ca3af;margin-bottom:0}’
-+‘table{width:100%;border-collapse:collapse;font-size:11px}’
-+‘thead tr{background:#f3f4f6;color:#374151}’
-+‘thead th{padding:5px 10px;text-align:left;font-weight:700;font-size:10px;border-bottom:1.5px solid #d1d5db}’
-+‘tbody tr{border-bottom:1px solid #f3f4f6}’
-+‘tbody tr:nth-child(even){background:#f9fafb}’
-+‘tbody td{padding:6px 10px;color:#374151}’
-+‘tfoot tr{background:#f3f4f6;font-weight:700}’
-+‘tfoot td{padding:5px 10px;color:#374151}’
-+’.footer{margin-top:24px;padding-top:12px;border-top:2px solid #e5e7eb;display:flex;justify-content:space-between}’
-+’.sig .sl{width:140px;border-top:1.5px solid #374151;margin-top:28px}’
-+’.sig .slb{font-size:9px;color:#6b7280;margin-top:3px}’
-+’@media print{.bar{display:none!important}.content{margin-top:0}body{padding:8px 12px}@page{margin:6mm;size:A4}}’;
+return '*{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",Arial,sans-serif}'
++'body{background:#fff;color:#1f2937;font-size:12px;padding:20px 24px}'
++'.bar{position:fixed;top:0;left:0;right:0;background:#4f46e5;color:white;display:flex;align-items:center;gap:12px;padding:10px 16px;z-index:9999}'
++'.bar button{padding:6px 14px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:700}'
++'.bb{background:rgba(255,255,255,.2);color:white}.bp{background:#f59e0b;color:#1f2937}'
++'.content{margin-top:52px}'
++'.hdr{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #4f46e5;padding-bottom:12px;margin-bottom:16px}'
++'.logo{width:44px;height:44px;background:linear-gradient(135deg,#f59e0b,#ea580c);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px}'
++'.cn{font-size:18px;font-weight:900;color:#4f46e5}.csub{font-size:9px;color:#7c3aed;font-weight:700}'
++'.hcname{font-size:16px;font-weight:900;color:#1e1b4b;text-align:center}.hceng{font-size:11px;font-weight:700;color:#7c3aed;text-align:center}'
++'.rt{font-size:14px;font-weight:800;color:#1e1b4b;text-align:right}.rd{font-size:12px;font-weight:700;text-align:right;margin-top:3px}'
++'.rp{font-size:8px;color:#9ca3af;text-align:right;margin-top:2px}'
++'.sumrow{display:flex;gap:10px;margin-bottom:16px}'
++'.sc{flex:1;border:1.5px solid #e5e7eb;border-radius:8px;padding:10px 12px}'
++'.scl{font-size:9px;color:#6b7280;font-weight:600;text-transform:uppercase}'
++'.scv{font-size:18px;font-weight:900;margin-top:2px}'
++'.sec{margin-bottom:16px}'
++'.st{font-size:11px;font-weight:700;color:#374151;background:#f3f4f6;padding:4px 10px;border-left:3px solid #9ca3af;margin-bottom:0}'
++'table{width:100%;border-collapse:collapse;font-size:11px}'
++'thead tr{background:#f3f4f6;color:#374151}'
++'thead th{padding:5px 10px;text-align:left;font-weight:700;font-size:10px;border-bottom:1.5px solid #d1d5db}'
++'tbody tr{border-bottom:1px solid #f3f4f6}'
++'tbody tr:nth-child(even){background:#f9fafb}'
++'tbody td{padding:6px 10px;color:#374151}'
++'tfoot tr{background:#f3f4f6;font-weight:700}'
++'tfoot td{padding:5px 10px;color:#374151}'
++'.footer{margin-top:24px;padding-top:12px;border-top:2px solid #e5e7eb;display:flex;justify-content:space-between}'
++'.sig .sl{width:140px;border-top:1.5px solid #374151;margin-top:28px}'
++'.sig .slb{font-size:9px;color:#6b7280;margin-top:3px}'
++'@media print{.bar{display:none!important}.content{margin-top:0}body{padding:8px 12px}@page{margin:6mm;size:A4}}';
 }
 function phdr(title, sub){
 var p=pp(), now=new Date();
-return ‘<div class="hdr"><div style="display:flex;align-items:center;gap:12px"><div class="logo">🏗</div><div><div class="cn">Sanjineer</div><div class="csub">Construction Manager</div></div></div>’
-+’<div style="flex:1;padding:0 12px;text-align:center"><div class="hcname">’+p.company+’</div><div class="hceng">’+p.engineer+’</div></div>’
-+’<div><div class="rt">’+title+’</div><div class="rd">’+sub+’</div><div class="rp">’+now.toLocaleString(‘en-IN’,{timeZone:‘Asia/Kolkata’})+’</div></div></div>’;
+return '<div class="hdr"><div style="display:flex;align-items:center;gap:12px"><div class="logo">🏗</div><div><div class="cn">Sanjineer</div><div class="csub">Construction Manager</div></div></div>'
++'<div style="flex:1;padding:0 12px;text-align:center"><div class="hcname">'+p.company+'</div><div class="hceng">'+p.engineer+'</div></div>'
++'<div><div class="rt">'+title+'</div><div class="rd">'+sub+'</div><div class="rp">'+now.toLocaleString('en-IN',{timeZone:'Asia/Kolkata'})+'</div></div></div>';
 }
 function pftr(){
-return ‘<div class="footer">’
-+’<div class="sig"><div class="sl"></div><div class="slb">Site Supervisor</div></div>’
-+’<div class="sig" style="text-align:center"><div class="sl" style="margin:0 auto"></div><div class="slb">Prepared By</div></div>’
-+’<div class="sig" style="text-align:right"><div class="sl" style="margin-left:auto"></div><div class="slb">Authorized</div></div>’
-+’</div><div style="text-align:center;margin-top:8px;font-size:8px;color:#d1d5db">Generated by Sanjineer App</div>’;
+return '<div class="footer">'
++'<div class="sig"><div class="sl"></div><div class="slb">Site Supervisor</div></div>'
++'<div class="sig" style="text-align:center"><div class="sl" style="margin:0 auto"></div><div class="slb">Prepared By</div></div>'
++'<div class="sig" style="text-align:right"><div class="sl" style="margin-left:auto"></div><div class="slb">Authorized</div></div>'
++'</div><div style="text-align:center;margin-top:8px;font-size:8px;color:#d1d5db">Generated by Sanjineer App</div>';
 }
 function opw(html){
-var pw=window.open(’’,’_blank’,‘width=900,height=700’);
+var pw=window.open('','_blank','width=900,height=700');
 if (pw) { pw.document.write(html); pw.document.close(); }
-else toast(‘Allow popups to print’,‘err’);
+else toast('Allow popups to print','err');
 }
 
 // ============================================================
@@ -2434,9 +2448,9 @@ _printDailyReportInner(photos);
 }
 function _printDailyReportInner(photos){
 AD=ld(); var d=DD, dl=fdl(d), meta=lm()[d]||{};
-var att=dedup(AD.filter(function(a){ return a.type===‘attendance’&&a.date===d; }));
-var mats=AD.filter(function(a){ return a.type===‘material’&&a.date===d&&!a.is_petty_cash; });
-var adv=att.reduce(function(s,a){ return s+(parseFloat(a.advance)||0); },0)+AD.filter(function(a){ return a.type===‘contractor_payment’&&a.date===d; }).reduce(function(s,a){ return s+(parseFloat(a.payment)||0); },0);
+var att=dedup(AD.filter(function(a){ return a.type==='attendance'&&a.date===d; }));
+var mats=AD.filter(function(a){ return a.type==='material'&&a.date===d&&!a.is_petty_cash; });
+var adv=att.reduce(function(s,a){ return s+(parseFloat(a.advance)||0); },0)+AD.filter(function(a){ return a.type==='contractor_payment'&&a.date===d; }).reduce(function(s,a){ return s+(parseFloat(a.payment)||0); },0);
 var mc=mats.reduce(function(s,m){ return s+(parseFloat(m.cost)||0); },0);
 var grp={}; att.forEach(function(a){ if(!grp[a.category]) grp[a.category]=[]; grp[a.category].push(a); });
 var cats=Object.keys(grp).sort(function(a,b){ return (CATS.indexOf(a)+1||99)-(CATS.indexOf(b)+1||99); });
@@ -2445,24 +2459,24 @@ var dW=dept.reduce(function(s,e){ return s+parseInt(e.workers||0); },0);
 var dH=dept.reduce(function(s,e){ return s+parseFloat(e.hours||0); },0);
 var dA=dept.reduce(function(s,e){ return s+parseFloat(e.amount||0); },0);
 var low=getLowStock();
-var html=’<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Daily Report</title><style>’+pcs()+’</style></head><body>’
-+’<div class="bar"><button class="bb" onclick="window.close()">← Back</button><span style="flex:1;font-weight:700">Daily Report — ‘+dl+’</span><button class="bp" onclick="window.print()">🖶 Print</button></div>’
-+’<div class="content">’+phdr(‘Daily Report’,dl)
-+(meta.weather||meta.status ? ‘<div style="background:#f0f4ff;border:1.5px solid #c7d2fe;border-radius:8px;padding:8px 14px;margin-bottom:14px"><div style="font-size:9px;font-weight:700;color:#6b7280;text-transform:uppercase">Site Status</div><div style="font-size:11px;margin-top:3px">’+(meta.weather?’<strong>’+meta.weather+’</strong> — ‘:’’)+meta.status+’</div></div>’ : ‘’)
-+’<div class="sumrow"><div class="sc" style="border-color:#fca5a5"><div class="scl">Advances</div><div class="scv" style="color:#dc2626">’+fc(adv)+’</div></div><div class="sc" style="border-color:#fcd34d"><div class="scl">Material</div><div class="scv" style="color:#d97706">’+fc(mc)+’</div></div></div>’
-+(low.length ? ‘<div style="background:#fee2e2;border:1.5px solid #fca5a5;border-radius:8px;padding:10px 14px;margin-bottom:14px"><strong>⚠ Low Stock:</strong> ‘+low.map(function(i){ return i.name+’ (’+getbal(i)+’ left)’; }).join(’, ‘)+’</div>’ : ‘’)
-+’<div class="sec"><div class="st">👷 Labour Summary</div>’
-+(cats.length ? ‘<table><thead><tr><th>Category</th><th style="text-align:center">Count</th><th style="text-align:center">Hours</th><th>Work Done</th></tr></thead><tbody>’
-+cats.map(function(cat){ var wks=grp[cat],hrs=wks.reduce(function(s,w){ return s+(parseFloat(w.hours)||0); },0),wd=(wks.find(function(w){ return w.work_done; })||{}).work_done||’–’; return ‘<tr><td style="font-weight:700;padding:6px 10px">’+cat+’</td><td style="text-align:center;padding:6px 10px;font-weight:700;color:#4f46e5">’+wks.length+’</td><td style="text-align:center;padding:6px 10px">’+hrs.toFixed(1)+‘h</td><td style="padding:6px 10px">’+wd+’</td></tr>’; }).join(’’)
-+’</tbody></table>’ : ‘<p style="padding:10px;color:#9ca3af">No attendance.</p>’)+’</div>’
-+(dept.length ? ‘<div class="sec"><div class="st" style="border-left-color:#7c3aed">🏗 Departmental Work</div><table><thead><tr style="background:#7c3aed"><th>Category</th><th style="text-align:center">Workers</th><th style="text-align:center">Hours</th><th>Work Done</th><th style="text-align:right">Amount</th></tr></thead><tbody>’
-+dept.map(function(e){ return ‘<tr><td style="font-weight:700;padding:6px 10px">’+e.cat+’</td><td style="text-align:center;padding:6px 10px;color:#7c3aed;font-weight:700">’+e.workers+’</td><td style="text-align:center;padding:6px 10px">’+(e.hours||’–’)+‘h</td><td style="padding:6px 10px">’+(e.work||’–’)+’</td><td style="text-align:right;padding:6px 10px;font-weight:700;color:#059669">’+(e.amount?fc(e.amount):’–’)+’</td></tr>’; }).join(’’)
-+’</tbody><tfoot><tr><td style="padding:7px 10px;font-weight:900">TOTAL</td><td style="text-align:center;padding:7px 10px;font-weight:900">’+dW+’</td><td style="text-align:center;padding:7px 10px;font-weight:900">’+dH+‘h</td><td></td><td style="text-align:right;padding:7px 10px;font-weight:900">’+fc(dA)+’</td></tr></tfoot></table></div>’ : ‘’)
-+(mats.length ? ‘<div class="sec"><div class="st" style="border-left-color:#059669">🪰 Materials</div><table><thead><tr><th>Material</th><th style="text-align:center">Qty</th><th style="text-align:right">Amount</th></tr></thead><tbody>’
-+mats.map(function(m){ return ‘<tr><td style="font-weight:600;padding:6px 10px">’+m.material_name+’</td><td style="text-align:center;padding:6px 10px">’+(m.quantity||’–’)+’</td><td style="text-align:right;padding:6px 10px;font-weight:700">’+fc(m.cost)+’</td></tr>’; }).join(’’)
-+’</tbody><tfoot><tr><td colspan="2" style="padding:7px 10px;font-weight:900">Total</td><td style="text-align:right;padding:7px 10px;font-weight:900">’+fc(mc)+’</td></tr></tfoot></table></div>’ : ‘’)
-+(photos.length ? ‘<div class="sec"><div class="st">📷 Site Photos</div><div style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0">’+photos.map(function(p){ return ‘<img src="'+p+'" style="width:120px;height:90px;object-fit:cover;border-radius:8px">’; }).join(’’)+’</div></div>’ : ‘’)
-+pftr()+’</div></body></html>’;
+var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Daily Report</title><style>'+pcs()+'</style></head><body>'
++'<div class="bar"><button class="bb" onclick="window.close()">← Back</button><span style="flex:1;font-weight:700">Daily Report — '+dl+'</span><button class="bp" onclick="window.print()">🖶 Print</button></div>'
++'<div class="content">'+phdr('Daily Report',dl)
++(meta.weather||meta.status ? '<div style="background:#f0f4ff;border:1.5px solid #c7d2fe;border-radius:8px;padding:8px 14px;margin-bottom:14px"><div style="font-size:9px;font-weight:700;color:#6b7280;text-transform:uppercase">Site Status</div><div style="font-size:11px;margin-top:3px">'+(meta.weather?'<strong>'+meta.weather+'</strong> — ':'')+meta.status+'</div></div>' : '')
++'<div class="sumrow"><div class="sc" style="border-color:#fca5a5"><div class="scl">Advances</div><div class="scv" style="color:#dc2626">'+fc(adv)+'</div></div><div class="sc" style="border-color:#fcd34d"><div class="scl">Material</div><div class="scv" style="color:#d97706">'+fc(mc)+'</div></div></div>'
++(low.length ? '<div style="background:#fee2e2;border:1.5px solid #fca5a5;border-radius:8px;padding:10px 14px;margin-bottom:14px"><strong>⚠ Low Stock:</strong> '+low.map(function(i){ return i.name+' ('+getbal(i)+' left)'; }).join(', ')+'</div>' : '')
++'<div class="sec"><div class="st">👷 Labour Summary</div>'
++(cats.length ? '<table><thead><tr><th>Category</th><th style="text-align:center">Count</th><th style="text-align:center">Hours</th><th>Work Done</th></tr></thead><tbody>'
++cats.map(function(cat){ var wks=grp[cat],hrs=wks.reduce(function(s,w){ return s+(parseFloat(w.hours)||0); },0),wd=(wks.find(function(w){ return w.work_done; })||{}).work_done||'–'; return '<tr><td style="font-weight:700;padding:6px 10px">'+cat+'</td><td style="text-align:center;padding:6px 10px;font-weight:700;color:#4f46e5">'+wks.length+'</td><td style="text-align:center;padding:6px 10px">'+hrs.toFixed(1)+'h</td><td style="padding:6px 10px">'+wd+'</td></tr>'; }).join('')
++'</tbody></table>' : '<p style="padding:10px;color:#9ca3af">No attendance.</p>')+'</div>'
++(dept.length ? '<div class="sec"><div class="st" style="border-left-color:#7c3aed">🏗 Departmental Work</div><table><thead><tr style="background:#7c3aed"><th>Category</th><th style="text-align:center">Workers</th><th style="text-align:center">Hours</th><th>Work Done</th><th style="text-align:right">Amount</th></tr></thead><tbody>'
++dept.map(function(e){ return '<tr><td style="font-weight:700;padding:6px 10px">'+e.cat+'</td><td style="text-align:center;padding:6px 10px;color:#7c3aed;font-weight:700">'+e.workers+'</td><td style="text-align:center;padding:6px 10px">'+(e.hours||'–')+'h</td><td style="padding:6px 10px">'+(e.work||'–')+'</td><td style="text-align:right;padding:6px 10px;font-weight:700;color:#059669">'+(e.amount?fc(e.amount):'–')+'</td></tr>'; }).join('')
++'</tbody><tfoot><tr><td style="padding:7px 10px;font-weight:900">TOTAL</td><td style="text-align:center;padding:7px 10px;font-weight:900">'+dW+'</td><td style="text-align:center;padding:7px 10px;font-weight:900">'+dH+'h</td><td></td><td style="text-align:right;padding:7px 10px;font-weight:900">'+fc(dA)+'</td></tr></tfoot></table></div>' : '')
++(mats.length ? '<div class="sec"><div class="st" style="border-left-color:#059669">🪰 Materials</div><table><thead><tr><th>Material</th><th style="text-align:center">Qty</th><th style="text-align:right">Amount</th></tr></thead><tbody>'
++mats.map(function(m){ return '<tr><td style="font-weight:600;padding:6px 10px">'+m.material_name+'</td><td style="text-align:center;padding:6px 10px">'+(m.quantity||'–')+'</td><td style="text-align:right;padding:6px 10px;font-weight:700">'+fc(m.cost)+'</td></tr>'; }).join('')
++'</tbody><tfoot><tr><td colspan="2" style="padding:7px 10px;font-weight:900">Total</td><td style="text-align:right;padding:7px 10px;font-weight:900">'+fc(mc)+'</td></tr></tfoot></table></div>' : '')
++(photos.length ? '<div class="sec"><div class="st">📷 Site Photos</div><div style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0">'+photos.map(function(p){ return '<img src="'+p+'" style="width:120px;height:90px;object-fit:cover;border-radius:8px">'; }).join('')+'</div></div>' : '')
++pftr()+'</div></body></html>';
 opw(html);
 }
 
@@ -2474,17 +2488,17 @@ opw(html);
 // ============================================================
 function printWorkerAttendance(){
 AD=ld();
-var workerSel=document.getElementById(‘att-print-worker’);
-var wid=workerSel?workerSel.value:’’;
-if(!wid){ toast(‘Please select a worker’,‘err’); return; }
-var monthSel=document.getElementById(‘att-print-month’);
+var workerSel=document.getElementById('att-print-worker');
+var wid=workerSel?workerSel.value:'';
+if(!wid){ toast('Please select a worker','err'); return; }
+var monthSel=document.getElementById('att-print-month');
 var selMs=monthSel?monthSel.value:mkey(VM);
-var mL=mlabel(new Date(selMs+’-01T00:00:00’));
-var worker=AD.find(function(d){ return d.__id===wid&&d.type===‘worker’; });
-if(!worker){ toast(‘Worker not found’,‘err’); return; }
+var mL=mlabel(new Date(selMs+'-01T00:00:00'));
+var worker=AD.find(function(d){ return d.__id===wid&&d.type==='worker'; });
+if(!worker){ toast('Worker not found','err'); return; }
 
-var allAtt=dedup(AD.filter(function(d){ return d.type===‘attendance’&&(d.date||’’).startsWith(selMs)&&d.name===worker.name; }));
-allAtt.sort(function(a,b){ return (a.date||’’).localeCompare(b.date||’’); });
+var allAtt=dedup(AD.filter(function(d){ return d.type==='attendance'&&(d.date||'').startsWith(selMs)&&d.name===worker.name; }));
+allAtt.sort(function(a,b){ return (a.date||'').localeCompare(b.date||''); });
 
 var totalHrs=0, totalAdv=0, totalPay=0;
 var rows=allAtt.map(function(a){
@@ -2492,60 +2506,60 @@ var hrs=parseFloat(a.hours)||0;
 var adv=parseFloat(a.advance)||0;
 var pay=hrs*(parseFloat(a.hourly_wage||worker.hourly_wage)||0);
 totalHrs+=hrs; totalAdv+=adv; totalPay+=pay;
-return ‘<tr>’
-+’<td style="padding:7px 10px;font-weight:600">’+fdl(a.date)+’</td>’
-+’<td style="text-align:center;padding:7px 10px">’+hrs+‘h</td>’
-+’<td style="text-align:right;padding:7px 10px;color:#059669;font-weight:700">’+fc(pay)+’</td>’
-+’<td style="text-align:right;padding:7px 10px;color:#dc2626">’+fc(adv)+’</td>’
-+’</tr>’;
-}).join(’’);
+return '<tr>'
++'<td style="padding:7px 10px;font-weight:600">'+fdl(a.date)+'</td>'
++'<td style="text-align:center;padding:7px 10px">'+hrs+'h</td>'
++'<td style="text-align:right;padding:7px 10px;color:#059669;font-weight:700">'+fc(pay)+'</td>'
++'<td style="text-align:right;padding:7px 10px;color:#dc2626">'+fc(adv)+'</td>'
++'</tr>';
+}).join('');
 
 var bal=totalPay-totalAdv;
 var profData=lprof()||{};
-var company=profData.company||‘Sanjineer’;
-var engineer=profData.engineer||’’;
+var company=profData.company||'Sanjineer';
+var engineer=profData.engineer||'';
 
-var html=’<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Attendance — ‘+worker.name+’</title><style>’+pcs()+’\n’
-+’.worker-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid #e5e7eb}’
-+’.wh-left{} .wh-right{text-align:right}’
-+’.wh-name{font-size:18px;font-weight:900;color:#1e1b4b}’
-+’.wh-sub{font-size:11px;color:#6b7280;margin-top:2px}’
-+’.wh-pay{font-size:22px;font-weight:900;color:#059669}’
-+’.wh-paylbl{font-size:10px;color:#6b7280;font-weight:600;text-transform:uppercase}’
-+’</style></head><body>’
-+’<div class="bar"><button class="bb" onclick="window.close()">← Back</button><span style="flex:1;font-weight:700">Attendance — ‘+worker.name+’</span><button class="bp" onclick="window.print()">🖶 Print</button></div>’
-+’<div class="content">’
-+’<div class="worker-header">’
-+’<div class="wh-left">’
-+’<div class="wh-name">’+worker.name+’</div>’
-+’<div class="wh-sub">’+worker.category+(worker.team_name?’  ·  Team: ‘+worker.team_name:’’)+’</div>’
-+’<div class="wh-sub" style="margin-top:4px">Period: <strong>’+mL+’</strong></div>’
-+’</div>’
-+’<div class="wh-right">’
-+’<div class="wh-paylbl">Final Payment</div>’
-+’<div class="wh-pay">’+fc(bal)+’</div>’
-+’<div style="font-size:10px;color:#6b7280;margin-top:2px">Pay ‘+fc(totalPay)+’ − Adv ‘+fc(totalAdv)+’</div>’
-+’</div>’
-+’</div>’
+var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Attendance — '+worker.name+'</title><style>'+pcs()+'\n'
++'.worker-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid #e5e7eb}'
++'.wh-left{} .wh-right{text-align:right}'
++'.wh-name{font-size:18px;font-weight:900;color:#1e1b4b}'
++'.wh-sub{font-size:11px;color:#6b7280;margin-top:2px}'
++'.wh-pay{font-size:22px;font-weight:900;color:#059669}'
++'.wh-paylbl{font-size:10px;color:#6b7280;font-weight:600;text-transform:uppercase}'
++'</style></head><body>'
++'<div class="bar"><button class="bb" onclick="window.close()">← Back</button><span style="flex:1;font-weight:700">Attendance — '+worker.name+'</span><button class="bp" onclick="window.print()">🖶 Print</button></div>'
++'<div class="content">'
++'<div class="worker-header">'
++'<div class="wh-left">'
++'<div class="wh-name">'+worker.name+'</div>'
++'<div class="wh-sub">'+worker.category+(worker.team_name?'  ·  Team: '+worker.team_name:'')+'</div>'
++'<div class="wh-sub" style="margin-top:4px">Period: <strong>'+mL+'</strong></div>'
++'</div>'
++'<div class="wh-right">'
++'<div class="wh-paylbl">Final Payment</div>'
++'<div class="wh-pay">'+fc(bal)+'</div>'
++'<div style="font-size:10px;color:#6b7280;margin-top:2px">Pay '+fc(totalPay)+' − Adv '+fc(totalAdv)+'</div>'
++'</div>'
++'</div>'
 +(allAtt.length
-? ‘<table><thead><tr>’
-+’<th>Date</th>’
-+’<th style="text-align:center">Hours</th>’
-+’<th style="text-align:right">Daily Pay</th>’
-+’<th style="text-align:right">Advance</th>’
-+’</tr></thead><tbody>’+rows+’</tbody>’
-+’<tfoot><tr style="background:#f0f4ff">’
-+’<td style="padding:8px 10px;font-weight:900">TOTAL</td>’
-+’<td style="text-align:center;padding:8px 10px;font-weight:900">’+totalHrs.toFixed(1)+‘h</td>’
-+’<td style="text-align:right;padding:8px 10px;font-weight:900;color:#059669">’+fc(totalPay)+’</td>’
-+’<td style="text-align:right;padding:8px 10px;font-weight:900;color:#dc2626">’+fc(totalAdv)+’</td>’
-+’</tr>’
-+’<tr style="background:'+(bal>=0?'#f0fdf4':'#fff1f2')+'">’
-+’<td colspan="3" style="padding:8px 10px;font-weight:900;font-size:13px">NET PAYABLE</td>’
-+’<td style="text-align:right;padding:8px 10px;font-weight:900;font-size:16px;color:'+(bal>=0?'#059669':'#dc2626')+'">’+fc(bal)+’</td>’
-+’</tr></tfoot></table>’
-: ‘<p style="padding:16px;color:#9ca3af;text-align:center">No attendance records for ‘+mL+’</p>’)
-+pftr()+’</div></body></html>’;
+? '<table><thead><tr>'
++'<th>Date</th>'
++'<th style="text-align:center">Hours</th>'
++'<th style="text-align:right">Daily Pay</th>'
++'<th style="text-align:right">Advance</th>'
++'</tr></thead><tbody>'+rows+'</tbody>'
++'<tfoot><tr style="background:#f0f4ff">'
++'<td style="padding:8px 10px;font-weight:900">TOTAL</td>'
++'<td style="text-align:center;padding:8px 10px;font-weight:900">'+totalHrs.toFixed(1)+'h</td>'
++'<td style="text-align:right;padding:8px 10px;font-weight:900;color:#059669">'+fc(totalPay)+'</td>'
++'<td style="text-align:right;padding:8px 10px;font-weight:900;color:#dc2626">'+fc(totalAdv)+'</td>'
++'</tr>'
++'<tr style="background:'+(bal>=0?'#f0fdf4':'#fff1f2')+'">'
++'<td colspan="3" style="padding:8px 10px;font-weight:900;font-size:13px">NET PAYABLE</td>'
++'<td style="text-align:right;padding:8px 10px;font-weight:900;font-size:16px;color:'+(bal>=0?'#059669':'#dc2626')+'">'+fc(bal)+'</td>'
++'</tr></tfoot></table>'
+: '<p style="padding:16px;color:#9ca3af;text-align:center">No attendance records for '+mL+'</p>')
++pftr()+'</div></body></html>';
 opw(html);
 }
 
@@ -2554,22 +2568,22 @@ opw(html);
 // ============================================================
 function printMonthlyReport(){
 AD=ld();
-var selEl=document.getElementById(‘print-month’), selMs=selEl?selEl.value:mkey(VM);
-var mL=mlabel(new Date(selMs+’-01T00:00:00’));
-var teamFilter=document.getElementById(‘teams-print-filter’);
-var selTeam=teamFilter?teamFilter.value:‘all’;
-var ctrs=AD.filter(function(d){ return d.type===‘contractor’; });
-if(selTeam!==‘all’) ctrs=ctrs.filter(function(c){ return c.contractor_name===selTeam; });
-if (!ctrs.length) { toast(‘No teams found’,‘err’); return; }
-var gTP=0, gTA=0, sectionsHtml=’’;
+var selEl=document.getElementById('print-month'), selMs=selEl?selEl.value:mkey(VM);
+var mL=mlabel(new Date(selMs+'-01T00:00:00'));
+var teamFilter=document.getElementById('teams-print-filter');
+var selTeam=teamFilter?teamFilter.value:'all';
+var ctrs=AD.filter(function(d){ return d.type==='contractor'; });
+if(selTeam!=='all') ctrs=ctrs.filter(function(c){ return c.contractor_name===selTeam; });
+if (!ctrs.length) { toast('No teams found','err'); return; }
+var gTP=0, gTA=0, sectionsHtml='';
 ctrs.forEach(function(c){
-var tw=AD.filter(function(d){ return d.type===‘worker’&&d.team_name===c.contractor_name; });
-var allAtt=dedup(AD.filter(function(d){ return d.type===‘attendance’&&(d.date||’’).startsWith(selMs)&&tw.some(function(w){ return w.name===d.name; }); }));
-var pays=AD.filter(function(d){ return d.type===‘contractor_payment’&&d.contractor_name===c.contractor_name&&(d.date||’’).startsWith(selMs); });
+var tw=AD.filter(function(d){ return d.type==='worker'&&d.team_name===c.contractor_name; });
+var allAtt=dedup(AD.filter(function(d){ return d.type==='attendance'&&(d.date||'').startsWith(selMs)&&tw.some(function(w){ return w.name===d.name; }); }));
+var pays=AD.filter(function(d){ return d.type==='contractor_payment'&&d.contractor_name===c.contractor_name&&(d.date||'').startsWith(selMs); });
 var cP=pays.reduce(function(s,p){ return s+(parseFloat(p.payment)||0); },0);
 var contractAmt=parseFloat(c.total_contract)||0;
 var tTeamPay=0, tTeamAdv=0;
-var workerRows=’’;
+var workerRows='';
 tw.forEach(function(w){
 var wa=allAtt.filter(function(a){ return a.name===w.name; });
 var days=wa.filter(function(a){ return parseFloat(a.hours)>0; }).length;
@@ -2578,56 +2592,56 @@ var pay=wa.reduce(function(s,a){ return s+(parseFloat(a.hours)||0)*(parseFloat(a
 var adv=wa.reduce(function(s,a){ return s+(parseFloat(a.advance)||0); },0);
 var bal=pay-adv;
 tTeamPay+=pay; tTeamAdv+=adv;
-workerRows+=’<tr>’
-+’<td style="padding:6px 10px;font-weight:600">’+w.name+’</td>’
-+’<td style="padding:6px 10px;color:#6b7280;font-size:10px">’+w.category+’</td>’
-+’<td style="text-align:center;padding:6px 10px">’+days+’</td>’
-+’<td style="text-align:center;padding:6px 10px">’+hrs.toFixed(1)+‘h</td>’
-+’<td style="text-align:right;padding:6px 10px;font-weight:700;color:#059669">’+fc(pay)+’</td>’
-+’<td style="text-align:right;padding:6px 10px;color:#dc2626">’+fc(adv)+’</td>’
-+’<td style="text-align:right;padding:6px 10px;font-weight:700;color:'+(bal>=0?'#1d4ed8':'#dc2626')+'">’+fc(bal)+’</td>’
-+’</tr>’;
+workerRows+='<tr>'
++'<td style="padding:6px 10px;font-weight:600">'+w.name+'</td>'
++'<td style="padding:6px 10px;color:#6b7280;font-size:10px">'+w.category+'</td>'
++'<td style="text-align:center;padding:6px 10px">'+days+'</td>'
++'<td style="text-align:center;padding:6px 10px">'+hrs.toFixed(1)+'h</td>'
++'<td style="text-align:right;padding:6px 10px;font-weight:700;color:#059669">'+fc(pay)+'</td>'
++'<td style="text-align:right;padding:6px 10px;color:#dc2626">'+fc(adv)+'</td>'
++'<td style="text-align:right;padding:6px 10px;font-weight:700;color:'+(bal>=0?'#1d4ed8':'#dc2626')+'">'+fc(bal)+'</td>'
++'</tr>';
 });
 if (contractAmt>0) {
 tTeamPay+=contractAmt;
-workerRows+=’<tr style="background:#fef9c3">’
-+’<td colspan="4" style="padding:6px 10px;font-style:italic;color:#92400e">Contract Amount</td>’
-+’<td style="text-align:right;padding:6px 10px;font-weight:700;color:#059669">’+fc(contractAmt)+’</td>’
-+’<td style="text-align:right;padding:6px 10px;color:#dc2626">’+fc(cP)+’</td>’
-+’<td style="text-align:right;padding:6px 10px;font-weight:700">’+fc(contractAmt-cP)+’</td>’
-+’</tr>’;
+workerRows+='<tr style="background:#fef9c3">'
++'<td colspan="4" style="padding:6px 10px;font-style:italic;color:#92400e">Contract Amount</td>'
++'<td style="text-align:right;padding:6px 10px;font-weight:700;color:#059669">'+fc(contractAmt)+'</td>'
++'<td style="text-align:right;padding:6px 10px;color:#dc2626">'+fc(cP)+'</td>'
++'<td style="text-align:right;padding:6px 10px;font-weight:700">'+fc(contractAmt-cP)+'</td>'
++'</tr>';
 tTeamAdv+=cP;
 }
 var tBal=tTeamPay-tTeamAdv;
 gTP+=tTeamPay; gTA+=tTeamAdv;
-sectionsHtml+=’<div class="sec">’
-+’<div class="st" style="border-left-color:#6366f1;display:flex;justify-content:space-between;align-items:center">’
-+’<span>👥 ‘+c.contractor_name+’ <span style="font-size:10px;font-weight:400;color:#6b7280">(’+( c.contractor_type||‘Team’)+’)</span></span>’
-+’<span style="font-size:11px;font-weight:800;color:'+(tBal>=0?'#059669':'#dc2626')+'">Balance: ‘+fc(tBal)+’</span>’
-+’</div>’
+sectionsHtml+='<div class="sec">'
++'<div class="st" style="border-left-color:#6366f1;display:flex;justify-content:space-between;align-items:center">'
++'<span>👥 '+c.contractor_name+' <span style="font-size:10px;font-weight:400;color:#6b7280">('+( c.contractor_type||'Team')+')</span></span>'
++'<span style="font-size:11px;font-weight:800;color:'+(tBal>=0?'#059669':'#dc2626')+'">Balance: '+fc(tBal)+'</span>'
++'</div>'
 +(tw.length||contractAmt>0
-? ‘<table><thead><tr><th>Worker</th><th>Role</th><th style="text-align:center">Days</th><th style="text-align:center">Hours</th><th style="text-align:right">Total Pay</th><th style="text-align:right">Advances</th><th style="text-align:right">Balance</th></tr></thead>’
-+’<tbody>’+workerRows+’</tbody>’
-+’<tfoot><tr style="background:#f0f4ff">’
-+’<td colspan="4" style="padding:7px 10px;font-weight:900">Team Total</td>’
-+’<td style="text-align:right;padding:7px 10px;font-weight:900;color:#059669">’+fc(tTeamPay)+’</td>’
-+’<td style="text-align:right;padding:7px 10px;font-weight:900;color:#dc2626">’+fc(tTeamAdv)+’</td>’
-+’<td style="text-align:right;padding:7px 10px;font-weight:900;color:'+(tBal>=0?'#059669':'#dc2626')+'">’+fc(tBal)+’</td>’
-+’</tr></tfoot></table>’
-: ‘<p style="padding:10px;color:#9ca3af">No workers / attendance this month.</p>’)
-+’</div>’;
+? '<table><thead><tr><th>Worker</th><th>Role</th><th style="text-align:center">Days</th><th style="text-align:center">Hours</th><th style="text-align:right">Total Pay</th><th style="text-align:right">Advances</th><th style="text-align:right">Balance</th></tr></thead>'
++'<tbody>'+workerRows+'</tbody>'
++'<tfoot><tr style="background:#f0f4ff">'
++'<td colspan="4" style="padding:7px 10px;font-weight:900">Team Total</td>'
++'<td style="text-align:right;padding:7px 10px;font-weight:900;color:#059669">'+fc(tTeamPay)+'</td>'
++'<td style="text-align:right;padding:7px 10px;font-weight:900;color:#dc2626">'+fc(tTeamAdv)+'</td>'
++'<td style="text-align:right;padding:7px 10px;font-weight:900;color:'+(tBal>=0?'#059669':'#dc2626')+'">'+fc(tBal)+'</td>'
++'</tr></tfoot></table>'
+: '<p style="padding:10px;color:#9ca3af">No workers / attendance this month.</p>')
++'</div>';
 });
-var html=’<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Payment Details</title><style>’+pcs()+’</style></head><body>’
-+’<div class="bar"><button class="bb" onclick="window.close()">← Back</button><span style="flex:1;font-weight:700">Payment Report — ‘+mL+(selTeam!==‘all’?’ · ‘+selTeam:’’)+’</span><button class="bp" onclick="window.print()">🖶 Print</button></div>’
-+’<div class="content">’+phdr(‘Monthly Payment Report’, mL+(selTeam!==‘all’?’ — ‘+selTeam:’’))
+var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Payment Details</title><style>'+pcs()+'</style></head><body>'
++'<div class="bar"><button class="bb" onclick="window.close()">← Back</button><span style="flex:1;font-weight:700">Payment Report — '+mL+(selTeam!=='all'?' · '+selTeam:'')+'</span><button class="bp" onclick="window.print()">🖶 Print</button></div>'
++'<div class="content">'+phdr('Monthly Payment Report', mL+(selTeam!=='all'?' — '+selTeam:''))
 +sectionsHtml
-+’<div style="margin-top:16px;padding:10px 14px;background:#f0f4ff;border:2px solid #c7d2fe;border-radius:10px;display:flex;justify-content:space-between;align-items:center">’
-+’<span style="font-weight:900;font-size:13px;color:#1e1b4b">GRAND TOTAL</span>’
-+’<span style="font-size:12px;color:#059669;font-weight:800">Pay: ‘+fc(gTP)+’</span>’
-+’<span style="font-size:12px;color:#dc2626;font-weight:800">Adv: ‘+fc(gTA)+’</span>’
-+’<span style="font-size:12px;font-weight:900;color:'+(gTP-gTA>=0?'#1d4ed8':'#dc2626')+'">Bal: ‘+fc(gTP-gTA)+’</span>’
-+’</div>’
-+pftr()+’</div></body></html>’;
++'<div style="margin-top:16px;padding:10px 14px;background:#f0f4ff;border:2px solid #c7d2fe;border-radius:10px;display:flex;justify-content:space-between;align-items:center">'
++'<span style="font-weight:900;font-size:13px;color:#1e1b4b">GRAND TOTAL</span>'
++'<span style="font-size:12px;color:#059669;font-weight:800">Pay: '+fc(gTP)+'</span>'
++'<span style="font-size:12px;color:#dc2626;font-weight:800">Adv: '+fc(gTA)+'</span>'
++'<span style="font-size:12px;font-weight:900;color:'+(gTP-gTA>=0?'#1d4ed8':'#dc2626')+'">Bal: '+fc(gTP-gTA)+'</span>'
++'</div>'
++pftr()+'</div></body></html>';
 opw(html);
 }
 
@@ -2639,15 +2653,15 @@ var entries=ldept()[DTD]||[], dl=fdl(DTD);
 var tW=entries.reduce(function(s,e){ return s+parseInt(e.workers||0); },0);
 var tH=entries.reduce(function(s,e){ return s+parseFloat(e.hours||0); },0);
 var tA=entries.reduce(function(s,e){ return s+parseFloat(e.amount||0); },0);
-var html=’<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Dept Work</title><style>’+pcs()+’</style></head><body>’
-+’<div class="bar"><button class="bb" onclick="window.close()">← Back</button><span style="flex:1;font-weight:700">Dept Work — ‘+dl+’</span><button class="bp" onclick="window.print()">🖶 Print</button></div>’
-+’<div class="content">’+phdr(‘Departmental Work’,dl)
-+’<div class="sumrow"><div class="sc" style="border-color:#a5b4fc"><div class="scl">Workers</div><div class="scv" style="color:#4f46e5">’+tW+’</div></div><div class="sc" style="border-color:#86efac"><div class="scl">Hours</div><div class="scv" style="color:#059669">’+tH+‘h</div></div><div class="sc" style="border-color:#fca5a5"><div class="scl">Amount</div><div class="scv" style="color:#dc2626">’+fc(tA)+’</div></div></div>’
-+(entries.length ? ‘<table><thead><tr style="background:#7c3aed"><th>Category</th><th style="text-align:center">Workers</th><th style="text-align:center">Hours</th><th>Work Done</th><th style="text-align:right">Amount</th></tr></thead><tbody>’
-+entries.map(function(e){ return ‘<tr><td style="font-weight:700;padding:7px 10px">’+e.cat+’</td><td style="text-align:center;padding:7px 10px;font-weight:700;color:#7c3aed">’+e.workers+’</td><td style="text-align:center;padding:7px 10px">’+(e.hours||’–’)+‘h</td><td style="padding:7px 10px">’+(e.work||’–’)+(e.qty?’ (’+e.qty+’ ‘+(e.unit||’’)+’)’:’’)+’</td><td style="text-align:right;padding:7px 10px;font-weight:700;color:#059669">’+(e.amount?fc(e.amount):’–’)+’</td></tr>’; }).join(’’)
-+’</tbody><tfoot><tr><td style="padding:8px 10px;font-weight:900">TOTAL</td><td style="text-align:center;padding:8px 10px;font-weight:900">’+tW+’</td><td style="text-align:center;padding:8px 10px;font-weight:900">’+tH+‘h</td><td></td><td style="text-align:right;padding:8px 10px;font-weight:900">’+fc(tA)+’</td></tr></tfoot></table>’
-: ‘<p style="padding:10px;color:#9ca3af">No entries.</p>’)
-+pftr()+’</div></body></html>’;
+var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Dept Work</title><style>'+pcs()+'</style></head><body>'
++'<div class="bar"><button class="bb" onclick="window.close()">← Back</button><span style="flex:1;font-weight:700">Dept Work — '+dl+'</span><button class="bp" onclick="window.print()">🖶 Print</button></div>'
++'<div class="content">'+phdr('Departmental Work',dl)
++'<div class="sumrow"><div class="sc" style="border-color:#a5b4fc"><div class="scl">Workers</div><div class="scv" style="color:#4f46e5">'+tW+'</div></div><div class="sc" style="border-color:#86efac"><div class="scl">Hours</div><div class="scv" style="color:#059669">'+tH+'h</div></div><div class="sc" style="border-color:#fca5a5"><div class="scl">Amount</div><div class="scv" style="color:#dc2626">'+fc(tA)+'</div></div></div>'
++(entries.length ? '<table><thead><tr style="background:#7c3aed"><th>Category</th><th style="text-align:center">Workers</th><th style="text-align:center">Hours</th><th>Work Done</th><th style="text-align:right">Amount</th></tr></thead><tbody>'
++entries.map(function(e){ return '<tr><td style="font-weight:700;padding:7px 10px">'+e.cat+'</td><td style="text-align:center;padding:7px 10px;font-weight:700;color:#7c3aed">'+e.workers+'</td><td style="text-align:center;padding:7px 10px">'+(e.hours||'–')+'h</td><td style="padding:7px 10px">'+(e.work||'–')+(e.qty?' ('+e.qty+' '+(e.unit||'')+')':'')+'</td><td style="text-align:right;padding:7px 10px;font-weight:700;color:#059669">'+(e.amount?fc(e.amount):'–')+'</td></tr>'; }).join('')
++'</tbody><tfoot><tr><td style="padding:8px 10px;font-weight:900">TOTAL</td><td style="text-align:center;padding:8px 10px;font-weight:900">'+tW+'</td><td style="text-align:center;padding:8px 10px;font-weight:900">'+tH+'h</td><td></td><td style="text-align:right;padding:8px 10px;font-weight:900">'+fc(tA)+'</td></tr></tfoot></table>'
+: '<p style="padding:10px;color:#9ca3af">No entries.</p>')
++pftr()+'</div></body></html>';
 opw(html);
 }
 
@@ -2655,10 +2669,10 @@ opw(html);
 // PRINT: DEPT MONTHLY
 // ============================================================
 function printDeptMonthly(){
-var selEl=document.getElementById(‘dept-print-month’), selMs=selEl?selEl.value:mkey(VM);
-var mL=mlabel(new Date(selMs+’-01’));
+var selEl=document.getElementById('dept-print-month'), selMs=selEl?selEl.value:mkey(VM);
+var mL=mlabel(new Date(selMs+'-01'));
 var store=ldept(), dates=Object.keys(store).filter(function(d){ return d.startsWith(selMs); }).sort();
-if (!dates.length) { toast(‘No dept data for ‘+mL,‘err’); return; }
+if (!dates.length) { toast('No dept data for '+mL,'err'); return; }
 var catSet={};
 dates.forEach(function(d){ (store[d]||[]).forEach(function(e){ catSet[e.cat]=1; }); });
 var cats=CATS.filter(function(c){ return catSet[c]; });
@@ -2666,25 +2680,25 @@ Object.keys(catSet).forEach(function(c){ if(cats.indexOf(c)<0) cats.push(c); });
 var totW={}, totH={};
 cats.forEach(function(c){ totW[c]=0; totH[c]=0; });
 var rows=dates.map(function(d){
-var ents=store[d]||[], day=d.split(’-’)[2];
-var cells=’<td style="font-weight:700;text-align:center;background:#f5f3ff;border:1px solid #e5e7eb;padding:5px">’+day+’</td>’;
+var ents=store[d]||[], day=d.split('-')[2];
+var cells='<td style="font-weight:700;text-align:center;background:#f5f3ff;border:1px solid #e5e7eb;padding:5px">'+day+'</td>';
 cats.forEach(function(cat){
 var e=ents.find(function(x){ return x.cat===cat; });
-if (e) { totW[cat]+=parseInt(e.workers||0); totH[cat]+=parseFloat(e.hours||0); cells+=’<td style="text-align:center;border:1px solid #e5e7eb;padding:5px"><strong>’+e.workers+’</strong><br><span style="font-size:9px;color:#6b7280">(’+e.hours+‘h)</span></td>’; }
-else cells+=’<td style="text-align:center;border:1px solid #e5e7eb;padding:5px;color:#d1d5db">—</td>’;
+if (e) { totW[cat]+=parseInt(e.workers||0); totH[cat]+=parseFloat(e.hours||0); cells+='<td style="text-align:center;border:1px solid #e5e7eb;padding:5px"><strong>'+e.workers+'</strong><br><span style="font-size:9px;color:#6b7280">('+e.hours+'h)</span></td>'; }
+else cells+='<td style="text-align:center;border:1px solid #e5e7eb;padding:5px;color:#d1d5db">—</td>';
 });
-return ‘<tr>’+cells+’</tr>’;
-}).join(’’);
-var html=’<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Monthly Dept</title><style>’+pcs()+‘table{border-collapse:collapse}</style></head><body>’
-+’<div class="bar"><button class="bb" onclick="window.close()">← Back</button><span style="flex:1;font-weight:700">Monthly Dept — ‘+mL+’</span><button class="bp" onclick="window.print()">🖶 Print</button></div>’
-+’<div class="content">’+phdr(‘Monthly Dept Work’,mL)
-+’<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr>’
-+’<th style="background:#1e1b4b;color:white;padding:7px 10px;border:1px solid #374151">Date</th>’
-+cats.map(function(c){ return ‘<th style="background:#1e1b4b;color:white;padding:7px 10px;border:1px solid #374151;min-width:80px">’+c+’</th>’; }).join(’’)
-+’</tr></thead><tbody>’+rows+’</tbody><tfoot><tr>’
-+’<td style="background:#1e1b4b;color:white;border:1px solid #374151;padding:6px 8px;font-weight:900">TOTAL</td>’
-+cats.map(function(c){ return ‘<td style="text-align:center;background:#1e1b4b;color:white;border:1px solid #374151;padding:6px 8px;font-weight:900">’+totW[c]+’<br><span style="font-size:9px;font-weight:400">(’+totH[c]+‘h)</span></td>’; }).join(’’)
-+’</tr></tfoot></table></div>’+pftr()+’</div></body></html>’;
+return '<tr>'+cells+'</tr>';
+}).join('');
+var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Monthly Dept</title><style>'+pcs()+'table{border-collapse:collapse}</style></head><body>'
++'<div class="bar"><button class="bb" onclick="window.close()">← Back</button><span style="flex:1;font-weight:700">Monthly Dept — '+mL+'</span><button class="bp" onclick="window.print()">🖶 Print</button></div>'
++'<div class="content">'+phdr('Monthly Dept Work',mL)
++'<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr>'
++'<th style="background:#1e1b4b;color:white;padding:7px 10px;border:1px solid #374151">Date</th>'
++cats.map(function(c){ return '<th style="background:#1e1b4b;color:white;padding:7px 10px;border:1px solid #374151;min-width:80px">'+c+'</th>'; }).join('')
++'</tr></thead><tbody>'+rows+'</tbody><tfoot><tr>'
++'<td style="background:#1e1b4b;color:white;border:1px solid #374151;padding:6px 8px;font-weight:900">TOTAL</td>'
++cats.map(function(c){ return '<td style="text-align:center;background:#1e1b4b;color:white;border:1px solid #374151;padding:6px 8px;font-weight:900">'+totW[c]+'<br><span style="font-size:9px;font-weight:400">('+totH[c]+'h)</span></td>'; }).join('')
++'</tr></tfoot></table></div>'+pftr()+'</div></body></html>';
 opw(html);
 }
 
@@ -2692,58 +2706,72 @@ opw(html);
 // EXCEL EXPORT
 // ============================================================
 function exportExcel(){
-AD=ld(); var vms=mkey(VM), ctrs=AD.filter(function(d){ return d.type===‘contractor’; });
-if (!ctrs.length) { toast(‘No teams to export’,‘err’); return; }
+AD=ld(); var vms=mkey(VM), ctrs=AD.filter(function(d){ return d.type==='contractor'; });
+if (!ctrs.length) { toast('No teams to export','err'); return; }
+function *doExport() {
 var wb=XLSX.utils.book_new();
-var data=[[‘Sanjineer — Payment Report’],[‘Month: ‘+mlabel(VM)],[‘Company: ‘+pp().company],[‘Generated: ‘+new Date().toLocaleDateString(‘en-IN’,{timeZone:‘Asia/Kolkata’})],[],[‘Team’,‘Type’,‘Workers’,‘Payment (₹)’,‘Advances (₹)’,‘Balance (₹)’]];
+var data=[['Sanjineer — Payment Report'],['Month: '+mlabel(VM)],['Company: '+pp().company],['Generated: '+new Date().toLocaleDateString('en-IN',{timeZone:'Asia/Kolkata'})],[],['Team','Type','Workers','Payment (₹)','Advances (₹)','Balance (₹)']];
 ctrs.forEach(function(c){
-var tw=AD.filter(function(d){ return d.type===‘worker’&&d.team_name===c.contractor_name; });
-var ta=dedup(AD.filter(function(d){ return d.type===‘attendance’&&(d.date||’’).startsWith(vms)&&tw.some(function(w){ return w.name===d.name; }); }));
+var tw=AD.filter(function(d){ return d.type==='worker'&&d.team_name===c.contractor_name; });
+var ta=dedup(AD.filter(function(d){ return d.type==='attendance'&&(d.date||'').startsWith(vms)&&tw.some(function(w){ return w.name===d.name; }); }));
 var wP=ta.reduce(function(s,a){ return s+(parseFloat(a.hours)||0)*(parseFloat(a.hourly_wage)||0); },0);
 var wA=ta.reduce(function(s,a){ return s+(parseFloat(a.advance)||0); },0);
-var pays=AD.filter(function(d){ return d.type===‘contractor_payment’&&d.contractor_name===c.contractor_name&&(d.date||’’).startsWith(vms); });
+var pays=AD.filter(function(d){ return d.type==='contractor_payment'&&d.contractor_name===c.contractor_name&&(d.date||'').startsWith(vms); });
 var cP=pays.reduce(function(s,p){ return s+(parseFloat(p.payment)||0); },0);
 var tp2=wP+(parseFloat(c.total_contract)||0), ta2=wA+cP;
-data.push([c.contractor_name, c.contractor_type||‘Team’, tw.length, tp2, ta2, tp2-ta2]);
+data.push([c.contractor_name, c.contractor_type||'Team', tw.length, tp2, ta2, tp2-ta2]);
 });
 var ws=XLSX.utils.aoa_to_sheet(data);
-ws[’!cols’]=[{wch:22},{wch:14},{wch:10},{wch:16},{wch:16},{wch:14}];
-XLSX.utils.book_append_sheet(wb,ws,‘Summary’);
-XLSX.writeFile(wb,‘Sanjineer_’+vms+’.xlsx’);
-toast(‘Excel exported!’,‘ok’);
+ws['!cols']=[{wch:22},{wch:14},{wch:10},{wch:16},{wch:16},{wch:14}];
+XLSX.utils.book_append_sheet(wb,ws,'Summary');
+XLSX.writeFile(wb,'Sanjineer*'+vms+'.xlsx');
+toast('Excel exported!','ok');
+}
+if (typeof XLSX !== 'undefined') { _doExport(); return; }
+toast('Loading Excel…','ok');
+var s = document.createElement('script');
+s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+s.onload = _doExport;
+s.onerror = function(){ toast('Export failed - check internet','err'); };
+document.head.appendChild(s);
 }
 
 // ============================================================
 // PWA MANIFEST
 // ============================================================
-(function(){
-var m={name:‘Sanjineer’,short_name:‘Sanjineer’,start_url:’.’,display:‘standalone’,background_color:’#0f172a’,theme_color:’#4f46e5’,
-icons:[{src:‘data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="36" fill="%234f46e5"/><text x="96" y="130" font-size="100" text-anchor="middle">%F0%9F%8F%97</text></svg>’,sizes:‘192x192’,type:‘image/svg+xml’}]};
-var el=document.getElementById(‘pwa-manifest’);
-if (el) el.href=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:‘application/json’}));
-})();
-window.addEventListener(‘beforeinstallprompt’,function(e){
+// PWA setup runs after DOM ready (inside boot)
+function _setupPWA() {
+try {
+var m={name:'Sanjineer',short_name:'Sanjineer',start_url:'.',display:'standalone',background_color:'#0f172a',theme_color:'#4f46e5',
+icons:[{src:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="36" fill="%234f46e5"/><text x="96" y="130" font-size="100" text-anchor="middle">%F0%9F%8F%97</text></svg>',sizes:'192x192',type:'image/svg+xml'}]};
+var el=document.getElementById('pwa-manifest');
+if (el) el.href=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:'application/json'}));
+} catch(e) {}
+window.addEventListener('beforeinstallprompt',function(e){
 e.preventDefault(); PWA=e;
-if (!safeLS.getItem(‘pwa_dismissed’)) document.getElementById(‘pwa-banner’).style.display=‘flex’;
+if (!safeLS.getItem('pwa_dismissed')) { var b=document.getElementById('pwa-banner'); if(b) b.style.display='flex'; }
 });
+}
 
 // ============================================================
 // INIT
 // ============================================================
-var _booted = false;
-function _runBoot() {
-if (_booted) return;
-_booted = true;
-try { applyProfile(); } catch(e) { console.warn(‘applyProfile error’, e); }
-try { boot(); } catch(e) { console.error(‘boot error’, e); }
+// ── BULLETPROOF BOOT for GitHub Pages ──────────────────────
+// Runs immediately if DOM ready, otherwise waits for it
+(function() {
+var done = false;
+function run() {
+if (done) return; done = true;
+try { applyProfile(); } catch(e) {}
+try { boot(); } catch(e) { console.error('boot:', e); }
 }
-document.addEventListener(‘DOMContentLoaded’, _runBoot);
-// Immediate fallback — covers GitHub Pages where DOMContentLoaded may already have fired
-if (document.readyState === ‘complete’ || document.readyState === ‘interactive’) {
-setTimeout(_runBoot, 0);
+if (document.readyState === 'loading') {
+document.addEventListener('DOMContentLoaded', run);
+} else {
+run(); // DOM already ready (GitHub Pages cached page scenario)
 }
-// Belt-and-suspenders: window load as final fallback
-window.addEventListener(‘load’, _runBoot);
+window.addEventListener('load', run); // final safety net
+})();
 </script>
 
 </body>
