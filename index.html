@@ -1981,20 +1981,7 @@ service cloud.firestore {
             <button onclick="openViewerModal()" style="padding:.65rem;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:#c4b5fd;border-radius:12px;font-weight:700;font-size:.78rem;cursor:pointer;">&#128279; Viewer Link</button>
             <button onclick="disconnectCloudWithBackup()" style="padding:.65rem;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#fca5a5;border-radius:12px;font-size:.78rem;font-weight:700;cursor:pointer;">&#128268; Disconnect</button>
           </div>
-          <div id="cloud-firebase-section" style="display:none;margin-bottom:.75rem;">
-            <div style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:10px;padding:.7rem;margin-bottom:.6rem;">
-              <p style="font-size:11px;font-weight:800;color:#86efac;">&#9989; Payment done! Cloud (Supabase) is auto-connected.</p>
-            </div>
-            <div style="margin-bottom:.5rem;"><label style="font-size:10px;font-weight:700;color:#a78bfa;display:block;margin-bottom:3px;">Cloud Site ID (optional, default: sanjineer-main-site)</label><input id="fb-api-key" type="text" placeholder="AIza..." class="auth-input"></div>
-            <div style="margin-bottom:.5rem;"><label style="font-size:10px;font-weight:700;color:#a78bfa;display:block;margin-bottom:3px;">Auth Domain *</label><input id="fb-auth-domain" type="text" placeholder="your-app.firebaseapp.com" class="auth-input"></div>
-            <div style="margin-bottom:.5rem;"><label style="font-size:10px;font-weight:700;color:#a78bfa;display:block;margin-bottom:3px;">Project ID *</label><input id="fb-project-id" type="text" placeholder="your-project-id" class="auth-input"></div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.5rem;">
-              <div><label style="font-size:10px;font-weight:700;color:#a78bfa;display:block;margin-bottom:3px;">App ID *</label><input id="fb-app-id" type="text" placeholder="1:xxx:web:xxx" class="auth-input"></div>
-              <div><label style="font-size:10px;font-weight:700;color:#a78bfa;display:block;margin-bottom:3px;">Bucket</label><input id="fb-bucket" type="text" placeholder="your-app.appspot.com" class="auth-input"></div>
-            </div>
-            <div style="margin-bottom:.6rem;"><label style="font-size:10px;font-weight:700;color:#a78bfa;display:block;margin-bottom:3px;">Cloud Site ID *</label><input id="fb-site-id" type="text" placeholder="e.g. rampur-site-001" class="auth-input"><p style="font-size:9px;color:#7c3aed;margin-top:2px;">Unique ID &mdash; links all devices to same site</p></div>
-            <button onclick="saveFirebaseConfig()" style="width:100%;padding:.75rem;background:linear-gradient(135deg,#059669,#10b981);color:white;border:none;border-radius:12px;font-weight:800;font-size:.9rem;cursor:pointer;">&#128293; Save Site ID</button>
-          </div>
+          <div id="cloud-firebase-section" style="display:none;"></div>
           <div>
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;">
               <p style="font-size:11px;font-weight:800;color:#a78bfa;">&#128101; Viewer Accounts</p>
@@ -4183,8 +4170,8 @@ function _pdfHeader(appName, company, reportTitle, rightHtml, showEngineer){
     +'<p style="font-size:14px;font-weight:900;color:white;line-height:1">'+appName+'</p>'
     +'<p style="font-size:9px;color:rgba(255,255,255,0.75);line-height:1;margin-top:2px">Site Manager</p></div>'
     +'<div style="text-align:center"><p style="font-size:16px;font-weight:900;color:white;line-height:1">'+company+'</p>'
-    +(showEngineer && prof.engineer ? '<p style="font-size:10px;color:rgba(255,255,255,0.85);margin-top:3px">'+prof.engineer+'</p>' : '')
-    +(prof.address?'<p style="font-size:9px;color:rgba(255,255,255,0.65);margin-top:2px">'+prof.address+'</p>':'')
+    +(showEngineer && prof.address ? '<p style="font-size:9px;color:rgba(255,255,255,0.65);margin-top:2px">'+prof.address+'</p>' : (!showEngineer && prof.address ? '<p style="font-size:9px;color:rgba(255,255,255,0.7);margin-top:3px">'+prof.address+'</p>' : ''))
+    +(showEngineer && prof.engineer ? '<p style="font-size:10px;color:rgba(255,255,255,0.85);margin-top:2px">'+prof.engineer+'</p>' : '')
     +'</div><div style="text-align:right">'+(rightHtml||defaultRight)+'</div></div>';
 }
 function _pdfFooter(){
@@ -4238,7 +4225,7 @@ var solidColor=isGrad?'#4f46e5':hc;
 // Logo: use profile logo or default emoji
 var logoHtml=p.logo?'<img src="'+p.logo+'" style="width:44px;height:44px;border-radius:10px;object-fit:contain;background:white;padding:3px">':'<div class="logo">🏗</div>';
 return '<div class="hdr" style="border-bottom:3px solid '+solidColor+'"><div style="display:flex;align-items:center;gap:12px">'+logoHtml+'<div><div class="cn" style="color:'+solidColor+'">Sanjineer</div><div class="csub" style="color:'+solidColor+'">Construction Manager</div></div></div>'
-+'<div style="flex:1;padding:0 12px;text-align:center"><div class="hcname">'+(p.company||'')+'</div></div>'
++'<div style="flex:1;padding:0 12px;text-align:center"><div class="hcname">'+(p.company||'')+'</div>'+(p.address?'<div style="font-size:10px;color:#6b7280;margin-top:3px;font-weight:400">'+p.address+'</div>':'')+'</div>'
 +'<div><div class="rt">'+title+'</div><div class="rd">'+sub+'</div><div class="rp">'+now.toLocaleString('en-IN',{timeZone:'Asia/Kolkata'})+'</div></div></div>';
 }
 function pftr(){
@@ -5629,40 +5616,38 @@ function switchCloudTab(tab) {
 
 function refreshCloudModalState() {
   var isAdmin = safeLS.getItem(ADMIN_ROLE_KEY) === 'admin';
-  var cfg     = getFbConfig();
   var siteId  = getSiteId();
+  var sbReady = !!(_sb && _adminSBUser);
 
-  // Admin bar (post-login strip) visibility
+  // Admin bar visibility
   var adminBar = document.getElementById('cloud-admin-bar');
   if (adminBar) adminBar.style.display = isAdmin ? 'block' : 'none';
 
-  // Tab switcher — hide when logged in as admin (show post-login panel instead)
+  // Tab switcher
   var tabSwitcher = document.getElementById('cloud-tab-switcher');
   if (tabSwitcher) tabSwitcher.style.display = isAdmin ? 'none' : 'flex';
 
   if (isAdmin) {
-    // Show post-login content inside admin tab
     var prelogin  = document.getElementById('ctab-admin-prelogin');
     var postlogin = document.getElementById('ctab-admin-postlogin');
     var adminPanel = document.getElementById('ctab-admin');
     if (prelogin)  prelogin.style.display  = 'none';
     if (postlogin) postlogin.style.display = 'block';
     if (adminPanel) adminPanel.style.display = 'block';
-    // Load viewer list inline
+    // Load viewer list
     loadViewerAccountsInline();
-    // Firebase section inside postlogin
+    // Hide old Firebase section — always hidden now
     var fbSection = document.getElementById('cloud-firebase-section');
-    if (fbSection) fbSection.style.display = (cfg && siteId) ? 'none' : 'block';
+    if (fbSection) fbSection.style.display = 'none';
     // Site ID display
     var siteEl = document.getElementById('cloud-site-id-display');
-    if (siteEl) siteEl.textContent = 'Site ID: ' + (siteId || '—');
-    // Sync dot
-    var syncDot = document.getElementById('cloud-sync-dot');
+    if (siteEl) siteEl.textContent = 'Site ID: ' + (siteId || 'sanjineer-main-site');
+    // Sync dot — green if Supabase session active, yellow if logged in but session not yet ready
+    var syncDot  = document.getElementById('cloud-sync-dot');
     var syncTime = document.getElementById('cloud-sync-time');
-    if (syncDot) syncDot.style.background = (cfg && siteId) ? '#22c55e' : '#fbbf24';
-    if (syncTime) syncTime.textContent = (cfg && siteId) ? 'Syncing…' : 'Not connected';
+    if (syncDot)  syncDot.style.background = sbReady ? '#22c55e' : '#fbbf24';
+    if (syncTime) syncTime.textContent = sbReady ? 'Connected ✓' : 'Connecting…';
   } else {
-    // Pre-login: show tabs, default to admin tab
     var prelogin  = document.getElementById('ctab-admin-prelogin');
     var postlogin = document.getElementById('ctab-admin-postlogin');
     if (prelogin)  prelogin.style.display  = 'block';
@@ -6148,11 +6133,20 @@ function doSmartLogin() {
         var data = aRes.data || {};
         var now = Date.now();
         var endDate = data.subscription_end_date || 0;
+        // Also check localStorage fallback (in case DB write was delayed after payment)
+        var cachedSubEnd = parseInt(safeLS.getItem('cm_sub_end') || '0');
+        var hasCachedPayment = !!safeLS.getItem('cm_rzp_payment_id');
         var isActive = data.subscribed && endDate > now;
+        var allowFromCache = hasCachedPayment && cachedSubEnd > now;
         safeLS.setItem(ADMIN_ROLE_KEY, 'admin');
         safeLS.setItem(ADMIN_EMAIL_KEY, email);
         _adminSBUser = user;
-        if (isActive) {
+        if (isActive || allowFromCache) {
+          // Silently sync to DB if only cached
+          if (allowFromCache && !isActive) {
+            var subEnd2 = cachedSubEnd > now ? cachedSubEnd : (now + 30*24*60*60*1000);
+            _sb.from('admins').upsert({ id: user.id, subscribed: true, subscription_end_date: subEnd2 }, { onConflict: 'id' }).catch(function(){});
+          }
           onAdminLoginSuccess(email, user, null);
         } else {
           closeAuthModal();
