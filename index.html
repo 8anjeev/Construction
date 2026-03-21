@@ -4164,7 +4164,8 @@ function _pdfHeader(appName, company, reportTitle, rightHtml, showEngineer){
   var prof=lprof()||{};
   var hColor = prof.headerColor || 'linear-gradient(135deg,#4f46e5,#7c3aed,#ec4899)';
   var defaultRight='<p style="font-size:13px;font-weight:800;color:white;line-height:1.3">'+reportTitle+'</p>'+'<p style="font-size:9px;color:rgba(255,255,255,0.7);margin-top:4px">'+new Date().toLocaleDateString('en-IN',{timeZone:'Asia/Kolkata',day:'numeric',month:'short',year:'numeric'})+'</p>';
-  var logoHtml = prof.logo ? '<img src="'+prof.logo+'" style="width:36px;height:36px;border-radius:9px;object-fit:contain;margin-bottom:4px;background:white;padding:2px">' : '<div style="width:36px;height:36px;background:linear-gradient(135deg,#f59e0b,#ea580c);border-radius:9px;display:inline-flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:4px">&#127959;&#65039;</div>';
+  // Always show the app logo (🏗️) on the left — company logo is used only in invoice
+  var logoHtml = '<div style="width:36px;height:36px;background:linear-gradient(135deg,#f59e0b,#ea580c);border-radius:9px;display:inline-flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:4px">&#127959;&#65039;</div>';
   return '<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:'+hColor+';border-radius:14px;margin-bottom:18px;-webkit-print-color-adjust:exact;print-color-adjust:exact;">'
     +'<div style="text-align:left">'+logoHtml
     +'<p style="font-size:14px;font-weight:900;color:white;line-height:1">'+appName+'</p>'
@@ -4222,8 +4223,8 @@ var p=pp(), now=new Date();
 var hc=p.headerColor||'linear-gradient(135deg,#4f46e5,#7c3aed)';
 var isGrad=hc.indexOf('gradient')!==-1;
 var solidColor=isGrad?'#4f46e5':hc;
-// Logo: use profile logo or default emoji
-var logoHtml=p.logo?'<img src="'+p.logo+'" style="width:44px;height:44px;border-radius:10px;object-fit:contain;background:white;padding:3px">':'<div class="logo">🏗</div>';
+// Always show app logo (🏗️) — company logo is for invoice only
+var logoHtml='<div class="logo">🏗</div>';
 return '<div class="hdr" style="border-bottom:3px solid '+solidColor+'"><div style="display:flex;align-items:center;gap:12px">'+logoHtml+'<div><div class="cn" style="color:'+solidColor+'">Sanjineer</div><div class="csub" style="color:'+solidColor+'">Construction Manager</div></div></div>'
 +'<div style="flex:1;padding:0 12px;text-align:center"><div class="hcname">'+(p.company||'')+'</div>'+(p.address?'<div style="font-size:10px;color:#6b7280;margin-top:3px;font-weight:400">'+p.address+'</div>':'')+'</div>'
 +'<div><div class="rt">'+title+'</div><div class="rd">'+sub+'</div><div class="rp">'+now.toLocaleString('en-IN',{timeZone:'Asia/Kolkata'})+'</div></div></div>';
@@ -4288,7 +4289,8 @@ var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Daily Report</
 +'<div class="bar"><button class="bb" onclick="window.close()">← Back</button><span style="flex:1;font-weight:700">Daily Report — '+dl+'</span><button class="bp" onclick="window.print()">🖶 Print</button><button class="bx" onclick="window.close()">✕</button></div>'
 +'<div class="content">'+_pdfHeader('Sanjineer',(lprof()||{}).company||'','',
   '<p style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.75);line-height:1;text-transform:uppercase;letter-spacing:.04em">Daily Report</p>'
-  +'<p style="font-size:13px;font-weight:900;color:white;line-height:1.3;margin-top:4px">'+dl+'</p>',
+  +'<p style="font-size:13px;font-weight:900;color:white;line-height:1.3;margin-top:4px">'+new Date(d+'T00:00:00').toLocaleDateString('en-IN',{timeZone:'Asia/Kolkata',day:'numeric',month:'long',year:'numeric'})+'</p>'
+  +'<p style="font-size:11px;font-weight:900;color:white;margin-top:3px">'+new Date(d+'T00:00:00').toLocaleDateString('en-IN',{timeZone:'Asia/Kolkata',weekday:'long'})+'</p>',
   true
 )
 +(meta.weather||meta.status ? '<div style="background:#f0f4ff;border:1.5px solid #c7d2fe;border-radius:8px;padding:8px 14px;margin-bottom:14px"><div style="font-size:9px;font-weight:700;color:#6b7280;text-transform:uppercase">Site Status</div><div style="font-size:11px;margin-top:3px">'+(meta.weather?'<strong>'+meta.weather+'</strong> — ':'')+meta.status+'</div></div>' : '')
@@ -4512,7 +4514,8 @@ var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Dept Work</tit
 +'<div class="bar"><button class="bb" onclick="window.close()">← Back</button><span style="flex:1;font-weight:700">Dept Work — '+dl+'</span><button class="bp" onclick="window.print()">🖶 Print</button><button class="bx" onclick="window.close()">✕</button></div>'
 +'<div class="content">'+_pdfHeader('Sanjineer',(lprof()||{}).company||'','',
   '<p style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.75);line-height:1;text-transform:uppercase;letter-spacing:.04em">Departmental Work</p>'
-  +'<p style="font-size:13px;font-weight:900;color:white;line-height:1.3;margin-top:4px">'+dl+'</p>'
+  +'<p style="font-size:13px;font-weight:900;color:white;line-height:1.3;margin-top:4px">'+new Date(DTD+'T00:00:00').toLocaleDateString('en-IN',{timeZone:'Asia/Kolkata',day:'numeric',month:'long',year:'numeric'})+'</p>'
+  +'<p style="font-size:11px;font-weight:900;color:white;margin-top:3px">'+new Date(DTD+'T00:00:00').toLocaleDateString('en-IN',{timeZone:'Asia/Kolkata',weekday:'long'})+'</p>'
 )
 +'<div class="sumrow"><div class="sc" style="border-color:#a5b4fc"><div class="scl">Workers</div><div class="scv" style="color:#4f46e5">'+tW+'</div></div><div class="sc" style="border-color:#86efac"><div class="scl">Hours</div><div class="scv" style="color:#059669">'+tH+'h</div></div><div class="sc" style="border-color:#fca5a5"><div class="scl">Amount</div><div class="scv" style="color:#dc2626">'+fc(tA)+'</div></div></div>'
 +(entries.length ? '<table><thead><tr style="background:#7c3aed"><th>Category</th><th style="text-align:center">Workers</th><th style="text-align:center">Hours</th><th>Work Done</th><th style="text-align:right">Amount</th></tr></thead><tbody>'
@@ -6219,10 +6222,12 @@ function showAuthErr(tab, msg) {
 
 function onAdminLoginSuccess(email, user, app) {
   _adminUser = user;
-  _adminApp  = null; // no Firebase app needed
+  _adminApp  = null;
   _adminSBUser = user;
   safeLS.setItem(ADMIN_ROLE_KEY,  'admin');
   safeLS.setItem(ADMIN_EMAIL_KEY, email);
+  // Always ensure admin row exists — prevents foreign key issues when creating viewers
+  _sb.from('admins').upsert({ id: user.id, email: email }, { onConflict: 'id', ignoreDuplicates: true }).catch(function(){});
   closeAuthModal();
   var emailEl = document.getElementById('cloud-admin-email');
   if (emailEl) emailEl.textContent = email;
@@ -6424,7 +6429,13 @@ function createViewerAccount() {
   btn.textContent = '⏳ Creating…'; btn.disabled = true;
   var siteId = getSiteId();
 
-  _hashPwd(pass).then(function(hash) {
+  // Ensure admin row exists in admins table first (prevents foreign key violation)
+  _sb.from('admins').upsert({
+    id: _adminSBUser.id,
+    email: _adminSBUser.email || safeLS.getItem(ADMIN_EMAIL_KEY) || ''
+  }, { onConflict: 'id', ignoreDuplicates: true }).then(function() {
+    return _hashPwd(pass);
+  }).then(function(hash) {
     return _sb.from('viewers').upsert({
       admin_id:      _adminSBUser.id,
       email:         email.toLowerCase(),
