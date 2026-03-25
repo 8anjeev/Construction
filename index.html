@@ -160,6 +160,8 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
   var _SB_URL  = 'https://doawfaujanpxivinvivn.supabase.co';
   var _SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvYXdmYXVqYW5weGl2aW52aXZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQwNjY0MTYsImV4cCI6MjA4OTY0MjQxNn0.-vFAQfm4oAnvh4ZTPg0EL1FiofgCMq_N-ccKwoMVCbE';
   var _sb = null;
+  window._sbSubActive = false; // Only set to true after DB verification
+  window._sbSubChecked = false; // Set to true once DB check completes
 
   // Init Supabase client (SDK loaded synchronously via CDN)
   function _initSB() {
@@ -215,7 +217,7 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
   }
   function getSiteId() {
     var s = safeLS.getItem(CLOUD_SITE_ID);
-    return s || 'sanjineer-main-site';
+    return s || '';
   }
   function isCloudActivated() { return safeLS.getItem(CLOUD_KEY) === '1'; }
   </script>
@@ -447,6 +449,28 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
     #mat-purchase-modal button.text-xl, #mat-use-modal button.text-xl,
     #profile-modal button.text-xl { font-size: 14px !important; }
 
+    /* ── att-modal (Add Worker Attendance) — compact ── */
+    #att-modal > div { padding: 10px 12px !important; }
+    #att-modal .space-y-3 > * + * { margin-top: 6px !important; }
+    #att-modal h3 { font-size: 13px !important; }
+    #att-modal label { font-size: 9px !important; margin-bottom: 1px !important; }
+    #att-modal input { padding: 5px 8px !important; font-size: 11px !important; }
+    #att-modal > div > div[style*="background:#fef3c7"] { padding: 7px 9px !important; }
+    #att-modal > div > div[style*="background:#fef3c7"] p.text-xs { font-size: 9px !important; margin-bottom: 5px !important; }
+    #att-modal .grid.grid-cols-2 input { font-size: 11px !important; }
+    #att-modal button.w-full { padding-top: 6px !important; padding-bottom: 6px !important; font-size: 11px !important; margin-top: 4px !important; }
+
+    /* ── master-att-modal (Bulk Entry) — compact ── */
+    #master-att-modal > div { border-radius: 18px !important; box-shadow: 0 32px 80px rgba(0,0,0,0.55), 0 16px 40px rgba(0,0,0,0.40), 0 6px 16px rgba(0,0,0,0.25) !important; }
+    #master-att-modal .p-3 { padding: 8px 10px !important; }
+    #master-att-modal .grid.grid-cols-3 { gap: 5px !important; }
+    #master-att-modal .grid.grid-cols-3 label { font-size: 9px !important; margin-bottom: 1px !important; }
+    #master-att-modal .grid.grid-cols-3 input { padding: 4px 6px !important; font-size: 11px !important; }
+    #master-att-modal .flex.gap-2 button { padding-top: 4px !important; padding-bottom: 4px !important; font-size: 10px !important; }
+    #master-att-modal p.font-bold.text-gray-800 { font-size: 12px !important; }
+    #master-att-modal p.text-\[10px\] { font-size: 9px !important; }
+    #master-att-modal button.w-full { padding-top: 7px !important; padding-bottom: 7px !important; font-size: 11px !important; }
+
     /* ── 12. Cloud & viewer modals — also premium shadow ── */
     #cloud-modal > div {
       box-shadow:
@@ -539,7 +563,7 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
       animation:modalSlideIn .2s cubic-bezier(0.34,1.56,0.64,1);
     }
     @keyframes modalSlideIn{from{opacity:0;transform:scale(0.92) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
-    #profile-modal,#att-modal,#ct-modal,#mat-purchase-modal,#mat-use-modal,#dept-add-modal{display:none;}
+    #profile-modal,#att-modal,#ct-modal,#mat-purchase-modal,#mat-use-modal,#dept-add-modal,#master-att-modal{display:none;}
     #bill-view-modal{display:none;}
     #apk-modal{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:1rem;}
     #apk-modal.show{display:flex;}
@@ -582,13 +606,151 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
     /* PAYMENT LANDING */
     #pay-landing-modal{display:none;}
     #pay-landing-modal.show{display:flex!important;}
+
+    /* ══════════════════════════════════════════
+       DESKTOP / LAPTOP LAYOUT  (>= 1024px)
+       ══════════════════════════════════════════ */
+    @media (min-width: 1024px) {
+
+      /* Root wrapper: full-width, no mobile cap */
+      #main-app {
+        max-width: 100% !important;
+        width: 100% !important;
+        margin: 0 !important;
+        display: grid !important;
+        grid-template-columns: 1fr 220px !important;
+        grid-template-rows: 56px 1fr !important;
+        grid-template-areas:
+          "header sidebar"
+          "content sidebar" !important;
+        min-height: 100vh !important;
+        background: #f1f5f9 !important;
+      }
+
+      /* Header: spans content column */
+      #main-app > header {
+        grid-area: header !important;
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 40 !important;
+        padding: 0 20px !important;
+        height: 56px !important;
+        display: flex !important;
+        align-items: center !important;
+      }
+      #main-app > header > div {
+        height: 100% !important;
+        width: 100% !important;
+      }
+
+      /* NAV: becomes right sidebar */
+      #main-app > nav {
+        grid-area: sidebar !important;
+        position: sticky !important;
+        top: 0 !important;
+        height: 100vh !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        background: linear-gradient(180deg,#312e81 0%,#1e1b4b 100%) !important;
+        border-left: 1px solid rgba(255,255,255,0.08) !important;
+        border-bottom: none !important;
+        padding: 12px 0 16px 0 !important;
+        backdrop-filter: none !important;
+        scrollbar-width: thin !important;
+        scrollbar-color: rgba(99,102,241,0.4) transparent !important;
+      }
+      #main-app > nav::-webkit-scrollbar { width: 4px; }
+      #main-app > nav::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.4); border-radius: 4px; }
+
+      /* Make the flex row into a vertical column */
+      #main-app > nav > div {
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: visible !important;
+        gap: 1px !important;
+        padding: 0 8px !important;
+        width: 100% !important;
+      }
+
+      /* Sidebar section label */
+      #main-app > nav > div::before {
+        content: "SECTIONS";
+        display: block;
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: .12em;
+        color: rgba(255,255,255,0.3);
+        padding: 0 8px 8px 8px;
+        margin-bottom: 4px;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+      }
+
+      /* Tab buttons: full-width, left-aligned, horizontal text */
+      #main-app > nav .tab-btn {
+        flex-shrink: 0 !important;
+        width: 100% !important;
+        text-align: left !important;
+        padding: 8px 12px !important;
+        border-radius: 10px !important;
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        color: rgba(255,255,255,0.55) !important;
+        white-space: nowrap !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        transition: background .15s, color .15s !important;
+        border-left: 3px solid transparent !important;
+        box-sizing: border-box !important;
+      }
+      #main-app > nav .tab-btn:hover {
+        background: rgba(255,255,255,0.09) !important;
+        color: rgba(255,255,255,0.9) !important;
+      }
+      #main-app > nav .tab-btn.active {
+        background: rgba(99,102,241,0.28) !important;
+        color: #fff !important;
+        font-weight: 700 !important;
+        box-shadow: 0 2px 8px rgba(99,102,241,0.25) !important;
+        border-left: 3px solid #818cf8 !important;
+      }
+
+      /* Main content area */
+      #main-app > main {
+        grid-area: content !important;
+        padding: 16px 24px 32px 24px !important;
+        overflow-y: auto !important;
+        background: #f1f5f9 !important;
+        max-width: none !important;
+      }
+
+      /* Slightly nicer card shadows on desktop */
+      #main-app > main .bg-white.rounded-2xl,
+      #main-app > main .bg-white.rounded-xl {
+        box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 14px rgba(0,0,0,0.05) !important;
+      }
+
+      /* Dashboard: 3 stat columns */
+      #tab-dashboard .grid.grid-cols-2.gap-2 {
+        grid-template-columns: repeat(3, minmax(0,1fr)) !important;
+      }
+
+      /* Slightly larger text in tables */
+      main table { font-size: 12px !important; }
+      main th { font-size: 11px !important; }
+      main td { font-size: 12px !important; }
+
+      /* Wider modals on desktop */
+      .fixed > div.max-w-sm { max-width: 400px !important; }
+      .fixed > div.max-w-md { max-width: 520px !important; }
+    }
   </style>
 </head>
 <body>
 
 <!-- ========== MAIN APP ========== -->
 
-<div id="main-app" class="flex flex-col min-h-screen">
+<div id="main-app" class="flex flex-col min-h-screen" style="max-width:480px;margin:0 auto;">
 
 <!-- HEADER -->
 
@@ -644,6 +806,8 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
     <button class="tab-btn flex-shrink-0 px-2.5 py-1 text-xs font-semibold text-white/70 rounded-lg" data-tab="schedule" onclick="switchTab('schedule')">📅 Schedule</button>
     <button class="tab-btn flex-shrink-0 px-2.5 py-1 text-xs font-semibold text-white/70 rounded-lg" data-tab="punchlist" onclick="switchTab('punchlist')">📋 Punch List</button>
     <button class="tab-btn flex-shrink-0 px-2.5 py-1 text-xs font-semibold text-white/70 rounded-lg" data-tab="bill" onclick="switchTab('bill')">🧾 Bill</button>
+    <button class="tab-btn flex-shrink-0 px-2.5 py-1 text-xs font-semibold text-white/70 rounded-lg" data-tab="quotation" onclick="switchTab('quotation')">💼 Quotation</button>
+    <button class="tab-btn flex-shrink-0 px-2.5 py-1 text-xs font-semibold text-white/70 rounded-lg" data-tab="visits" onclick="switchTab('visits')">🏛️ Site Visits</button>
   </div>
 </nav>
 
@@ -696,32 +860,32 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
   </div>
 
   <!-- Row 4: Punch List | Circular Clock | Workers Listed -->
-  <div class="grid grid-cols-3 gap-1.5 mb-1.5" style="overflow:visible;align-items:stretch;">
-    <!-- Punch List chip -->
-    <div class="g-tobr-violet500-purple500 stat-card rounded-xl text-white cursor-pointer" style="padding:9px 10px;min-height:90px;display:flex;flex-direction:column;justify-content:space-between" onclick="switchTab('punchlist')">
-      <p class="text-[9px] text-purple-200 font-semibold">📋 Punch List</p>
+  <div class="mb-1.5" style="display:flex;gap:6px;align-items:center;">
+    <!-- Punch List chip — expands horizontally, fixed height -->
+    <div class="g-tobr-violet500-purple500 stat-card rounded-xl text-white cursor-pointer" style="flex:1;padding:9px 10px;height:90px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box;" onclick="switchTab('punchlist')">
+      <p style="font-size:9px;color:#e9d5ff;font-weight:600;margin:0">📋 Punch List</p>
       <div>
-        <p id="dash-open-punches" class="font-black leading-none" style="font-size:14px!important;margin-top:3px">0</p>
-        <p class="text-[9px] text-purple-200" style="margin-top:3px">Open items</p>
+        <p id="dash-open-punches" class="font-black leading-none" style="font-size:14px!important;margin-top:3px;margin-bottom:0">0</p>
+        <p style="font-size:9px;color:#e9d5ff;margin-top:3px;margin-bottom:0">Open items</p>
       </div>
-      <p id="dash-punch-in-progress" class="text-[9px] text-purple-300" style="margin-top:2px">0 in progress</p>
+      <p id="dash-punch-in-progress" style="font-size:9px;color:#d8b4fe;margin:0">0 in progress</p>
     </div>
-    <!-- Circular live clock -->
-    <div style="display:flex;align-items:center;justify-content:center;overflow:visible;min-height:90px;">
-      <div id="dash-clock-circle" style="width:100%;aspect-ratio:1/1;border-radius:50%;background:linear-gradient(135deg,#1e1b4b,#4f46e5);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 8px 28px rgba(79,70,229,0.55),0 0 0 3px rgba(255,255,255,0.16);border:2px solid rgba(255,255,255,0.24);overflow:hidden;">
-        <p id="dash-clock-date" class="text-white font-bold" style="font-size:10px;line-height:1;opacity:.88"></p>
-        <p id="dash-clock-weekday" class="text-white font-black" style="font-size:14px;line-height:1.25;margin-top:2px"></p>
-        <p id="dash-clock-time" class="font-black" style="font-size:12px;line-height:1;color:#a5b4fc;margin-top:3px"></p>
+    <!-- Circular live clock — fixed 90×90, never grows -->
+    <div style="width:90px;height:90px;flex-shrink:0;">
+      <div id="dash-clock-circle" style="width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#1e1b4b,#4f46e5);display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 8px 28px rgba(79,70,229,0.55),0 0 0 3px rgba(255,255,255,0.16);border:2px solid rgba(255,255,255,0.24);overflow:hidden;box-sizing:border-box;">
+        <p id="dash-clock-date" class="text-white font-bold" style="font-size:9px;line-height:1;opacity:.88;margin:0"></p>
+        <p id="dash-clock-weekday" class="text-white font-black" style="font-size:12px;line-height:1.2;margin-top:2px;margin-bottom:0"></p>
+        <p id="dash-clock-time" class="font-black" style="font-size:10px;line-height:1;color:white;opacity:.88;margin-top:2px;margin-bottom:0"></p>
       </div>
     </div>
-    <!-- Workers chip -->
-    <div class="stat-card rounded-xl text-white cursor-pointer" style="padding:9px 10px;min-height:90px;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(135deg,#2563eb,#4f46e5)" onclick="switchTab('attendance')">
-      <p class="text-[9px] text-indigo-200 font-semibold">👷 Workers Listed</p>
+    <!-- Workers chip — expands horizontally, fixed height -->
+    <div class="stat-card rounded-xl text-white cursor-pointer" style="flex:1;padding:9px 10px;height:90px;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(135deg,#2563eb,#4f46e5);box-sizing:border-box;" onclick="switchTab('attendance')">
+      <p style="font-size:9px;color:#bfdbfe;font-weight:600;margin:0">👷 Workers Listed</p>
       <div>
-        <p id="dash-workers-count" class="font-black leading-none" style="font-size:14px!important;margin-top:3px">0</p>
-        <p class="text-[9px] text-indigo-200" style="margin-top:3px">Registered</p>
+        <p id="dash-workers-count" class="font-black leading-none" style="font-size:14px!important;margin-top:3px;margin-bottom:0">0</p>
+        <p style="font-size:9px;color:#bfdbfe;margin-top:3px;margin-bottom:0">Registered</p>
       </div>
-      <p id="dash-workers-today" class="text-[9px] text-indigo-300" style="margin-top:2px">0 today</p>
+      <p id="dash-workers-today" style="font-size:9px;color:#93c5fd;margin:0">0 today</p>
     </div>
   </div>
 
@@ -739,8 +903,16 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
     </div>
   </div>
 
+  <!-- Dashboard Month Filter -->
+  <div class="flex items-center gap-2 mb-2 overflow-x-auto" style="scrollbar-width:none">
+    <button onclick="setDashMonth(0)" id="dash-m-0" class="flex-shrink-0 px-3 py-1 rounded-full text-xs font-bold border-2 border-indigo-500 bg-indigo-500 text-white">This Month</button>
+    <button onclick="setDashMonth(1)" id="dash-m-1" class="flex-shrink-0 px-3 py-1 rounded-full text-xs font-bold border-2 border-gray-300 text-gray-500">-1 Month</button>
+    <button onclick="setDashMonth(2)" id="dash-m-2" class="flex-shrink-0 px-3 py-1 rounded-full text-xs font-bold border-2 border-gray-300 text-gray-500">-2 Months</button>
+    <button onclick="setDashMonth(-1)" id="dash-m-neg1" class="flex-shrink-0 px-3 py-1 rounded-full text-xs font-bold border-2 border-gray-300 text-gray-500">All Time</button>
+    <span id="dash-month-label" class="flex-shrink-0 text-xs text-gray-500 font-semibold"></span>
+  </div>
   <!-- Low Stock Alert -->
-  <div id="dash-low-stock" class="mb-2 hidden"><div class="g-tobr-red500-rose600 rounded-2xl p-3 text-white shadow-xl"><p class="font-bold text-sm mb-1.5">⚠️ Low Stock Alert</p><div id="dash-low-list"></div></div></div>
+  <div id="dash-low-stock" class="mb-2 hidden"><div class="g-tobr-red500-rose600 rounded-xl text-white shadow-xl" style="padding:6px 10px"><p class="font-bold mb-1" style="font-size:11px">⚠️ Low Stock Alert</p><div id="dash-low-list" style="display:flex;flex-wrap:wrap;gap:4px"></div></div></div>
 
   <!-- Teams This Month -->
   <div class="bg-white rounded-2xl p-3 shadow-xl"><h3 class="font-bold text-gray-800 mb-2">👥 Teams This Month</h3><div id="team-details"><p class="text-gray-400 text-center py-4 text-sm">No teams yet</p></div></div>
@@ -760,6 +932,7 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
       </div>
     </div>
     <p id="daily-label" class="text-gray-500 font-medium" style="font-size:9px;margin-top:1px"></p>
+
   </div>
 
   <div class="bg-white rounded-xl mb-2 shadow-xl" style="padding:6px 10px">
@@ -775,10 +948,13 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
     <textarea id="daily-status" rows="2" placeholder="Site status / observations / instructions..." class="w-full border border-gray-200 rounded-lg text-xs resize-none focus:outline-none focus:border-indigo-400" style="padding:4px 8px"></textarea>
   </div>
 
-  <div class="grid grid-cols-2 gap-2 mb-2">
+  <div class="grid grid-cols-3 gap-2 mb-2">
     <div class="g-tobr-rose500-pink500 rounded-xl text-white" style="padding:5px 10px"><p class="text-[9px] text-rose-100 leading-none">Advances Today</p><p id="daily-advances" class="text-base font-bold leading-none mt-0.5">₹0</p></div>
     <div class="g-tobr-amber500-orange500 rounded-xl text-white" style="padding:5px 10px"><p class="text-[9px] text-amber-100 leading-none">Material Today</p><p id="daily-mat-cost" class="text-base font-bold leading-none mt-0.5">₹0</p></div>
+    <div class="g-tobr-indigo500-violet500 rounded-xl text-white" style="padding:5px 10px"><p class="text-[9px] text-indigo-100 leading-none">Worker Cost</p><p id="daily-worker-cost" class="text-base font-bold leading-none mt-0.5">₹0</p></div>
   </div>
+
+
 
   <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
     <h3 class="font-bold text-gray-800 mb-3">👷 Labour Summary</h3>
@@ -814,6 +990,26 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
     </div>
   </div>
 
+  <!-- Materials Stock Usage Table -->
+  <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
+    <h3 class="font-bold text-gray-800 mb-3">📦 Materials Stock</h3>
+    <div class="overflow-x-auto">
+      <table class="w-full" style="font-size:11px;border-collapse:collapse">
+        <thead>
+          <tr style="background:linear-gradient(135deg,#d97706,#f59e0b);color:white">
+            <th style="padding:6px 8px;text-align:left;border-radius:8px 0 0 8px">Material</th>
+            <th style="padding:6px 8px;text-align:center">Stock</th>
+            <th style="padding:6px 8px;text-align:center">Used Today</th>
+            <th style="padding:6px 8px;text-align:center;border-radius:0 8px 8px 0">Remaining</th>
+          </tr>
+        </thead>
+        <tbody id="daily-stock-table">
+          <tr><td colspan="4" style="padding:12px;text-align:center;color:#9ca3af">No materials in stock</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
   <div class="bg-white rounded-2xl p-3 shadow-xl">
     <h3 class="text-sm font-bold text-gray-700 mb-3">📷 Site Photos (max 4)</h3>
     <div class="flex gap-2 flex-wrap mb-3" id="photo-previews"><p class="text-gray-400 text-xs">No photos yet</p></div>
@@ -840,8 +1036,11 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
     </div>
   </div>
   <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
-    <p class="text-xs font-semibold text-gray-500 mb-2">➕ Add Worker</p>
-    <div class="grid grid-cols-2 gap-3">
+    <div class="flex items-center justify-between mb-2">
+      <p class="text-xs font-semibold text-gray-500">➕ Add Worker</p>
+      <button onclick="addWorker()" class="g-tor-emerald500-teal500 text-white rounded-xl font-semibold active:scale-95" style="font-size:10px;padding:4px 12px">✅ Add Worker</button>
+    </div>
+    <div class="grid grid-cols-2 gap-2">
       <input type="text" id="w-name" placeholder="Worker Name" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
       <select id="w-category" class="px-3 py-2 border border-gray-200 rounded-xl bg-white text-sm focus:outline-none focus:border-indigo-400">
         <option value="">Select Role</option>
@@ -855,10 +1054,17 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
       <select id="w-team" class="px-3 py-2 border border-gray-200 rounded-xl bg-white text-sm focus:outline-none focus:border-indigo-400">
         <option value="">Select Team</option>
       </select>
-      <input type="number" id="w-wage" placeholder="Hourly Wage (₹)" step="any" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
-      <button onclick="addWorker()" class="g-tor-emerald500-teal500 col-span-2 text-white rounded-xl font-semibold text-sm active:scale-95" style="padding:6px 0">Add Worker</button>
+      <input type="number" id="w-wage" placeholder="Regular Rate ₹/hr" step="any" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
+      <input type="number" id="w-ot-rate" placeholder="OT Rate ₹/hr (opt)" step="any" class="col-span-2 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
     </div>
   </div>
+
+  <!-- Master Attendance -->
+  <button onclick="openMasterAtt()" class="w-full mb-3 active:scale-95 g-tor-indigo500-purple500 rounded-2xl shadow-xl" style="padding:12px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:none;cursor:pointer">
+    <span style="font-size:13px;font-weight:800;color:#fff;line-height:1">🗂️ Master Atten.</span>
+    <span style="font-size:10px;color:rgba(255,255,255,0.75);font-weight:500;line-height:1">Select to mark attendance</span>
+  </button>
+
   <div class="bg-white rounded-2xl p-3 shadow-xl">
     <p class="text-xs font-semibold text-gray-500 mb-2">👷 Workers List</p>
     <div id="workers-list"><p class="text-gray-400 text-center py-4">No workers yet</p></div>
@@ -943,6 +1149,11 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
 <!-- ===== MATERIALS ===== -->
 
 <div id="tab-materials" class="tab-content" style="display:none">
+  <!-- Low stock reorder -->
+  <div id="mat-reorder-bar" style="display:none;margin-bottom:8px;padding:8px 12px;background:linear-gradient(135deg,#dc2626,#ef4444);border-radius:12px;display:flex;align-items:center;justify-content:space-between;gap:8px">
+    <p style="color:white;font-size:11px;font-weight:700;margin:0" id="mat-low-count">⚠️ 0 items low on stock</p>
+    <button onclick="reorderWhatsApp()" style="background:rgba(255,255,255,0.25);border:none;color:white;font-size:10px;font-weight:800;padding:4px 12px;border-radius:8px;cursor:pointer">📱 Reorder via WhatsApp</button>
+  </div>
   <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
     <p class="text-xs font-semibold text-gray-500 mb-2">🧱 Add Material / Stock Item <span class="font-normal text-gray-400">— set min alert level</span></p>
     <div class="grid grid-cols-2 gap-2.5 mb-3">
@@ -950,6 +1161,8 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
       <input type="text" id="mat-unit" placeholder="Unit (bags, kg, nos...)" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
       <input type="number" id="mat-init-qty" placeholder="Opening Stock Qty" step="any" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
       <input type="number" id="mat-min-qty" placeholder="Min Stock Alert" step="any" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
+      <input type="text" id="mat-supplier" placeholder="Supplier Name (opt)" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
+      <input type="text" id="mat-supplier-phone" placeholder="Supplier Phone (opt)" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
     </div>
     <button onclick="addMaterialItem()" class="g-tor-amber500-orange500 w-full text-white py-2.5 rounded-xl font-bold text-sm active:scale-95">🧱 Add Material Item</button>
   </div>
@@ -1251,6 +1464,28 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
       <button onclick="printMonthlyReport()" class="g-tor-violet500-purple600 flex-shrink-0 px-3 py-1.5 text-white rounded-xl text-xs font-semibold active:scale-95">🖨️ Print</button>
     </div>
   </div>
+  <!-- Subcontractor Bill Tracking -->
+  <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
+    <div class="flex items-center justify-between mb-2">
+      <p class="text-xs font-bold text-gray-700">🧾 Subcontractor Bill Tracker</p>
+      <button onclick="toggleSubconBillPanel()" class="bg-indigo-100 text-indigo-600 text-xs font-bold rounded-lg px-3 py-1">+ Add Bill</button>
+    </div>
+    <div id="subcon-bill-panel" style="display:none;margin-bottom:10px;padding:10px;background:#f8fafc;border-radius:12px;border:1px solid #e2e8f0">
+      <div class="grid grid-cols-2 gap-2 mb-2">
+        <div><label class="text-[10px] font-bold text-gray-500 block mb-1">Contractor</label>
+          <select id="scb-contractor" class="w-full px-3 py-2 border border-gray-200 rounded-xl bg-white text-sm focus:outline-none focus:border-indigo-400"><option value="">Select Contractor</option></select>
+        </div>
+        <div><label class="text-[10px] font-bold text-gray-500 block mb-1">Date</label><input type="date" id="scb-date" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none"></div>
+        <div><label class="text-[10px] font-bold text-gray-500 block mb-1">Bill No.</label><input type="text" id="scb-no" placeholder="Bill / RA No." class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none"></div>
+        <div><label class="text-[10px] font-bold text-gray-500 block mb-1">Bill Amount (₹)</label><input type="number" id="scb-amount" placeholder="0" step="any" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none"></div>
+        <div><label class="text-[10px] font-bold text-gray-500 block mb-1">Paid (₹)</label><input type="number" id="scb-paid" placeholder="0" step="any" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none"></div>
+        <div><label class="text-[10px] font-bold text-gray-500 block mb-1">Work Description</label><input type="text" id="scb-desc" placeholder="Brickwork, Plaster..." class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none"></div>
+      </div>
+      <button onclick="saveSubconBill()" class="g-tor-indigo500-purple500 w-full text-white py-2 rounded-xl font-bold text-sm active:scale-95">💾 Save Bill</button>
+    </div>
+    <div id="subcon-bill-list"><p class="text-gray-400 text-xs text-center py-2">No bills tracked yet</p></div>
+  </div>
+
   <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
     <p class="text-xs font-semibold text-gray-500 mb-2">➕ Add Contractor / Staff</p>
     <div class="grid grid-cols-2 gap-3">
@@ -1424,6 +1659,11 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
     <p class="text-sm font-bold text-gray-700 mb-3">📂 Category Breakdown</p>
     <div id="bgt-categories"><p class="text-gray-400 text-sm text-center py-2">Save budget setup to see breakdown</p></div>
   </div>
+  <!-- Actuals vs Budget visual bars -->
+  <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
+    <p class="text-sm font-bold text-gray-700 mb-3">📊 Budget vs Actual — Visual</p>
+    <div id="bgt-visual-bars"><p class="text-gray-400 text-xs text-center py-2">Set budget categories to see comparison</p></div>
+  </div>
   <!-- Plinth Area Summary -->
   <div class="bg-white rounded-2xl p-3 shadow-xl">
     <p class="text-sm font-bold text-gray-700 mb-2">📐 Plinth Area Summary</p>
@@ -1458,10 +1698,15 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
     </div>
     <button onclick="addMilestone()" class="g-tobr-amber500-orange500 w-full text-white py-2.5 rounded-xl font-bold text-sm active:scale-95">Add Milestone</button>
   </div>
-  <!-- Timeline -->
-  <div class="bg-white rounded-2xl p-3 shadow-xl">
+  <!-- Timeline list -->
+  <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
     <p class="text-sm font-bold text-gray-700 mb-3">📅 Project Timeline</p>
     <div id="milestones-list"><div class="text-center py-10"><span style="font-size:40px">📅</span><p class="font-semibold text-gray-600 mt-2">No milestones yet</p><p class="text-gray-400 text-xs mt-1">Add project phases and deadlines</p></div></div>
+  </div>
+  <!-- Gantt chart - separate card below with clear spacing -->
+  <div class="bg-white rounded-2xl p-3 shadow-xl" style="margin-top:8px">
+    <p class="text-sm font-bold text-gray-700 mb-3">📊 Gantt Chart</p>
+    <div id="gantt-view" style="overflow-x:auto;min-height:40px"><p class="text-gray-400 text-xs text-center py-2">Add milestones with dates to see Gantt chart</p></div>
   </div>
 </div>
 
@@ -1508,9 +1753,10 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
 <!-- ===== BILL ===== -->
 <div id="tab-bill" class="tab-content" style="display:none">
   <!-- Bill Type Selector -->
-  <div class="grid grid-cols-2 gap-2 mb-3">
-    <button onclick="showBillType('salary')" id="bill-btn-salary" class="g-tobr-indigo500-violet500 text-white rounded-xl py-2 px-3 text-center shadow-xl active:scale-95 font-bold text-sm">💰 Salary Slip</button>
-    <button onclick="showBillType('invoice')" id="bill-btn-invoice" class="bg-white text-indigo-600 rounded-xl py-2 px-3 text-center shadow-xl active:scale-95 font-bold text-sm border-2 border-indigo-200">🧾 Invoice</button>
+  <div class="grid grid-cols-3 gap-2 mb-3">
+    <button onclick="showBillType('salary')" id="bill-btn-salary" class="g-tobr-indigo500-violet500 text-white rounded-xl py-2 px-2 text-center shadow-xl active:scale-95 font-bold text-xs">💰 Salary Slip</button>
+    <button onclick="showBillType('invoice')" id="bill-btn-invoice" class="bg-white text-indigo-600 rounded-xl py-2 px-2 text-center shadow-xl active:scale-95 font-bold text-xs border-2 border-indigo-200">🧾 Invoice</button>
+    <button onclick="showBillType('po')" id="bill-btn-po" class="bg-white text-emerald-600 rounded-xl py-2 px-2 text-center shadow-xl active:scale-95 font-bold text-xs border-2 border-emerald-200">📦 Purchase Order</button>
   </div>
 
   <!-- Salary Slip Section -->
@@ -1582,7 +1828,6 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
       <div class="mb-2">
         <div class="flex items-center justify-between mb-2"><label class="text-[10px] font-bold text-gray-500 uppercase tracking-wide">Line Items</label><button onclick="addInvLine()" class="bg-indigo-100 text-indigo-600 rounded-lg text-xs font-bold px-2 py-1 active:scale-95">+ Add</button></div>
         <div id="inv-lines">
-          
           <div id="inv-lines-body">
             <div class="inv-line mb-2 bg-gray-50 rounded-lg p-2">
               <input type="text" placeholder="Description" class="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none inv-desc mb-1">
@@ -1612,8 +1857,162 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
       <button onclick="generateInvoice()" class="g-tor-emerald500-teal500 w-full text-white py-2.5 rounded-xl font-bold text-sm active:scale-95">🖨️ Save & Print Invoice</button>
     </div>
   </div>
+
+  <!-- Purchase Order Section -->
+  <div id="bill-po-section" style="display:none">
+    <!-- Suppliers -->
+    <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-sm font-bold text-gray-700">🏭 Suppliers</p>
+        <button onclick="togglePoSupplierForm()" class="g-tobr-emerald500-teal500 text-white rounded-lg text-xs font-bold active:scale-95" style="padding:4px 10px">+ Add Supplier</button>
+      </div>
+      <div id="po-supplier-form" style="display:none;background:#f0fdf4;border-radius:10px;padding:10px;margin-bottom:8px;border:1px solid #bbf7d0">
+        <div class="grid grid-cols-2 gap-2 mb-2">
+          <input type="text" id="pos-name" placeholder="Supplier Name *" class="px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-emerald-400">
+          <input type="text" id="pos-contact" placeholder="Contact / Phone" class="px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-emerald-400">
+          <input type="text" id="pos-gst" placeholder="GST No. (opt)" class="px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-emerald-400">
+          <input type="text" id="pos-addr" placeholder="Address (opt)" class="px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-emerald-400">
+        </div>
+        <button onclick="savePoSupplier()" class="g-tor-emerald500-teal500 w-full text-white py-1.5 rounded-lg text-xs font-bold active:scale-95">✅ Save Supplier</button>
+      </div>
+      <div id="po-suppliers-list"><p class="text-gray-400 text-xs text-center py-2">No suppliers yet</p></div>
+    </div>
+    <!-- New PO -->
+    <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-sm font-bold text-gray-700">📦 New Purchase Order</p>
+        <button onclick="generatePOPDF()" class="g-tobr-emerald500-teal500 text-white rounded-lg text-xs font-bold active:scale-95" style="padding:4px 10px">🖨️ Print PDF</button>
+      </div>
+      <div class="grid grid-cols-2 gap-2 mb-2">
+        <div><label class="text-[10px] font-bold text-gray-500 block mb-1">PO No.</label><input type="text" id="po-no" placeholder="PO-001" class="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-emerald-400"></div>
+        <div><label class="text-[10px] font-bold text-gray-500 block mb-1">Date</label><input type="date" id="po-date" class="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-emerald-400"></div>
+        <div><label class="text-[10px] font-bold text-gray-500 block mb-1">Supplier</label>
+          <select id="po-supplier" class="w-full px-2 py-1.5 border border-gray-200 rounded-lg bg-white text-xs focus:outline-none focus:border-emerald-400">
+            <option value="">Select Supplier</option>
+          </select>
+        </div>
+        <div><label class="text-[10px] font-bold text-gray-500 block mb-1">Delivery By</label><input type="date" id="po-delivery" class="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-emerald-400"></div>
+        <div class="col-span-2"><label class="text-[10px] font-bold text-gray-500 block mb-1">Site / Delivery Address</label><input type="text" id="po-site" placeholder="Delivery location" class="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-emerald-400"></div>
+        <div class="col-span-2"><label class="text-[10px] font-bold text-gray-500 block mb-1">Terms & Notes</label><textarea id="po-notes" rows="2" placeholder="Payment terms, delivery conditions..." class="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs resize-none focus:outline-none focus:border-emerald-400"></textarea></div>
+      </div>
+    </div>
+    <!-- PO Line Items -->
+    <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-sm font-bold text-gray-700">📋 Items Ordered</p>
+        <button onclick="addPOLine()" class="g-tobr-amber500-orange500 text-white rounded-lg text-xs font-bold active:scale-95" style="padding:4px 10px">+ Add Item</button>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs mb-2">
+          <thead><tr class="bg-gray-50"><th class="px-2 py-1.5 text-left text-gray-600">Item / Material</th><th class="px-2 py-1.5 text-center text-gray-600">Unit</th><th class="px-2 py-1.5 text-center text-gray-600">Qty</th><th class="px-2 py-1.5 text-center text-gray-600">Rate ₹</th><th class="px-2 py-1.5 text-right text-gray-600">Amount</th><th class="px-1"></th></tr></thead>
+          <tbody id="po-lines-body"></tbody>
+        </table>
+      </div>
+      <div class="flex justify-between items-center border-t pt-2">
+        <div class="flex gap-2 items-center">
+          <label class="text-xs text-gray-600">GST %</label>
+          <input type="number" id="po-gst" placeholder="0" value="0" step="any" class="w-14 px-2 py-1 border border-gray-200 rounded-lg text-xs focus:outline-none" oninput="calcPOTotal()">
+        </div>
+        <div class="text-right">
+          <p class="text-xs text-gray-500">Subtotal: <span id="po-subtotal" class="font-bold text-gray-700">₹0</span></p>
+          <p class="text-xs text-gray-500">GST: <span id="po-gst-amt" class="font-bold text-gray-700">₹0</span></p>
+          <p class="text-sm font-black text-emerald-700">Total: <span id="po-total">₹0</span></p>
+        </div>
+      </div>
+      <button onclick="savePO()" class="g-tobr-emerald500-teal500 w-full text-white py-2 rounded-xl font-bold text-sm active:scale-95 mt-2">💾 Save Purchase Order</button>
+    </div>
+    <!-- Saved POs -->
+    <div class="bg-white rounded-2xl p-3 shadow-xl">
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-sm font-bold text-gray-700">📁 Saved Purchase Orders</p>
+        <button onclick="loadPOTab()" class="bg-gray-100 text-gray-600 rounded-lg text-xs font-semibold px-3 py-1">🔄</button>
+      </div>
+      <div id="po-records-list"><p class="text-gray-400 text-center py-3 text-xs">No POs saved yet</p></div>
+    </div>
+  </div>
 </div>
 
+<!-- ===== QUOTATION / ESTIMATE ===== -->
+<div id="tab-quotation" class="tab-content" style="display:none">
+  <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
+    <div class="flex items-center justify-between mb-2">
+      <p class="text-sm font-bold text-gray-700">💼 New Quotation / Estimate</p>
+      <button onclick="generateQuotePDF()" class="g-tobr-indigo500-violet500 text-white rounded-lg text-xs font-bold active:scale-95" style="padding:5px 12px">🖨️ Print PDF</button>
+    </div>
+    <div class="grid grid-cols-2 gap-2 mb-2">
+      <div><label class="text-[10px] font-bold text-gray-500 block mb-1">Quote No.</label><input type="text" id="qt-no" placeholder="e.g. QT-001" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400"></div>
+      <div><label class="text-[10px] font-bold text-gray-500 block mb-1">Date</label><input type="date" id="qt-date" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400"></div>
+      <div><label class="text-[10px] font-bold text-gray-500 block mb-1">Client Name</label><input type="text" id="qt-client" placeholder="Client Name" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400"></div>
+      <div><label class="text-[10px] font-bold text-gray-500 block mb-1">Project / Location</label><input type="text" id="qt-project" placeholder="Site / Project" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400"></div>
+    </div>
+    <div><label class="text-[10px] font-bold text-gray-500 block mb-1">Validity / Notes</label><textarea id="qt-notes" rows="2" placeholder="Valid for 30 days. Terms apply." class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:border-indigo-400"></textarea></div>
+  </div>
+  <!-- BOQ Line Items -->
+  <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
+    <div class="flex items-center justify-between mb-2">
+      <p class="text-sm font-bold text-gray-700">📋 Bill of Quantities (BOQ)</p>
+      <button onclick="addQtLine()" class="g-tobr-amber500-orange500 text-white rounded-lg text-xs font-bold active:scale-95" style="padding:4px 10px">+ Add Item</button>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-xs mb-2">
+        <thead><tr class="bg-gray-50"><th class="px-2 py-1.5 text-left text-gray-600">Description</th><th class="px-2 py-1.5 text-center text-gray-600">Unit</th><th class="px-2 py-1.5 text-center text-gray-600">Qty</th><th class="px-2 py-1.5 text-center text-gray-600">Rate ₹</th><th class="px-2 py-1.5 text-right text-gray-600">Amount</th><th class="px-1 py-1.5"></th></tr></thead>
+        <tbody id="qt-lines-body"></tbody>
+      </table>
+    </div>
+    <div class="flex justify-between items-center border-t pt-2">
+      <div class="flex gap-2 items-center">
+        <label class="text-xs text-gray-600">GST %</label>
+        <input type="number" id="qt-gst" placeholder="0" value="0" step="any" class="w-14 px-2 py-1 border border-gray-200 rounded-lg text-xs focus:outline-none">
+      </div>
+      <div class="text-right">
+        <p class="text-xs text-gray-500">Subtotal: <span id="qt-subtotal" class="font-bold text-gray-700">₹0</span></p>
+        <p class="text-xs text-gray-500">GST: <span id="qt-gst-amt" class="font-bold text-gray-700">₹0</span></p>
+        <p class="text-sm font-black text-indigo-700">Grand Total: <span id="qt-total">₹0</span></p>
+      </div>
+    </div>
+  </div>
+  <!-- Saved Quotations -->
+  <div class="bg-white rounded-2xl p-3 shadow-xl">
+    <div class="flex items-center justify-between mb-2">
+      <p class="text-sm font-bold text-gray-700">📁 Saved Quotations</p>
+      <button onclick="loadQuotationTab()" class="bg-gray-100 text-gray-600 rounded-lg text-xs font-semibold px-3 py-1">🔄 Refresh</button>
+    </div>
+    <div id="qt-records-list"><p class="text-gray-400 text-center py-3 text-xs">No quotations saved yet</p></div>
+  </div>
+</div>
+
+<!-- ===== SITE VISITS / INSPECTION LOG ===== -->
+<div id="tab-visits" class="tab-content" style="display:none">
+  <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
+    <p class="text-sm font-bold text-gray-700 mb-2">📝 Log Site Visit / Inspection</p>
+    <div class="grid grid-cols-2 gap-2 mb-2">
+      <div><label class="text-[10px] font-bold text-gray-500 block mb-1">Date</label><input type="date" id="vt-date" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400"></div>
+      <div><label class="text-[10px] font-bold text-gray-500 block mb-1">Visit Type</label>
+        <select id="vt-type" class="w-full px-3 py-2 border border-gray-200 rounded-xl bg-white text-sm focus:outline-none focus:border-indigo-400">
+          <option value="Client Visit">Client Visit</option>
+          <option value="Consultant">Consultant</option>
+          <option value="Inspection">Govt. Inspection</option>
+          <option value="Safety Audit">Safety Audit</option>
+          <option value="Quality Check">Quality Check</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div><label class="text-[10px] font-bold text-gray-500 block mb-1">Visitor Name</label><input type="text" id="vt-visitor" placeholder="Name" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400"></div>
+      <div><label class="text-[10px] font-bold text-gray-500 block mb-1">Organization / Role</label><input type="text" id="vt-org" placeholder="Company / Role" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400"></div>
+    </div>
+    <div class="mb-2"><label class="text-[10px] font-bold text-gray-500 block mb-1">Observations / Directions</label><textarea id="vt-notes" rows="3" placeholder="What was observed, directed, or decided..." class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:border-indigo-400"></textarea></div>
+    <div class="mb-2"><label class="text-[10px] font-bold text-gray-500 block mb-1">Action Required</label><input type="text" id="vt-action" placeholder="Any follow-up action needed?" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400"></div>
+    <button onclick="saveVisit()" class="g-tobr-indigo500-violet500 w-full text-white py-2 rounded-xl font-semibold text-sm active:scale-95">📝 Save Visit Log</button>
+  </div>
+  <!-- Visits List -->
+  <div class="bg-white rounded-2xl p-3 shadow-xl">
+    <div class="flex items-center justify-between mb-2">
+      <p class="text-sm font-bold text-gray-700">📋 Visit History</p>
+      <button onclick="printVisitLog()" class="g-tobr-indigo500-violet500 text-white rounded-lg text-xs font-bold active:scale-95" style="padding:4px 10px">🖨️ Print Log</button>
+    </div>
+    <div id="visits-list"><p class="text-gray-400 text-center py-3 text-xs">No visits logged yet</p></div>
+  </div>
+</div>
 </main>
 </div>
 
@@ -1659,16 +2058,58 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
   </div>
 </div>
 
-<!-- Attendance Modal -->
+<!-- Master Attendance Modal -->
+<div id="master-att-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 items-center justify-center p-3" style="display:none">
+  <div class="bg-white rounded-2xl w-full max-w-sm shadow-2xl flex flex-col" style="max-height:90vh">
+    <!-- Header -->
+    <div class="flex items-center justify-between border-b border-gray-100" style="padding:8px 12px">
+      <div>
+        <p class="font-bold text-gray-800" style="font-size:12px">🗂️ Master Attendance</p>
+        <p style="font-size:9px;color:#9ca3af" id="master-att-date-lbl"></p>
+      </div>
+      <button onclick="closeMasterAtt()" class="text-gray-400 font-bold" style="font-size:14px">✕</button>
+    </div>
+    <!-- Hours + Advance inputs -->
+    <div class="border-b border-gray-100" style="padding:8px 10px">
+      <div class="grid grid-cols-3 gap-1.5 mb-1.5">
+        <div><label class="font-bold text-gray-500 uppercase block" style="font-size:9px;margin-bottom:2px">Date</label><input type="date" id="ma-date" class="w-full px-2 border border-gray-200 rounded-lg focus:outline-none focus:border-indigo-400" style="padding-top:4px;padding-bottom:4px;font-size:11px"></div>
+        <div><label class="font-bold text-gray-500 uppercase block" style="font-size:9px;margin-bottom:2px">Hours</label><input type="number" id="ma-hours" placeholder="8" step="any" class="w-full px-2 border border-gray-200 rounded-lg focus:outline-none focus:border-indigo-400" style="padding-top:4px;padding-bottom:4px;font-size:11px"></div>
+        <div><label class="font-bold text-gray-500 uppercase block" style="font-size:9px;margin-bottom:2px">Advance ₹</label><input type="number" id="ma-advance" placeholder="0" step="any" class="w-full px-2 border border-gray-200 rounded-lg focus:outline-none focus:border-indigo-400" style="padding-top:4px;padding-bottom:4px;font-size:11px"></div>
+      </div>
+      <div class="flex gap-1.5">
+        <button onclick="masterAttSelectAll(true)" class="flex-1 bg-indigo-50 text-indigo-600 rounded-lg font-bold border border-indigo-200" style="padding:3px 0;font-size:10px">✅ All</button>
+        <button onclick="masterAttSelectAll(false)" class="flex-1 bg-gray-50 text-gray-500 rounded-lg font-bold border border-gray-200" style="padding:3px 0;font-size:10px">☐ None</button>
+      </div>
+    </div>
+    <!-- Worker list grouped by category -->
+    <div class="overflow-y-auto flex-1" style="padding:8px 10px" id="master-att-worker-list"></div>
+    <!-- Save -->
+    <div class="border-t border-gray-100" style="padding:8px 10px">
+      <button onclick="saveMasterAttendance()" class="g-tor-indigo500-purple500 w-full text-white rounded-xl font-bold active:scale-95" style="padding:7px 0;font-size:11px">✅ Add Attendance for Selected</button>
+      <p id="master-att-msg" class="text-center mt-1" style="display:none;font-size:10px"></p>
+    </div>
+  </div>
+</div>
 
-<div id="att-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 items-center justify-center p-4" style="display:none">
-  <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl">
-    <div class="flex items-center justify-between mb-2"><h3 id="att-modal-title" class="font-bold text-gray-800">Attendance</h3><button onclick="closeAttModal()" class="text-gray-400 text-xl">✕</button></div>
-    <div class="space-y-3">
-      <div><label class="text-xs font-medium text-gray-600">Date</label><input type="date" id="att-date" class="w-full mt-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none"></div>
-      <div><label class="text-xs font-medium text-gray-600">Hours Worked</label><input type="number" id="att-hours" placeholder="Hours" step="any" class="w-full mt-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none"></div>
-      <div><label class="text-xs font-medium text-gray-600">Advance Payment (Optional)</label><input type="number" id="att-advance" placeholder="Amount" step="any" class="w-full mt-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none"></div>
-      <button onclick="saveAttendance()" class="g-tor-indigo500-purple500 w-full text-white py-2 rounded-xl font-semibold text-sm active:scale-95">Save</button>
+<div id="att-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 items-center justify-center p-3" style="display:none">
+  <div class="bg-white rounded-2xl w-full max-w-sm shadow-2xl" style="padding:10px 12px">
+    <div class="flex items-center justify-between mb-2"><h3 id="att-modal-title" class="font-bold text-gray-800 text-sm">Attendance</h3><button onclick="closeAttModal()" class="text-gray-400 font-bold" style="font-size:14px">✕</button></div>
+    <div class="space-y-2">
+      <div class="grid grid-cols-2 gap-2">
+        <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-0.5">Date</label><input type="date" id="att-date" class="w-full px-2 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-indigo-400" style="padding-top:5px;padding-bottom:5px"></div>
+        <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-0.5">Regular Hours</label><input type="number" id="att-hours" placeholder="e.g. 8" step="any" class="w-full px-2 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-indigo-400" style="padding-top:5px;padding-bottom:5px"></div>
+      </div>
+      <div><label class="text-[9px] font-bold text-gray-500 uppercase block mb-0.5">Advance Payment <span class="font-normal normal-case text-gray-400">(Optional)</span></label><input type="number" id="att-advance" placeholder="Amount ₹" step="any" class="w-full px-2 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-indigo-400" style="padding-top:5px;padding-bottom:5px"></div>
+      <!-- Overtime Section -->
+      <div style="background:#fef3c7;border-radius:8px;padding:7px 9px;border:1px solid #fcd34d">
+        <p class="font-bold text-amber-700 mb-1" style="font-size:9px">⏰ Overtime (Optional)</p>
+        <div class="grid grid-cols-2 gap-2">
+          <div><label class="text-[9px] font-bold text-gray-500 block mb-0.5">OT Hours</label><input type="number" id="att-ot-hours" placeholder="e.g. 2" step="any" class="w-full px-2 border border-amber-200 rounded-lg text-xs focus:outline-none bg-white" style="padding-top:5px;padding-bottom:5px"></div>
+          <div><label class="text-[9px] font-bold text-gray-500 block mb-0.5">OT Rate (₹/hr)</label><input type="number" id="att-ot-rate" placeholder="auto" step="any" class="w-full px-2 border border-amber-200 rounded-lg text-xs focus:outline-none bg-white" style="padding-top:5px;padding-bottom:5px"></div>
+        </div>
+        <p id="att-ot-calc" class="text-amber-700 font-semibold mt-1" style="display:none;font-size:9px"></p>
+      </div>
+      <button onclick="saveAttendance()" class="g-tor-indigo500-purple500 w-full text-white rounded-xl font-semibold active:scale-95" style="padding:7px 0;font-size:11px">Save Attendance</button>
     </div>
   </div>
 </div>
@@ -1925,11 +2366,11 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
             </div>
           </div>
           <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:.75rem .9rem;">
-            <p style="font-size:10px;font-weight:700;color:#7c3aed;margin-bottom:.5rem;">&#8505;&#65039; How login works</p>
+            <p style="font-size:10px;font-weight:700;color:#7c3aed;margin-bottom:.5rem;">ℹ️ Admin Login — Cloud Access</p>
             <div style="display:flex;flex-direction:column;gap:5px;">
-              <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">&#128273;</span><p style="font-size:10px;color:#a78bfa;">Admin ID &rarr; full access, backup, manage viewers</p></div>
-              <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">&#128065;&#65039;</span><p style="font-size:10px;color:#a78bfa;">Viewer ID &rarr; read-only, permitted tabs only</p></div>
-              <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">&#128272;</span><p style="font-size:10px;color:#a78bfa;">Viewer credentials given by site admin</p></div>
+              <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">☁️</span><p style="font-size:10px;color:#a78bfa;">Login to access Cloud Backup, Sync & Viewer management</p></div>
+              <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">💳</span><p style="font-size:10px;color:#a78bfa;">Active ₹30/month subscription required</p></div>
+              <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">👁️</span><p style="font-size:10px;color:#a78bfa;">Viewers use a shared link — no login needed for them</p></div>
             </div>
           </div>
         </div>
@@ -1964,24 +2405,11 @@ service cloud.firestore {
 }</div>
             <button onclick="var r='rules_version = \'2\';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n    match /admins/{uid} {\n      allow read, write: if request.auth != null\n        &amp;&amp; request.auth.uid == uid;\n    }\n    match /viewers/{uid} {\n      allow read: if request.auth != null\n        &amp;&amp; request.auth.uid == uid;\n      allow write: if request.auth != null\n        &amp;&amp; exists(/databases/$(database)/documents/admins/$(request.auth.uid));\n    }\n    match /sites/{siteId} {\n      allow write: if request.auth != null\n        &amp;&amp; exists(/databases/$(database)/documents/admins/$(request.auth.uid));\n      allow read: if request.auth != null;\n    }\n  }\n}';var t=document.createElement('textarea');t.value=r.replace(/&amp;/g,'&');document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();toast('✅ Rules copied!','ok');" style="width:100%;margin-top:6px;padding:6px;background:linear-gradient(135deg,#d97706,#f59e0b);color:white;border:none;border-radius:8px;font-size:10px;font-weight:800;cursor:pointer;">📋 Copy Rules to Clipboard</button>
           </div>
-          <div style="background:linear-gradient(135deg,rgba(34,197,94,.12),rgba(16,185,129,.07));border:1px solid rgba(34,197,94,.22);border-radius:12px;padding:.75rem .9rem;margin-bottom:.75rem;">
-            <div style="display:flex;align-items:center;justify-content:space-between;">
-              <div>
-                <p style="font-size:12px;font-weight:800;color:#86efac;line-height:1;">&#9729;&#65039; Cloud Active</p>
-                <p id="cloud-site-id-display" style="font-size:9px;color:#6ee7b7;margin-top:3px;">Site ID: &mdash;</p>
-              </div>
-              <div style="width:30px;height:30px;background:rgba(34,197,94,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;">&#9989;</div>
-            </div>
-          </div>
+          <div id="cloud-firebase-section" style="display:none;"></div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
             <button onclick="cloudBackupNow()" style="padding:.7rem;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white;border:none;border-radius:12px;font-weight:700;font-size:.78rem;cursor:pointer;">&#11014;&#65039; Backup Now</button>
             <button onclick="cloudRestoreNow()" style="padding:.7rem;background:linear-gradient(135deg,#0891b2,#0ea5e9);color:white;border:none;border-radius:12px;font-weight:700;font-size:.78rem;cursor:pointer;">&#11015;&#65039; Restore</button>
           </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
-            <button onclick="openViewerModal()" style="padding:.65rem;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:#c4b5fd;border-radius:12px;font-weight:700;font-size:.78rem;cursor:pointer;">&#128279; Viewer Link</button>
-            <button onclick="disconnectCloudWithBackup()" style="padding:.65rem;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#fca5a5;border-radius:12px;font-size:.78rem;font-weight:700;cursor:pointer;">&#128268; Disconnect</button>
-          </div>
-          <div id="cloud-firebase-section" style="display:none;"></div>
           <div>
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;">
               <p style="font-size:11px;font-weight:800;color:#a78bfa;">&#128101; Viewer Accounts</p>
@@ -2020,7 +2448,6 @@ service cloud.firestore {
           <div style="display:flex;flex-direction:column;gap:5px;">
             <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">&#9729;&#65039;</span><p style="font-size:10px;color:#6ee7b7;">Cloud Backup &amp; Sync &mdash; <strong style="color:#fbbf24;">&#8377;30/month</strong></p></div>
             <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">&#128101;</span><p style="font-size:10px;color:#6ee7b7;">Unlimited Viewer accounts &mdash; <strong style="color:#86efac;">Free</strong></p></div>
-            <div style="display:flex;align-items:center;gap:6px;padding:5px 8px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);border-radius:8px;margin-top:1px;"><span style="font-size:11px;">🚧</span><p style="font-size:9px;color:#fbbf24;font-weight:700;">Viewer feature currently under progress</p></div>
             <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">&#128242;</span><p style="font-size:10px;color:#6ee7b7;">Multi-device real-time sync</p></div>
             <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">&#128274;</span><p style="font-size:10px;color:#6ee7b7;">Tab-level viewer permissions</p></div>
             <div style="display:flex;align-items:center;justify-content:center;gap:5px;margin-top:4px;padding:6px 8px;background:rgba(131,58,180,.15);border:1px solid rgba(193,53,132,.3);border-radius:8px;">
@@ -2080,15 +2507,14 @@ service cloud.firestore {
     <!-- Scrollable body -->
     <div style="overflow-y:auto;flex:1;padding:1rem 1.2rem 1.2rem;">
 
-      <!-- Create new viewer -->
+      <!-- Create new viewer — token-based, no password needed -->
       <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:1.1rem;padding:.9rem;margin-bottom:1rem;">
-        <p style="font-size:12px;font-weight:800;color:#fbbf24;margin-bottom:.7rem;">➕ Create New Viewer</p>
-        <label style="font-size:10px;font-weight:700;color:#a78bfa;display:block;margin-bottom:3px">Email</label>
-        <input id="vw-email" type="email" class="auth-input" placeholder="viewer@example.com">
-        <label style="font-size:10px;font-weight:700;color:#a78bfa;display:block;margin-bottom:3px">Password (min 6 chars)</label>
-        <input id="vw-pass" type="password" class="auth-input" placeholder="Set a password for them">
+        <p style="font-size:12px;font-weight:800;color:#fbbf24;margin-bottom:.7rem;">🔗 Create Viewer Link</p>
+        <p style="font-size:10px;color:#a78bfa;margin-bottom:.7rem;line-height:1.5;">Share the generated link — viewer opens it, sees only selected tabs. No login needed. Stays active until you delete it.</p>
+        <label style="font-size:10px;font-weight:700;color:#a78bfa;display:block;margin-bottom:3px">Viewer Name / Label</label>
+        <input id="vw-name" type="text" class="auth-input" placeholder="e.g. Client View, Rampur Site, Suresh">
 
-        <label style="font-size:10px;font-weight:700;color:#a78bfa;display:block;margin-bottom:6px;">Tab Permissions — tap to toggle:</label>
+        <label style="font-size:10px;font-weight:700;color:#a78bfa;display:block;margin-bottom:6px;margin-top:.6rem;">Select Tabs to Show — tap to toggle:</label>
         <div id="perm-chips-container" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:.75rem;">
           <span class="perm-chip on" data-tab="dashboard">📊 Dashboard</span>
           <span class="perm-chip on" data-tab="daily">📋 Daily Report</span>
@@ -2108,18 +2534,19 @@ service cloud.firestore {
         </div>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:.75rem;">
           <input type="checkbox" id="vw-can-print" style="accent-color:#818cf8;width:15px;height:15px;">
-          <label for="vw-can-print" style="font-size:11px;color:#c4b5fd;font-weight:600;">Allow Print / Export on permitted tabs</label>
+          <label for="vw-can-print" style="font-size:11px;color:#c4b5fd;font-weight:600;">Allow Print / Export</label>
         </div>
-        <button onclick="createViewerAccount()" id="create-viewer-btn" style="width:100%;padding:.78rem;background:linear-gradient(135deg,#d97706,#f59e0b);color:white;border:none;border-radius:.875rem;font-weight:800;font-size:.875rem;cursor:pointer;box-shadow:0 4px 14px rgba(217,119,6,.45);">
-          ➕ Create Viewer Account
+        <button onclick="generateViewerLink()" id="create-viewer-btn" style="width:100%;padding:.78rem;background:linear-gradient(135deg,#d97706,#f59e0b);color:white;border:none;border-radius:.875rem;font-weight:800;font-size:.875rem;cursor:pointer;box-shadow:0 4px 14px rgba(217,119,6,.45);">
+          🔗 Generate & Copy Link
         </button>
         <p id="vw-create-err" style="font-size:11px;color:#fca5a5;text-align:center;margin-top:.4rem;display:none"></p>
+        <!-- Generated link display -->
+        <div id="vw-link-result" style="display:none;margin-top:.75rem;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px;">
+          <p style="font-size:9px;color:#86efac;font-weight:700;margin-bottom:4px">✅ Link Generated — Share this:</p>
+          <p id="vw-link-text" style="font-size:10px;color:#c4b5fd;word-break:break-all;margin-bottom:6px;line-height:1.5"></p>
+          <button onclick="copyVwLink()" style="width:100%;padding:6px;background:rgba(99,102,241,.3);border:1px solid rgba(129,140,248,.4);color:#c7d2fe;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;">📋 Copy Link</button>
+        </div>
       </div>
-
-      <!-- Viewer link shortcut -->
-      <button onclick="closeViewerMgmt();openViewerModal();" style="width:100%;padding:.72rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#c4b5fd;border-radius:.875rem;font-weight:700;font-size:.82rem;cursor:pointer;margin-bottom:1rem;">
-        🔗 Copy / Share Viewer Link
-      </button>
 
       <!-- Existing viewers list -->
       <div>
@@ -2144,10 +2571,14 @@ service cloud.firestore {
         <div style="width:44px;height:44px;background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 14px rgba(245,158,11,.4);">🏗️</div>
         <div>
           <p style="font-size:17px;font-weight:900;color:white;line-height:1;">Sanjineer Cloud</p>
-          <p style="font-size:10px;color:#c4b5fd;">Pro Subscription</p>
+          <p style="font-size:10px;color:#c4b5fd;">Pro Subscription Required</p>
         </div>
       </div>
-      <button onclick="closePayLanding()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:9px;color:rgba(255,255,255,.6);font-size:20px;width:34px;height:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+      <button id="pay-close-btn" onclick="_safeClosePayLanding()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:9px;color:rgba(255,255,255,.6);font-size:20px;width:34px;height:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+    </div>
+    <div id="pay-locked-msg" style="display:none;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:8px 12px;margin-bottom:.75rem;display:none;">
+      <p style="font-size:11px;color:#fca5a5;font-weight:700;">🔒 Subscription required to use Cloud</p>
+      <p style="font-size:10px;color:#fca5a5;margin-top:2px;opacity:.8;">Pay to activate, or <button onclick="_cancelAndLogout()" style="background:none;border:none;color:#fbbf24;font-size:10px;font-weight:700;cursor:pointer;padding:0;text-decoration:underline">cancel & logout</button></p>
     </div>
     <div style="text-align:center;padding:1rem 0;margin-bottom:1rem;border-top:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08);">
       <p style="color:white;font-size:36px;font-weight:900;line-height:1;">₹30<span style="font-size:14px;font-weight:400;color:#a78bfa">/month</span></p>
@@ -2602,7 +3033,7 @@ function dismissPWA(){
 // ============================================================
 // TABS
 // ============================================================
-var TABS = ['dashboard','daily','departmental','attendance','machinery','expenses','materials','tools','drawings','rentals','contractors','budget','schedule','punchlist','bill'];
+var TABS = ['dashboard','daily','departmental','attendance','machinery','expenses','materials','tools','drawings','rentals','contractors','budget','schedule','punchlist','bill','quotation','visits'];
 
 var _plFilter='all';
 
@@ -2639,7 +3070,10 @@ function switchTab(name) {
     else if (name === 'schedule')     loadScheduleTab();
     else if (name === 'punchlist')    loadPunchTab();
     else if (name === 'bill')         initBillTab();
+    else if (name === 'quotation')    loadQuotationTab();
+    else if (name === 'visits')       loadVisitsTab();
     updateDropdowns();
+    if (typeof _postSwitchTab === 'function') _postSwitchTab(name);
   } catch(e) {
     console.error('switchTab render error [' + name + ']', e);
   }
@@ -2697,9 +3131,7 @@ function boot() {
   var machDate=document.getElementById('mach-date');if(machDate)machDate.value=ist();
   checkViewerMode();
   // ── SUPABASE CONFIG (pre-configured, no manual setup needed) ──
-  if (!getSiteId()) {
-    safeLS.setItem(CLOUD_SITE_ID, 'sanjineer-main-site');
-  }
+  // Site ID is now auto-set from admin user ID on login — no hardcoded default needed
   if (!isCloudActivated()) {
     safeLS.setItem(CLOUD_KEY, '1');
   }
@@ -2707,17 +3139,15 @@ function boot() {
   // Restore viewer session if they refreshed the page
   var viewerEmail = safeLS.getItem('sj_viewer_email');
   var viewerPerms = safeLS.getItem('sj_viewer_perms');
-  var viewerSite  = safeLS.getItem('sj_viewer_site');
-  if (viewerEmail && viewerPerms && viewerSite) {
+  var viewerAdmin = safeLS.getItem('sj_viewer_admin'); // adminId — used to fetch data
+  if (viewerEmail && viewerPerms && viewerAdmin) {
     _IS_VIEWER = true;
     var perms = [];
     try { perms = JSON.parse(viewerPerms); } catch(ex) {}
     var canPrint = safeLS.getItem('sj_viewer_print') === '1';
-    // Show viewer top bar
     if (!document.getElementById('viewer-top-bar')) {
       _showViewerBar(viewerEmail);
     }
-    // Apply permissions immediately (before data loads)
     document.querySelectorAll('.tab-btn[data-tab]').forEach(function(btn) {
       btn.style.display = perms.indexOf(btn.getAttribute('data-tab')) === -1 ? 'none' : '';
     });
@@ -2731,8 +3161,8 @@ function boot() {
         }
       });
     }
-    // Load data via Supabase backup
-    setTimeout(function() { _viewerLoadData(viewerSite, ''); }, 1500);
+    // Load data using adminId — correct admin's data always
+    setTimeout(function() { _viewerLoadData(viewerAdmin, ''); }, 1500);
     return;
   }
   if (!viewerEmail) {
@@ -2885,10 +3315,48 @@ function viewDaily() {
   var mats = AD.filter(function(a){ return a.type==='material' && a.date===DD && !a.is_petty_cash; });
   var mc = mats.reduce(function(s,m){ return s+(parseFloat(m.cost)||0); }, 0);
   var dm = document.getElementById('daily-mat-cost'); if (dm) dm.textContent = fc(mc);
+  // Worker cost = sum of (hours × hourly_wage) for each worker present today
+  var wc = att.reduce(function(s, a) {
+    var worker = AD.find(function(w){ return w.type==='worker' && w.name===a.name; });
+    var rate = worker ? (parseFloat(worker.hourly_wage)||0) : 0;
+    return s + (parseFloat(a.hours)||0) * rate;
+  }, 0);
+  var dwc = document.getElementById('daily-worker-cost'); if (dwc) dwc.textContent = fc(wc);
   var dmt = document.getElementById('daily-mat-table');
   if (dmt) dmt.innerHTML = mats.length
     ? mats.map(function(m){ return '<tr class="border-b border-gray-100"><td class="px-2 py-2 font-medium text-xs">'+m.material_name+'</td><td class="px-2 py-2 text-center text-xs">'+(m.quantity||'--')+'</td><td class="px-2 py-2 text-right text-xs">'+fc(m.cost)+'</td></tr>'; }).join('')
     : '<tr><td colspan="3" class="py-3 text-center text-gray-400 text-xs">None today</td></tr>';
+
+  // Populate Materials Stock Usage table
+  var stockTbl = document.getElementById('daily-stock-table');
+  if (stockTbl) {
+    var allMats = lmat();
+    if (!allMats.length) {
+      stockTbl.innerHTML = '<tr><td colspan="4" style="padding:8px;text-align:center;color:#9ca3af;font-size:11px">No materials in stock</td></tr>';
+    } else {
+      stockTbl.innerHTML = allMats.map(function(item) {
+        var currentStock = getbal(item);
+        var usedToday = (item.transactions||[]).filter(function(t){ return t.type==='use' && (t.date||'').startsWith(DD); }).reduce(function(s,t){ return s+t.qty; }, 0);
+        var purchasedToday = (item.transactions||[]).filter(function(t){ return t.type==='purchase' && (t.date||'').startsWith(DD); }).reduce(function(s,t){ return s+t.qty; }, 0);
+        // Previous day stock = current stock - today's purchases + today's usage
+        var prevStock = currentStock - purchasedToday + usedToday;
+        var remaining = currentStock;
+        var isLow = item.minQty > 0 && remaining <= item.minQty;
+        var nameCell = isLow
+          ? '<span style="background:#fee2e2;color:#dc2626;font-weight:800;border-radius:6px;padding:2px 7px;font-size:11px">'+item.name+'</span> <span style="background:#fef08a;color:#92400e;font-weight:700;border-radius:4px;padding:1px 5px;font-size:9px">LOW</span>'
+          : '<span style="font-size:11px;font-weight:600;color:#374151">'+item.name+'</span>';
+        var remCell = isLow
+          ? '<span style="background:#fee2e2;color:#dc2626;font-weight:800;border-radius:6px;padding:2px 6px;font-size:11px">'+remaining+' '+item.unit+'</span>'
+          : '<span style="color:#059669;font-weight:700;font-size:11px">'+remaining+' '+item.unit+'</span>';
+        return '<tr style="border-bottom:1px solid #f3f4f6">'
+          + '<td style="padding:5px 8px;">'+nameCell+'</td>'
+          + '<td style="padding:5px 8px;text-align:center;font-size:11px;color:#374151">'+prevStock+' '+item.unit+'</td>'
+          + '<td style="padding:5px 8px;text-align:center;font-size:11px;color:'+(usedToday>0?'#d97706':'#9ca3af')+';font-weight:'+(usedToday>0?'700':'400')+'">'+(usedToday>0?usedToday+' '+item.unit:'—')+'</td>'
+          + '<td style="padding:5px 8px;text-align:center">'+remCell+'</td>'
+          + '</tr>';
+      }).join('');
+    }
+  }
   var grp = {};
   att.forEach(function(a){ if (!grp[a.category]) grp[a.category]=[]; grp[a.category].push(a); });
   var cats = Object.keys(grp).sort(function(a,b){ return (CATS.indexOf(a)+1||99)-(CATS.indexOf(b)+1||99); });
@@ -4106,7 +4574,7 @@ if(sBar)sBar.style.width=msPct+'%';if(sPct)sPct.textContent=msPct+'%';
 // Live clock
 _updateDashClock();
 var low=getLowStock(), lsDiv=document.getElementById('dash-low-stock');
-if (low.length) { lsDiv.classList.remove('hidden'); document.getElementById('dash-low-list').innerHTML=low.map(function(i){ return '<p style="color:white;font-size:12px">• '+i.name+': '+getbal(i)+' '+i.unit+' (min '+i.minQty+')</p>'; }).join(''); }
+if (low.length) { lsDiv.classList.remove('hidden'); document.getElementById('dash-low-list').innerHTML=low.map(function(i){ return '<span style="background:rgba(0,0,0,0.2);border-radius:6px;padding:2px 7px;font-size:10px;font-weight:700;white-space:nowrap">'+i.name+' <span style="color:#fde68a">'+getbal(i)+' '+i.unit+'</span></span>'; }).join(''); }
 else lsDiv.classList.add('hidden');
 var ctrs=AD.filter(function(d){ return d.type==='contractor'; });
 var td=document.getElementById('team-details');
@@ -4278,6 +4746,7 @@ var att=dedup(AD.filter(function(a){ return a.type==='attendance'&&a.date===d; }
 var mats=AD.filter(function(a){ return a.type==='material'&&a.date===d&&!a.is_petty_cash; });
 var adv=att.reduce(function(s,a){ return s+(parseFloat(a.advance)||0); },0)+AD.filter(function(a){ return a.type==='contractor_payment'&&a.date===d; }).reduce(function(s,a){ return s+(parseFloat(a.payment)||0); },0);
 var mc=mats.reduce(function(s,m){ return s+(parseFloat(m.cost)||0); },0);
+var wc=att.reduce(function(s,a){ var worker=AD.find(function(w){ return w.type==='worker'&&w.name===a.name; }); var rate=worker?(parseFloat(worker.hourly_wage)||0):0; return s+(parseFloat(a.hours)||0)*rate; },0);
 var grp={}; att.forEach(function(a){ if(!grp[a.category]) grp[a.category]=[]; grp[a.category].push(a); });
 var cats=Object.keys(grp).sort(function(a,b){ return (CATS.indexOf(a)+1||99)-(CATS.indexOf(b)+1||99); });
 var dept=ldept()[d]||[];
@@ -4294,7 +4763,7 @@ var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Daily Report</
   true
 )
 +(meta.weather||meta.status ? '<div style="background:#f0f4ff;border:1.5px solid #c7d2fe;border-radius:8px;padding:8px 14px;margin-bottom:14px"><div style="font-size:9px;font-weight:700;color:#6b7280;text-transform:uppercase">Site Status</div><div style="font-size:11px;margin-top:3px">'+(meta.weather?'<strong>'+meta.weather+'</strong> — ':'')+meta.status+'</div></div>' : '')
-+'<div class="sumrow"><div class="sc" style="border-color:#fca5a5"><div class="scl">Advances</div><div class="scv" style="color:#dc2626">'+fc(adv)+'</div></div><div class="sc" style="border-color:#fcd34d"><div class="scl">Material</div><div class="scv" style="color:#d97706">'+fc(mc)+'</div></div></div>'
++'<div class="sumrow"><div class="sc" style="border-color:#fca5a5"><div class="scl">Advances</div><div class="scv" style="color:#dc2626">'+fc(adv)+'</div></div><div class="sc" style="border-color:#fcd34d"><div class="scl">Material</div><div class="scv" style="color:#d97706">'+fc(mc)+'</div></div><div class="sc" style="border-color:#a5b4fc"><div class="scl">Worker Cost</div><div class="scv" style="color:#4f46e5">'+fc(wc)+'</div></div></div>'
 +(low.length ? '<div style="background:#fee2e2;border:1.5px solid #fca5a5;border-radius:8px;padding:10px 14px;margin-bottom:14px"><strong>⚠ Low Stock:</strong> '+low.map(function(i){ return i.name+' ('+getbal(i)+' left)'; }).join(', ')+'</div>' : '')
 +'<div class="sec"><div class="st">👷 Labour Summary</div>'
 +(cats.length ? '<table><thead><tr><th>Category</th><th style="text-align:center">Count</th><th style="text-align:center">Hours</th><th>Work Done</th></tr></thead><tbody>'
@@ -4303,9 +4772,34 @@ var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Daily Report</
 +(dept.length ? '<div class="sec"><div class="st" style="border-left-color:#7c3aed">🏗 Departmental Work</div><table><thead><tr style="background:#7c3aed"><th>Category</th><th style="text-align:center">Workers</th><th style="text-align:center">Hours</th><th>Work Done</th><th style="text-align:right">Amount</th></tr></thead><tbody>'
 +dept.map(function(e){ return '<tr><td style="font-weight:700;padding:6px 10px">'+e.cat+'</td><td style="text-align:center;padding:6px 10px;color:#7c3aed;font-weight:700">'+e.workers+'</td><td style="text-align:center;padding:6px 10px">'+(e.hours||'–')+'h</td><td style="padding:6px 10px">'+(e.work||'–')+'</td><td style="text-align:right;padding:6px 10px;font-weight:700;color:#059669">'+(e.amount?fc(e.amount):'–')+'</td></tr>'; }).join('')
 +'</tbody><tfoot><tr><td style="padding:7px 10px;font-weight:900">TOTAL</td><td style="text-align:center;padding:7px 10px;font-weight:900">'+dW+'</td><td style="text-align:center;padding:7px 10px;font-weight:900">'+dH+'h</td><td></td><td style="text-align:right;padding:7px 10px;font-weight:900">'+fc(dA)+'</td></tr></tfoot></table></div>' : '')
-+(mats.length ? '<div class="sec"><div class="st" style="border-left-color:#059669">🪰 Materials</div><table><thead><tr><th>Material</th><th style="text-align:center">Qty</th><th style="text-align:right">Amount</th></tr></thead><tbody>'
++(mats.length ? '<div class="sec"><div class="st" style="border-left-color:#059669">🧱 Materials Purchased</div><table><thead><tr><th>Material</th><th style="text-align:center">Qty</th><th style="text-align:right">Amount</th></tr></thead><tbody>'
 +mats.map(function(m){ return '<tr><td style="font-weight:600;padding:6px 10px">'+m.material_name+'</td><td style="text-align:center;padding:6px 10px">'+(m.quantity||'–')+'</td><td style="text-align:right;padding:6px 10px;font-weight:700">'+fc(m.cost)+'</td></tr>'; }).join('')
 +'</tbody><tfoot><tr><td colspan="2" style="padding:7px 10px;font-weight:900">Total</td><td style="text-align:right;padding:7px 10px;font-weight:900">'+fc(mc)+'</td></tr></tfoot></table></div>' : '')
++(function(){
+  var allMats = lmat(); if (!allMats.length) return '';
+  var rows = allMats.map(function(item){
+    var currentStock = getbal(item);
+    var usedToday = (item.transactions||[]).filter(function(t){ return t.type==='use' && (t.date||'').startsWith(d); }).reduce(function(s,t){ return s+t.qty; }, 0);
+    var purchasedToday = (item.transactions||[]).filter(function(t){ return t.type==='purchase' && (t.date||'').startsWith(d); }).reduce(function(s,t){ return s+t.qty; }, 0);
+    var prevStock = currentStock - purchasedToday + usedToday;
+    var remaining = currentStock;
+    var isLow = item.minQty > 0 && remaining <= item.minQty;
+    var nameCell = isLow
+      ? '<span style="background:#fee2e2;color:#dc2626;font-weight:800;border-radius:5px;padding:2px 6px">'+item.name+'</span> <span style="background:#fef08a;color:#92400e;font-weight:700;border-radius:4px;padding:1px 5px;font-size:9px">LOW</span>'
+      : item.name;
+    var remCell = isLow
+      ? '<span style="background:#fee2e2;color:#dc2626;font-weight:800;border-radius:5px;padding:2px 6px">'+remaining+' '+item.unit+'</span>'
+      : '<span style="color:#059669;font-weight:700">'+remaining+' '+item.unit+'</span>';
+    return '<tr style="border-bottom:1px solid #f3f4f6">'
+      +'<td style="padding:5px 8px">'+nameCell+'</td>'
+      +'<td style="text-align:center;padding:5px 8px">'+prevStock+' '+item.unit+'</td>'
+      +'<td style="text-align:center;padding:5px 8px;color:'+(usedToday>0?'#d97706':'#9ca3af')+';font-weight:'+(usedToday>0?'700':'400')+'">'+(usedToday>0?usedToday+' '+item.unit:'—')+'</td>'
+      +'<td style="text-align:center;padding:5px 8px">'+remCell+'</td></tr>';
+  }).join('');
+  return '<div class="sec"><div class="st" style="border-left-color:#d97706">📦 Materials Stock</div>'
+    +'<table><thead><tr><th>Material</th><th style="text-align:center">Prev Stock</th><th style="text-align:center">Used Today</th><th style="text-align:center">Remaining</th></tr></thead>'
+    +'<tbody>'+rows+'</tbody></table></div>';
+})()
 +(photos.length ? '<div class="sec"><div class="st">📷 Site Photos</div><div style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0">'+photos.map(function(p){ return '<img src="'+p+'" style="width:120px;height:90px;object-fit:cover;border-radius:8px">'; }).join('')+'</div></div>' : '')
 +pftr()+'</div></body></html>';
 opw(html);
@@ -4959,7 +5453,7 @@ function openDrawingFile(id,room){
   if(!d||!d.file){toast('No file attached','err');return;}
   var w=window.open('','_blank');
   if(w){w.document.write('<html><head><title>'+d.name+'</title><style>body{margin:0;background:#000;display:flex;flex-direction:column;align-items:center;min-height:100vh}.ctrl{padding:10px 16px;background:#1e1b4b;display:flex;gap:10px;width:100%;align-items:center;box-sizing:border-box}.ctrl button{padding:6px 14px;border:none;border-radius:8px;cursor:pointer;font-weight:700;font-size:13px}.view-area{flex:1;width:100%;display:flex;align-items:center;justify-content:center;padding:10px}</style></head><body>'+
-    '<div class="ctrl"><span style="color:white;font-weight:700;font-size:14px">'+d.name+'</span><button onclick="document.getElementById(\'zoom-el\').style.transform=\'scale(\'+((parseFloat(document.getElementById(\'zoom-el\').style.transform.replace(/[^0-9.]/g,\'\')||\'1\'))+0.25)+\')\'" style="background:#4f46e5;color:white">🔍+</button><button onclick="document.getElementById(\'zoom-el\').style.transform=\'scale(\'+Math.max(0.25,(parseFloat(document.getElementById(\'zoom-el\').style.transform.replace(/[^0-9.]/g,\'\')||\'1\'))-0.25)+\')\'" style="background:#374151;color:white">🔍-</button><button onclick="document.getElementById(\'zoom-el\').style.transform=\'scale(1)\'" style="background:#374151;color:white">Reset</button></div>'+
+    '<div class="ctrl"><button onclick="window.close()" style="background:#374151;color:white">← Back</button><span style="color:white;font-weight:700;font-size:14px;flex:1">'+d.name+'</span><button onclick="document.getElementById(\'zoom-el\').style.transform=\'scale(\'+((parseFloat(document.getElementById(\'zoom-el\').style.transform.replace(/[^0-9.]/g,\'\')||\'1\'))+0.25)+\')\'" style="background:#4f46e5;color:white">🔍+</button><button onclick="document.getElementById(\'zoom-el\').style.transform=\'scale(\'+Math.max(0.25,(parseFloat(document.getElementById(\'zoom-el\').style.transform.replace(/[^0-9.]/g,\'\')||\'1\'))-0.25)+\')\'" style="background:#374151;color:white">🔍-</button><button onclick="document.getElementById(\'zoom-el\').style.transform=\'scale(1)\'" style="background:#374151;color:white">Reset</button></div>'+
     '<div class="view-area"><iframe id="zoom-el" src="'+d.file+'" style="width:100%;height:85vh;border:0;border-radius:8px;transform-origin:center top;transform:scale(1)"></iframe></div>'+
     '</body></html>');w.document.close();}
 }
@@ -5197,16 +5691,27 @@ function initBillTab(){
 function showBillType(type){
   var ss=document.getElementById('bill-salary-section');
   var is=document.getElementById('bill-invoice-section');
+  var ps=document.getElementById('bill-po-section');
   var bs=document.getElementById('bill-btn-salary');
   var bi=document.getElementById('bill-btn-invoice');
+  var bp=document.getElementById('bill-btn-po');
+  var inactive='bg-white rounded-xl py-2 px-2 text-center shadow-xl active:scale-95 font-bold text-xs border-2';
+  if(ss)ss.style.display='none';
+  if(is)is.style.display='none';
+  if(ps)ps.style.display='none';
+  if(bs)bs.className=inactive+' border-indigo-200 text-indigo-600';
+  if(bi)bi.className=inactive+' border-indigo-200 text-indigo-600';
+  if(bp)bp.className=inactive+' border-emerald-200 text-emerald-600';
   if(type==='salary'){
-    if(ss)ss.style.display='block';if(is)is.style.display='none';
-    if(bs){bs.className='g-tobr-indigo500-violet500 text-white rounded-2xl p-3 text-center shadow-xl active:scale-95 font-bold text-sm';}
-    if(bi){bi.className='bg-white text-indigo-600 rounded-2xl p-3 text-center shadow-xl active:scale-95 font-bold text-sm border-2 border-indigo-200';}
-  } else {
-    if(ss)ss.style.display='none';if(is)is.style.display='block';
-    if(bi){bi.className='g-tobr-emerald500-teal500 text-white rounded-2xl p-3 text-center shadow-xl active:scale-95 font-bold text-sm';}
-    if(bs){bs.className='bg-white text-indigo-600 rounded-2xl p-3 text-center shadow-xl active:scale-95 font-bold text-sm border-2 border-indigo-200';}
+    if(ss)ss.style.display='block';
+    if(bs)bs.className='g-tobr-indigo500-violet500 text-white rounded-xl py-2 px-2 text-center shadow-xl active:scale-95 font-bold text-xs';
+  } else if(type==='invoice'){
+    if(is)is.style.display='block';
+    if(bi)bi.className='g-tobr-indigo500-violet500 text-white rounded-xl py-2 px-2 text-center shadow-xl active:scale-95 font-bold text-xs';
+  } else if(type==='po'){
+    if(ps)ps.style.display='block';
+    if(bp)bp.className='g-tobr-emerald500-teal500 text-white rounded-xl py-2 px-2 text-center shadow-xl active:scale-95 font-bold text-xs';
+    loadPOTab();
   }
 }
 
@@ -5306,7 +5811,7 @@ function generateSalarySlip(){
   fr.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;border:0;z-index:99999;background:white;';
   fr.id = 'salary-print-frame';
   document.body.appendChild(fr);
-  var closeScript = '<script>function closeSalaryFrame(){parent.document.getElementById("salary-print-frame").remove();}<\/script>';
+  var closeScript = '<scr'+'ipt>function closeSalaryFrame(){parent.document.getElementById("salary-print-frame").remove();}<\/scr'+'ipt>';
   fr.contentDocument.write(html
     .replace(/onclick="window\.close\(\)"/g, 'onclick="closeSalaryFrame()"')
     .replace('</head>', '</head>' + closeScript));
@@ -5556,7 +6061,14 @@ var _cloudSyncTimer = null;
 // -- Helpers --
 function isCloudActivated() { return safeLS.getItem(CLOUD_KEY) === '1'; }
 function getFbConfig() { try { return JSON.parse(safeLS.getItem(CLOUD_FB_CFG) || 'null'); } catch(e) { return null; } }
-function getSiteId() { return safeLS.getItem(CLOUD_SITE_ID) || ''; }
+function getSiteId() {
+  if (_adminSBUser && _adminSBUser.id) {
+    var key = 'user-' + _adminSBUser.id.replace(/-/g,'').slice(0,12);
+    safeLS.setItem(CLOUD_SITE_ID, key);
+    return key;
+  }
+  return safeLS.getItem(CLOUD_SITE_ID) || '';
+}
 
 // -- Header cloud button update --
 function updateCloudBtn() {
@@ -5584,6 +6096,17 @@ function updateCloudBtn() {
 function openCloudModal() {
   refreshCloudModalState();
   document.getElementById('cloud-modal').classList.add('show');
+  // If admin is logged in but DB check still pending, retry once it completes
+  var isAdmin = safeLS.getItem(ADMIN_ROLE_KEY) === 'admin';
+  if (isAdmin && !window._sbSubChecked) {
+    var check = setInterval(function() {
+      if (window._sbSubChecked) {
+        clearInterval(check);
+        refreshCloudModalState();
+      }
+    }, 300);
+    setTimeout(function(){ clearInterval(check); }, 8000);
+  }
 }
 function closeCloudModal() { document.getElementById('cloud-modal').classList.remove('show'); }
 
@@ -5618,45 +6141,81 @@ function switchCloudTab(tab) {
 }
 
 function refreshCloudModalState() {
-  var isAdmin = safeLS.getItem(ADMIN_ROLE_KEY) === 'admin';
-  var siteId  = getSiteId();
-  var sbReady = !!(_sb && _adminSBUser);
+  var isAdmin  = safeLS.getItem(ADMIN_ROLE_KEY) === 'admin';
+  var siteId   = getSiteId();
+  var sbReady  = !!(_sb && _adminSBUser);
+  var subEnd   = parseInt(safeLS.getItem('cm_sub_end') || '0'); // display only
+  var isFullyActive = isAdmin && !!window._sbSubActive;
 
-  // Admin bar visibility
+  // Admin bar — only when fully active
   var adminBar = document.getElementById('cloud-admin-bar');
-  if (adminBar) adminBar.style.display = isAdmin ? 'block' : 'none';
+  if (adminBar) adminBar.style.display = isFullyActive ? 'block' : 'none';
 
   // Tab switcher
   var tabSwitcher = document.getElementById('cloud-tab-switcher');
-  if (tabSwitcher) tabSwitcher.style.display = isAdmin ? 'none' : 'flex';
+  if (tabSwitcher) tabSwitcher.style.display = isFullyActive ? 'none' : 'flex';
 
-  if (isAdmin) {
+  if (isFullyActive) {
+    var adminPanel = document.getElementById('ctab-admin');
+    // If panel was overwritten by expired-screen, restore original structure
+    if (adminPanel && !document.getElementById('ctab-admin-postlogin')) {
+      adminPanel.innerHTML =
+        '<div id="ctab-admin-prelogin" style="display:none"></div>'
+        + '<div id="ctab-admin-postlogin" style="display:block">'
+        + document.getElementById('ctab-admin-postlogin-tpl') ? '' : ''
+        + '</div>';
+      // Reload the page to restore full UI — safer than rebuilding HTML inline
+      toast('✅ Cloud ready! Refreshing…', 'ok');
+      setTimeout(function(){ location.reload(); }, 800);
+      return;
+    }
     var prelogin  = document.getElementById('ctab-admin-prelogin');
     var postlogin = document.getElementById('ctab-admin-postlogin');
-    var adminPanel = document.getElementById('ctab-admin');
     if (prelogin)  prelogin.style.display  = 'none';
     if (postlogin) postlogin.style.display = 'block';
     if (adminPanel) adminPanel.style.display = 'block';
-    // Load viewer list
     loadViewerAccountsInline();
-    // Hide old Firebase section — always hidden now
     var fbSection = document.getElementById('cloud-firebase-section');
     if (fbSection) fbSection.style.display = 'none';
-    // Site ID display
     var siteEl = document.getElementById('cloud-site-id-display');
-    if (siteEl) siteEl.textContent = 'Site ID: ' + (siteId || 'sanjineer-main-site');
-    // Sync dot — green if Supabase session active, yellow if logged in but session not yet ready
+    var displaySite = siteId || ((_adminSBUser && _adminSBUser.id) ? 'user-' + _adminSBUser.id.replace(/-/g,'').slice(0,12) : '—');
+    if (siteEl) siteEl.textContent = 'Site ID: ' + displaySite;
     var syncDot  = document.getElementById('cloud-sync-dot');
     var syncTime = document.getElementById('cloud-sync-time');
     if (syncDot)  syncDot.style.background = sbReady ? '#22c55e' : '#fbbf24';
     if (syncTime) syncTime.textContent = sbReady ? 'Connected ✓' : 'Connecting…';
-  } else {
+    // Expiry warning
+    if (subEnd && subEnd > Date.now() && subEnd - Date.now() < 5 * 24 * 60 * 60 * 1000) {
+      var expiryEl = document.getElementById('cloud-sub-expiry');
+      if (expiryEl && expiryEl.textContent && !expiryEl.textContent.includes('Expires')) {
+        expiryEl.style.color = '#fbbf24';
+        expiryEl.textContent = '⚠️ Subscription expiring soon — renew!';
+      }
+    }
+  } else if (isAdmin && !window._sbSubActive && window._sbSubChecked) {
+    // Logged in but subscription expired/not paid — show renew screen
+    var adminPanel = document.getElementById('ctab-admin');
+    if (adminPanel) {
+      adminPanel.style.display = 'block';
+      adminPanel.innerHTML = '<div style="text-align:center;padding:2rem 1rem;">'
+        + '<p style="font-size:32px;margin-bottom:12px">🔒</p>'
+        + '<p style="font-size:16px;font-weight:800;color:#fca5a5;margin-bottom:6px">Subscription Required</p>'
+        + '<p style="font-size:12px;color:#a78bfa;margin-bottom:1.5rem">Pay ₹30/month to activate Cloud Backup, Sync & Viewers</p>'
+        + '<button onclick="openPayLanding(true)" style="width:100%;padding:.9rem;background:linear-gradient(135deg,#2563eb,#4f46e5);color:white;border:none;border-radius:12px;font-weight:800;font-size:.95rem;cursor:pointer;margin-bottom:.75rem;">💳 Subscribe — ₹30/month</button>'
+        + '<button onclick="doAdminLogout()" style="width:100%;padding:.65rem;background:transparent;border:1px solid rgba(239,68,68,.3);color:rgba(239,68,68,.7);border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;">Logout</button>'
+        + '</div>';
+    }
+    var tabSwitcher2 = document.getElementById('cloud-tab-switcher');
+    if (tabSwitcher2) tabSwitcher2.style.display = 'none';
+  } else if (!isAdmin) {
+    // Not logged in — show login/create tabs
     var prelogin  = document.getElementById('ctab-admin-prelogin');
     var postlogin = document.getElementById('ctab-admin-postlogin');
     if (prelogin)  prelogin.style.display  = 'block';
     if (postlogin) postlogin.style.display = 'none';
     switchCloudTab('admin');
   }
+  // else: admin logged in but DB check still pending — keep showing whatever is there
 }
 
 // -- Razorpay Payment --
@@ -5700,8 +6259,7 @@ function cloudBackupNow() {
     lastSync: Date.now(), syncedBy: _adminSBUser.email, version: '2.0'
   };
   _sb.from('cloud_backups').upsert({
-    admin_id: _adminSBUser.id, backup_key: siteId, data: payload,
-    updated_at: new Date().toISOString()
+    admin_id: _adminSBUser.id, backup_key: siteId, data: payload
   }, { onConflict: 'admin_id,backup_key' }).then(function(r) {
     if (r.error) { toast('Backup failed: ' + r.error.message, 'err'); return; }
     var now = new Date().toLocaleTimeString('en-IN', {timeZone:'Asia/Kolkata'});
@@ -5819,29 +6377,104 @@ function shareViewerLink() {
 var _IS_VIEWER = false;
 function checkViewerMode() {
   var params = new URLSearchParams(window.location.search);
-  var viewSiteId = params.get('view');
-  var projId = params.get('pid');
-  if (!viewSiteId || !projId) return;
+  var token = params.get('vt');
+
+  // Legacy ?view= support
+  if (!token) {
+    var viewSiteId = params.get('view');
+    if (viewSiteId) {
+      _IS_VIEWER = true;
+      _showViewerBar('Viewer');
+      _viewerLoadData(viewSiteId, '');
+    }
+    return;
+  }
+
+  // Token-based viewer — check localStorage first for cached session
+  var cached = null;
+  try { cached = JSON.parse(safeLS.getItem('sj_vt_' + token) || 'null'); } catch(e) {}
+
+  if (cached && cached.perms) {
+    // Restore from cache immediately — no network wait
+    _applyTokenViewer(cached, token);
+    // Silently refresh from DB in background
+    _fetchViewerByToken(token, true);
+  } else {
+    // First time — fetch from DB
+    _fetchViewerByToken(token, false);
+  }
+}
+
+function _fetchViewerByToken(token, silent) {
+  if (!silent) {
+    // Show loading bar
+    document.body.insertAdjacentHTML('afterbegin',
+      '<div id="viewer-loading-bar" style="position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(90deg,#4f46e5,#7c3aed);height:3px;"></div>'
+    );
+  }
+  function doFetch() {
+    if (!_sb) { setTimeout(doFetch, 300); return; }
+    _sb.from('viewers').select('*').eq('password_hash', token).single().then(function(r) {
+      var bar = document.getElementById('viewer-loading-bar');
+      if (bar) bar.remove();
+      if (r.error || !r.data) {
+        if (!silent) {
+          document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0f172a;font-family:sans-serif;flex-direction:column;gap:12px"><p style="font-size:24px">🔒</p><p style="color:#fca5a5;font-weight:700;font-size:16px">Link expired or revoked</p><p style="color:#64748b;font-size:13px">Contact the admin for a new link</p></div>';
+        } else {
+          // Cached session invalidated — clear and reload
+          safeLS.removeItem('sj_vt_' + token);
+          window.location.reload();
+        }
+        return;
+      }
+      var vData = r.data;
+      // Cache to localStorage for offline/instant load
+      safeLS.setItem('sj_vt_' + token, JSON.stringify({
+        perms: vData.permissions || [],
+        canPrint: vData.can_print,
+        siteId: vData.site_id,
+        adminId: vData.admin_id,
+        email: vData.email
+      }));
+      if (!silent) _applyTokenViewer(vData, token);
+    }).catch(function() {
+      var bar = document.getElementById('viewer-loading-bar');
+      if (bar) bar.remove();
+    });
+  }
+  doFetch();
+}
+
+function _applyTokenViewer(vData, token) {
+  var perms    = vData.perms || vData.permissions || [];
+  var canPrint = vData.canPrint || vData.can_print || false;
+  var adminId  = vData.adminId || vData.admin_id || '';
+  var label    = vData.email ? vData.email.split('-').slice(0,-1).join(' ') : 'Viewer';
+
+  // Store in localStorage so reload works
+  safeLS.setItem('sj_viewer_perms',   JSON.stringify(perms));
+  safeLS.setItem('sj_viewer_print',   canPrint ? '1' : '0');
+  safeLS.setItem('sj_viewer_admin',   adminId);   // key: always use adminId to find data
+  safeLS.setItem('sj_viewer_email',   label);
+  safeLS.setItem('sj_viewer_token',   token);
+
   _IS_VIEWER = true;
-
-  // Add top banner
-  _showViewerBar('Site: ' + viewSiteId);
-
-  // Try to load Firebase data
-  _viewerLoadData(viewSiteId, projId);
+  _showViewerBar(label);
+  _applyViewerPermissions(perms, canPrint, adminId);
+  if (adminId) _viewerLoadData(adminId, '');
+  else toast('⚠️ Could not find admin data — invalid link?', 'err');
 }
 
 function _viewerRefresh() {
-  var siteId = safeLS.getItem('sj_viewer_site') || '';
-  var params = new URLSearchParams(window.location.search);
-  if (!siteId) siteId = params.get('view') || '';
-  var cfg = getFbConfig();
-  var projId = (cfg && cfg.projectId) ? cfg.projectId : (params.get('pid') || '');
-  if (siteId) {
-    _viewerLoadData(siteId, projId);
+  var adminId = safeLS.getItem('sj_viewer_admin') || '';
+  if (adminId) {
+    _viewerLoadData(adminId, '');
     toast('🔄 Refreshing data…', 'ok');
   } else {
-    toast('Site ID not found — please login again', 'err');
+    // Fallback: re-fetch token from DB
+    var token = safeLS.getItem('sj_viewer_token') || '';
+    if (token) { _fetchViewerByToken(token, false); }
+    else toast('Session expired — open the viewer link again', 'err');
   }
 }
 
@@ -5849,7 +6482,9 @@ function _viewerLogout() {
   safeLS.removeItem('sj_viewer_perms');
   safeLS.removeItem('sj_viewer_print');
   safeLS.removeItem('sj_viewer_site');
+  safeLS.removeItem('sj_viewer_admin');
   safeLS.removeItem('sj_viewer_email');
+  safeLS.removeItem('sj_viewer_token');
   _IS_VIEWER = false;
   _viewerApp = null;
   var bar = document.getElementById('viewer-top-bar');
@@ -5865,8 +6500,9 @@ function _viewerLogout() {
   switchCloudTab('admin');
 }
 
-function _viewerLoadData(siteId, projId) {
-  if (!_sb) { setTimeout(function() { _viewerLoadData(siteId, projId); }, 600); return; }
+function _viewerLoadData(adminId, projId) {
+  if (!_sb) { setTimeout(function() { _viewerLoadData(adminId, projId); }, 600); return; }
+  if (!adminId) { toast('⚠️ Admin ID missing — open the viewer link again', 'err'); return; }
 
   function applyViewerData(d) {
     var hasData = d && (d.db || d.mats || d.machinery || d.budget || d.milestones || d.punchlist);
@@ -5899,20 +6535,32 @@ function _viewerLoadData(siteId, projId) {
         }
       });
     }
-    var syncEl = document.getElementById('viewer-sync-time');
-    if (syncEl) syncEl.textContent = 'Updated: ' + new Date().toLocaleTimeString('en-IN', {timeZone:'Asia/Kolkata'});
+    updateDash();
     toast('✅ Cloud data loaded', 'ok');
   }
 
-  // Find which admin owns this siteId, load their latest backup
-  _sb.from('cloud_backups').select('data').eq('backup_key', siteId).single().then(function(r) {
-    if (r.error || !r.data) {
-      toast('No site data found for: ' + siteId, 'err'); return;
-    }
-    applyViewerData(r.data.data);
-  }).catch(function(e) {
-    toast('Data load error: ' + e.message, 'err');
-  });
+  // Query by admin_id — get their latest backup
+  _sb.from('cloud_backups')
+    .select('data,backup_key')
+    .eq('admin_id', adminId)
+    .order('id', { ascending: false })
+    .limit(1)
+    .then(function(r) {
+      if (r.error) {
+        // Log exact error so user can report it
+        console.error('Viewer backup fetch error:', r.error);
+        toast('⚠️ Load error: ' + (r.error.message || r.error.code || 'Check Supabase RLS on cloud_backups'), 'err');
+        return;
+      }
+      if (!r.data || r.data.length === 0) {
+        toast('No backup found. Admin needs to click Backup Now first.', 'err');
+        return;
+      }
+      applyViewerData(r.data[0].data);
+    }).catch(function(e) {
+      console.error('Viewer load catch:', e);
+      toast('Data load error: ' + (e.message || 'unknown'), 'err');
+    });
 }
 
 function _disableViewerWrites() {
@@ -6136,22 +6784,17 @@ function doSmartLogin() {
         var data = aRes.data || {};
         var now = Date.now();
         var endDate = data.subscription_end_date || 0;
-        // Also check localStorage fallback (in case DB write was delayed after payment)
-        var cachedSubEnd = parseInt(safeLS.getItem('cm_sub_end') || '0');
-        var hasCachedPayment = !!safeLS.getItem('cm_rzp_payment_id');
+        // ONLY trust Supabase DB — no localStorage fallback
         var isActive = data.subscribed && endDate > now;
-        var allowFromCache = hasCachedPayment && cachedSubEnd > now;
         safeLS.setItem(ADMIN_ROLE_KEY, 'admin');
         safeLS.setItem(ADMIN_EMAIL_KEY, email);
         _adminSBUser = user;
-        if (isActive || allowFromCache) {
-          // Silently sync to DB if only cached
-          if (allowFromCache && !isActive) {
-            var subEnd2 = cachedSubEnd > now ? cachedSubEnd : (now + 30*24*60*60*1000);
-            _sb.from('admins').upsert({ id: user.id, subscribed: true, subscription_end_date: subEnd2 }, { onConflict: 'id' }).catch(function(){});
-          }
+        if (isActive) {
+          window._sbSubActive = true;
+          safeLS.setItem('cm_sub_end', String(endDate)); // cache for display only, not for auth
           onAdminLoginSuccess(email, user, null);
         } else {
+          window._sbSubActive = false;
           closeAuthModal();
           _pendingAuthUser = user; _pendingAuthEmail = email; _pendingAuthApp = null;
           if (data.subscribed && endDate <= now) toast('⚠️ Subscription expired! Renew karo.', 'err');
@@ -6163,7 +6806,9 @@ function doSmartLogin() {
   }).catch(function(e) {
     btn.textContent = '🔑 Login'; btn.disabled = false;
     var msg = (e.message || 'Login failed');
-    if (msg.includes('Invalid login') || msg.includes('invalid_credentials')) msg = 'Galat email ya password';
+    if (msg.includes('Invalid login') || msg.includes('invalid_credentials') || msg.includes('invalid credentials')) {
+      msg = 'Account nahi mila — pehle Create Account karo, fir login karo';
+    }
     errEl.textContent = '⚠️ ' + msg; errEl.style.display = 'block';
   });
 }
@@ -6203,7 +6848,7 @@ function doAdminSignup() {
     if (r.error) throw r.error;
     var user = r.data.user;
     _pendingAuthUser = user; _pendingAuthEmail = email; _pendingAuthApp = null; _adminSBUser = user;
-    _sb.from('admins').upsert({ id: user.id, email: email, subscribed: false }, { onConflict: 'id' }).catch(function(){});
+    Promise.resolve(_sb.from('admins').upsert({ id: user.id, email: email, subscribed: false }, { onConflict: 'id' })).catch(function(){});
     closeAuthModal();
     openPayLanding(true);
     btn.textContent = '✨ Create Admin Account'; btn.disabled = false;
@@ -6224,10 +6869,12 @@ function onAdminLoginSuccess(email, user, app) {
   _adminUser = user;
   _adminApp  = null;
   _adminSBUser = user;
+  window._sbSubActive = true; // Set by login (already verified from DB before calling this)
+  window._sbSubChecked = true; // DB already verified during login
   safeLS.setItem(ADMIN_ROLE_KEY,  'admin');
   safeLS.setItem(ADMIN_EMAIL_KEY, email);
   // Always ensure admin row exists — prevents foreign key issues when creating viewers
-  _sb.from('admins').upsert({ id: user.id, email: email }, { onConflict: 'id', ignoreDuplicates: true }).catch(function(){});
+  Promise.resolve(_sb.from('admins').upsert({ id: user.id, email: email }, { onConflict: 'id' })).catch(function(){});
   closeAuthModal();
   var emailEl = document.getElementById('cloud-admin-email');
   if (emailEl) emailEl.textContent = email;
@@ -6251,33 +6898,54 @@ function onAdminLoginSuccess(email, user, app) {
       }
     }
   }).catch(function(){});
-  toast('✅ Welcome Admin! Fetching cloud data…', 'ok');
+  toast('✅ Welcome! Fetching cloud data…', 'ok');
   loadViewerAccountsInline();
   if (!isCloudActivated()) safeLS.setItem(CLOUD_KEY, '1');
   updateCloudBtn();
   startAutoSync();
-  // Restore latest cloud data to local on login
-  var siteId = getSiteId();
-  if (siteId) {
-    _sb.from('cloud_backups').select('data').eq('admin_id', user.id).eq('backup_key', siteId).single().then(function(r) {
-      if (!r.error && r.data && r.data.data) {
-        var d = r.data.data;
-        if (d.db) { sd(d.db); AD = ld(); }
-        if (d.meta) sm(d.meta);
-        if (d.mats) smat(d.mats);
-        if (d.dept) sdept(d.dept);
-        if (d.prof) sprof(d.prof);
-        if (d.machinery) smach(d.machinery);
-        if (d.drawings) sdrw(d.drawings);
-        if (d.budget) sbgt(d.budget);
-        if (d.milestones) sms(d.milestones);
-        if (d.punchlist) spl(d.punchlist);
-        applyProfile(); updateDash();
-        toast('☁️ Cloud data loaded!', 'ok');
-      }
-    }).catch(function(){});
-    setTimeout(function() { cloudBackupNow(); }, 2000);
-  }
+  // Restore latest cloud data — use siteId or fallback to any backup for this admin
+  // Always scope backup key to this admin's user ID — unique per user
+  var siteId = 'user-' + user.id.replace(/-/g,'').slice(0,12);
+  safeLS.setItem(CLOUD_SITE_ID, siteId);
+  _sb.from('cloud_backups').select('data').eq('admin_id', user.id).eq('backup_key', siteId).maybeSingle().then(function(r) {
+    if (r && !r.error && r.data && r.data.data) {
+      var d = r.data.data;
+      if (d.db) { sd(d.db); AD = ld(); }
+      if (d.meta) sm(d.meta);
+      if (d.mats) smat(d.mats);
+      if (d.dept) sdept(d.dept);
+      if (d.prof) sprof(d.prof);
+      if (d.machinery) smach(d.machinery);
+      if (d.drawings) sdrw(d.drawings);
+      if (d.budget) sbgt(d.budget);
+      if (d.milestones) sms(d.milestones);
+      if (d.punchlist) spl(d.punchlist);
+      applyProfile(); updateDash();
+      toast('☁️ Cloud data restored!', 'ok');
+    } else {
+      // No backup with that key — try getting the most recent backup for this admin
+      _sb.from('cloud_backups').select('data,backup_key').eq('admin_id', user.id).order('created_at', {ascending: false}).limit(1).then(function(r2) {
+        if (r2 && !r2.error && r2.data && r2.data.length > 0) {
+          var d = r2.data[0].data;
+          var foundKey = r2.data[0].backup_key;
+          if (foundKey) safeLS.setItem(CLOUD_SITE_ID, foundKey);
+          if (d.db) { sd(d.db); AD = ld(); }
+          if (d.meta) sm(d.meta);
+          if (d.mats) smat(d.mats);
+          if (d.dept) sdept(d.dept);
+          if (d.prof) sprof(d.prof);
+          if (d.machinery) smach(d.machinery);
+          if (d.drawings) sdrw(d.drawings);
+          if (d.budget) sbgt(d.budget);
+          if (d.milestones) sms(d.milestones);
+          if (d.punchlist) spl(d.punchlist);
+          applyProfile(); updateDash();
+          toast('☁️ Cloud data restored!', 'ok');
+        }
+      }).catch(function(){});
+    }
+  }).catch(function(){});
+  setTimeout(function() { cloudBackupNow(); }, 3000);
   openCloudModal();
   updateCloudBtn();
 }
@@ -6322,6 +6990,8 @@ function doUnsubscribe() {
 function doAdminLogout() {
   _sb && _sb.auth.signOut().catch(function(){});
   _adminUser = null; _adminApp = null; _adminSBUser = null;
+  window._sbSubActive = false;
+  window._sbSubChecked = true;
   safeLS.removeItem(ADMIN_ROLE_KEY);
   safeLS.removeItem(ADMIN_EMAIL_KEY);
   safeLS.removeItem('cm_sub_end');
@@ -6357,13 +7027,40 @@ function restoreAdminSession() {
         expiryEl.textContent = '✅ Valid till ' + dd + ' ' + mm + ' ' + yy;
       }
     }
-    // Supabase persists session automatically — just get it
+    // Supabase persists session — get and verify subscription
     if (_sb) {
       _sb.auth.getSession().then(function(r) {
         if (r.data && r.data.session) {
-          _adminSBUser = r.data.session.user;
-          _adminUser   = r.data.session.user;
-          setTimeout(loadViewerAccountsInline, 200);
+          var user = r.data.session.user;
+          _adminSBUser = user; _adminUser = user;
+          // Verify subscription from DB — ONLY source of truth
+          _sb.from('admins').select('subscribed,subscription_end_date')
+            .eq('id', user.id).single().then(function(aRes) {
+            if (!aRes.error && aRes.data) {
+              var d = aRes.data;
+              var endDate = d.subscription_end_date || 0;
+              var isActive = d.subscribed && endDate > Date.now();
+              window._sbSubActive = isActive;
+              if (isActive) {
+                safeLS.setItem('cm_sub_end', String(endDate)); // for display only
+              } else {
+                window._sbSubActive = false;
+              }
+            } else {
+              window._sbSubActive = false;
+            }
+            window._sbSubChecked = true;
+            // Refresh UI after DB check
+            updateCloudBtn && updateCloudBtn();
+            refreshCloudModalState && refreshCloudModalState();
+            setTimeout(loadViewerAccountsInline, 200);
+          }).catch(function(){
+            // Network error — deny access rather than allow
+            window._sbSubActive = false;
+            window._sbSubChecked = true;
+            updateCloudBtn && updateCloudBtn();
+            refreshCloudModalState && refreshCloudModalState();
+          });
         }
       }).catch(function(){});
     } else {
@@ -6413,49 +7110,75 @@ function getSelectedPerms() {
   return Array.prototype.map.call(chips, function(c) { return c.getAttribute('data-tab'); });
 }
 
-function createViewerAccount() {
-  var email    = document.getElementById('vw-email').value.trim();
-  var pass     = document.getElementById('vw-pass').value;
+// ── TOKEN-BASED VIEWER SYSTEM ─────────────────────────────────────
+function _genToken() {
+  var arr = new Uint8Array(18);
+  crypto.getRandomValues(arr);
+  return Array.from(arr).map(function(b){ return b.toString(36).padStart(2,'0'); }).join('').slice(0,24);
+}
+
+function generateViewerLink() {
+  var name     = document.getElementById('vw-name') ? document.getElementById('vw-name').value.trim() : '';
   var canPrint = document.getElementById('vw-can-print').checked;
   var perms    = getSelectedPerms();
   var errEl    = document.getElementById('vw-create-err');
   var btn      = document.getElementById('create-viewer-btn');
   errEl.style.display = 'none';
 
-  if (!email || !pass) { errEl.textContent = '⚠️ Email aur password dono bharo'; errEl.style.display='block'; return; }
-  if (pass.length < 6) { errEl.textContent = '⚠️ Password 6+ characters ka hona chahiye'; errEl.style.display='block'; return; }
+  if (!name) { errEl.textContent = '⚠️ Viewer ka naam dalo'; errEl.style.display='block'; return; }
+  if (perms.length === 0) { errEl.textContent = '⚠️ Kam se kam ek tab select karo'; errEl.style.display='block'; return; }
   if (!_sb || !_adminSBUser) { errEl.textContent = '⚠️ Admin login required'; errEl.style.display='block'; return; }
 
-  btn.textContent = '⏳ Creating…'; btn.disabled = true;
+  btn.textContent = '⏳ Generating…'; btn.disabled = true;
   var siteId = getSiteId();
+  var token  = _genToken();
+  var slug   = name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'').slice(0,20) + '-' + token.slice(0,4);
 
-  // Ensure admin row exists in admins table first (prevents foreign key violation)
-  _sb.from('admins').upsert({
+  Promise.resolve(_sb.from('admins').upsert({
     id: _adminSBUser.id,
     email: _adminSBUser.email || safeLS.getItem(ADMIN_EMAIL_KEY) || ''
-  }, { onConflict: 'id', ignoreDuplicates: true }).then(function() {
-    return _hashPwd(pass);
-  }).then(function(hash) {
-    return _sb.from('viewers').upsert({
+  }, { onConflict: 'id' })).then(function() {
+    return _sb.from('viewers').insert({
       admin_id:      _adminSBUser.id,
-      email:         email.toLowerCase(),
-      password_hash: hash,
+      email:         slug,
+      password_hash: token,
       permissions:   perms,
       can_print:     canPrint,
       site_id:       siteId
-    }, { onConflict: 'admin_id,email' });
+    });
   }).then(function(r) {
     if (r.error) throw r.error;
-    toast('✅ Viewer account created: ' + email, 'ok');
-    document.getElementById('vw-email').value = '';
-    document.getElementById('vw-pass').value  = '';
-    btn.textContent = '➕ Create Viewer Account'; btn.disabled = false;
+    btn.textContent = '🔗 Generate & Copy Link'; btn.disabled = false;
+    var base = window.location.href.split('?')[0];
+    var link = base + '?vt=' + encodeURIComponent(token);
+    var resEl = document.getElementById('vw-link-result');
+    var txtEl = document.getElementById('vw-link-text');
+    if (txtEl) txtEl.textContent = link;
+    if (resEl) resEl.style.display = 'block';
+    if (navigator.clipboard) navigator.clipboard.writeText(link).catch(function(){});
+    toast('✅ Link generated for: ' + name + ' — copied!', 'ok');
+    if (document.getElementById('vw-name')) document.getElementById('vw-name').value = '';
     loadViewerAccounts();
     loadViewerAccountsInline();
   }).catch(function(e) {
-    btn.textContent = '➕ Create Viewer Account'; btn.disabled = false;
+    btn.textContent = '🔗 Generate & Copy Link'; btn.disabled = false;
     errEl.textContent = '⚠️ ' + e.message; errEl.style.display = 'block';
   });
+}
+
+function createViewerAccount() { generateViewerLink(); }
+
+function copyVwLink() {
+  var txt = document.getElementById('vw-link-text') ? document.getElementById('vw-link-text').textContent : '';
+  if (!txt) return;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(txt).then(function(){ toast('Link copied!','ok'); });
+  } else {
+    var el = document.createElement('textarea');
+    el.value = txt; document.body.appendChild(el); el.select();
+    document.execCommand('copy'); document.body.removeChild(el);
+    toast('Link copied!','ok');
+  }
 }
 
 function loadViewerAccountsInline() {
@@ -6469,8 +7192,8 @@ function loadViewerAccountsInline() {
       listEl.innerHTML='<p style="font-size:10px;color:rgba(255,255,255,0.3);text-align:center;padding:12px">No viewers yet — click + New to create one</p>';
       return;
     }
-    var te = {dashboard:'📊',daily:'📋',departmental:'🏗️',attendance:'📅',machinery:'⚙️',expenses:'💰',materials:'🧱',tools:'🔧',drawings:'📐',rentals:'🚜',contractors:'👥',budget:'📊',schedule:'📅',punchlist:'📋',bill:'🧾'};
-    var allTabs = ['dashboard','daily','departmental','attendance','machinery','expenses','materials','tools','drawings','rentals','contractors','budget','schedule','punchlist','bill'];
+    var te = {dashboard:'📊',daily:'📋',departmental:'🏗️',attendance:'📅',machinery:'⚙️',expenses:'💰',materials:'🧱',tools:'🔧',drawings:'📐',rentals:'🚜',contractors:'👥',budget:'📊',schedule:'📅',punchlist:'📋',bill:'🧾',quotation:'💼',visits:'🏛️'};
+    var allTabs = ['dashboard','daily','departmental','attendance','machinery','expenses','materials','tools','drawings','rentals','contractors','budget','schedule','punchlist','bill','quotation','visits'];
     listEl.innerHTML = list.map(function(v,i) {
       var perms = v.permissions||[];
       var chips = perms.map(function(p){
@@ -6484,12 +7207,13 @@ function loadViewerAccountsInline() {
         +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">'
         +'<div style="display:flex;align-items:center;gap:7px;">'
         +'<div style="width:26px;height:26px;background:linear-gradient(135deg,#d97706,#f59e0b);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">👁️</div>'
-        +'<div><p style="font-size:11px;font-weight:700;color:white;line-height:1;">'+v.email+'</p>'
+        +'<div><p style="font-size:11px;font-weight:700;color:white;line-height:1;">'+v.email.replace(/-[a-z0-9]{4}$/,'').replace(/-/g,' ')+'</p>'
         +'<p style="font-size:9px;color:#a78bfa;margin-top:1px;">'+(v.can_print?'✅ Print on':'🚫 No print')+' · '+perms.length+' tabs</p></div>'
         +'</div>'
         +'<div style="display:flex;gap:5px;">'
+        +'<button onclick="_copyViewerToken(\''+v.password_hash+'\')" style="padding:4px 8px;background:rgba(16,185,129,.2);border:1px solid rgba(16,185,129,.35);color:#6ee7b7;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;">🔗 Link</button>'
         +'<button onclick="toggleInlineEdit(this,'+i+')" style="padding:4px 8px;background:rgba(99,102,241,.2);border:1px solid rgba(129,140,248,.35);color:#c7d2fe;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;">✏️ Edit</button>'
-        +'<button onclick="deleteViewerAccount(\''+v.id+'\','+i+')" style="padding:4px 8px;background:rgba(239,68,68,.18);border:1px solid rgba(239,68,68,.3);color:#fca5a5;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;">🗑</button>'
+        +'<button onclick="deleteViewerAccount(\''+( v.id || v.email )+'\','+i+')" style="padding:4px 8px;background:rgba(239,68,68,.18);border:1px solid rgba(239,68,68,.3);color:#fca5a5;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;">🗑</button>'
         +'</div></div>'
         +'<div id="inline-chips-view-'+i+'" style="display:flex;flex-wrap:wrap;">'+(chips||'<span style="font-size:9px;color:rgba(255,255,255,.3)">No tabs</span>')+'</div>'
         +'<div id="inline-edit-panel-'+i+'" style="display:none;margin-top:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:8px;">'
@@ -6499,7 +7223,7 @@ function loadViewerAccountsInline() {
         +'<input type="checkbox" id="inline-print-'+i+'" '+(v.can_print?'checked':'')+' style="accent-color:#818cf8;width:13px;height:13px;">'
         +'<label for="inline-print-'+i+'" style="font-size:10px;color:#c4b5fd;font-weight:600;">Allow Print / Export</label>'
         +'</div>'
-        +'<button onclick="saveInlineViewerPerms('+i+',\''+v.id+'\')" style="width:100%;padding:6px;background:linear-gradient(135deg,#d97706,#f59e0b);color:white;border:none;border-radius:8px;font-weight:800;font-size:10px;cursor:pointer;">💾 Save Permissions</button>'
+        +'<button onclick="saveInlineViewerPerms('+i+',\''+v.email+'\')" style="width:100%;padding:6px;background:linear-gradient(135deg,#d97706,#f59e0b);color:white;border:none;border-radius:8px;font-weight:800;font-size:10px;cursor:pointer;">💾 Save Permissions</button>'
         +'</div>'
         +'</div>';
     }).join('');
@@ -6536,12 +7260,18 @@ function saveInlineViewerPerms(idx, rowId) {
   });
   var canPrint = document.getElementById('inline-print-'+idx) ? document.getElementById('inline-print-'+idx).checked : false;
   if(!_sb||!_adminSBUser){toast('Not logged in','err');return;}
-  _sb.from('viewers').update({permissions:newPerms,can_print:canPrint}).eq('id',rowId).eq('admin_id',_adminSBUser.id)
+  if(!_adminSBUser.id){toast('Session expired — please login again','err');return;}
+  if(!rowId){toast('Cannot identify viewer row','err');return;}
+  // Always update by email + admin_id (safest — avoids UUID issues)
+  _sb.from('viewers')
+    .update({permissions: newPerms, can_print: canPrint})
+    .eq('admin_id', _adminSBUser.id)
+    .eq('email', rowId)
     .then(function(r){
       if(r.error){toast('Save failed: '+r.error.message,'err');return;}
       toast('✅ Permissions saved!','ok');
       loadViewerAccountsInline();
-    }).catch(function(e){toast(e.message,'err');});
+    }).catch(function(e){toast('Save error: '+(e.message||'unknown'),'err');});
 }
 
 function loadViewerAccounts() {
@@ -6571,8 +7301,8 @@ function renderViewerList(list) {
     listEl.innerHTML = '<div style="text-align:center;padding:20px 0;"><div style="font-size:28px;margin-bottom:6px">\u{1F465}</div><p style="font-size:11px;color:rgba(255,255,255,0.35);">No viewers created yet</p></div>';
     return;
   }
-  var te = {dashboard:'📊',daily:'📋',departmental:'🏗️',attendance:'📅',machinery:'⚙️',expenses:'💰',materials:'🧱',tools:'🔧',drawings:'📐',rentals:'🚜',contractors:'👥',budget:'📊',schedule:'📅',punchlist:'📋',bill:'🧾'};
-  var allTabs = ['dashboard','daily','departmental','attendance','machinery','expenses','materials','tools','drawings','rentals','contractors','budget','schedule','punchlist','bill'];
+  var te = {dashboard:'📊',daily:'📋',departmental:'🏗️',attendance:'📅',machinery:'⚙️',expenses:'💰',materials:'🧱',tools:'🔧',drawings:'📐',rentals:'🚜',contractors:'👥',budget:'📊',schedule:'📅',punchlist:'📋',bill:'🧾',quotation:'💼',visits:'🏛️'};
+  var allTabs = ['dashboard','daily','departmental','attendance','machinery','expenses','materials','tools','drawings','rentals','contractors','budget','schedule','punchlist','bill','quotation','visits'];
   listEl.innerHTML = list.map(function(v, i) {
     var perms = v.permissions || [];
     var chips = perms.map(function(p){
@@ -6650,10 +7380,30 @@ function saveViewerPerms(idx, rowId) {
     }).catch(function(e){ toast('Save failed: ' + e.message, 'err'); });
 }
 
+function _copyViewerToken(token) {
+  var base = window.location.href.split('?')[0];
+  var link = base + '?vt=' + encodeURIComponent(token);
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(link).then(function(){ toast('🔗 Link copied!', 'ok'); });
+  } else {
+    var el = document.createElement('textarea');
+    el.value = link; document.body.appendChild(el); el.select();
+    document.execCommand('copy'); document.body.removeChild(el);
+    toast('🔗 Link copied!', 'ok');
+  }
+}
+
 function deleteViewerAccount(rowId, idx) {
   if (!confirm('Delete this viewer account?')) return;
   if (!_sb || !_adminSBUser) { toast('Not logged in', 'err'); return; }
-  _sb.from('viewers').delete().eq('id', rowId).eq('admin_id', _adminSBUser.id)
+  var delQuery = _sb.from('viewers').delete();
+  // If rowId is a UUID (36 chars with dashes), use id; otherwise use email
+  if (rowId && rowId.length === 36 && rowId.split('-').length === 5) {
+    delQuery = delQuery.eq('id', rowId);
+  } else {
+    delQuery = delQuery.eq('email', rowId);
+  }
+  delQuery.eq('admin_id', _adminSBUser.id)
     .then(function(r) {
       if (r.error) { toast('Delete failed: ' + r.error.message, 'err'); return; }
       toast('Viewer account deleted', 'ok');
@@ -6811,10 +7561,38 @@ var _payLandingAfterAuth = false;
 
 function openPayLanding(afterAuth) {
   _payLandingAfterAuth = !!afterAuth;
-  document.getElementById('pay-landing-modal').classList.add('show');
+  var modal = document.getElementById('pay-landing-modal');
+  modal.classList.add('show');
+  // If afterAuth=true: hide X button, show locked message
+  var closeBtn = document.getElementById('pay-close-btn');
+  var lockedMsg = document.getElementById('pay-locked-msg');
+  if (closeBtn) closeBtn.style.display = afterAuth ? 'none' : 'flex';
+  if (lockedMsg) lockedMsg.style.display = afterAuth ? 'flex' : 'none';
 }
 function closePayLanding() {
   document.getElementById('pay-landing-modal').classList.remove('show');
+  var lockedMsg = document.getElementById('pay-locked-msg');
+  if (lockedMsg) lockedMsg.style.display = 'none';
+}
+function _safeClosePayLanding() {
+  // Only allow close if NOT in afterAuth gate
+  if (_payLandingAfterAuth) {
+    toast('Subscription zaroori hai — pehle pay karo ya logout karo', 'err');
+    return;
+  }
+  closePayLanding();
+}
+function _cancelAndLogout() {
+  // User chose to cancel — clear pending and logout
+  _pendingAuthUser = null; _pendingAuthEmail = null; _pendingAuthApp = null;
+  _adminSBUser = null; _adminUser = null;
+  safeLS.removeItem(ADMIN_ROLE_KEY); safeLS.removeItem(ADMIN_EMAIL_KEY);
+  safeLS.removeItem(CLOUD_KEY);
+  if (_sb) _sb.auth.signOut().catch(function(){});
+  closePayLanding();
+  openCloudModal();
+  switchCloudTab('admin');
+  toast('Logged out — create account again when ready to subscribe', 'ok');
 }
 
 // Open viewer login as inline modal (no URL param needed)
@@ -6869,31 +7647,58 @@ function _openSubscriptionRazorpay() {
 
 function onSubscriptionPaymentSuccess(response) {
   var payId = response.razorpay_payment_id || ('LIVE_' + Date.now());
+  var subEnd = Date.now() + (30 * 24 * 60 * 60 * 1000);
+  // Store payment ID locally for display/reference only (NOT for auth decisions)
   safeLS.setItem(CLOUD_KEY, '1');
-  safeLS.setItem('cm_rzp_payment_id', payId);
+  safeLS.setItem('cm_rzp_payment_id', payId); // display only
+  safeLS.setItem('cm_sub_end', String(subEnd)); // display only — real auth is from DB
+
   var user = _pendingAuthUser || _adminSBUser;
-  if (user && _sb) {
-    var subEnd = Date.now() + (30 * 24 * 60 * 60 * 1000);
-    _sb.from('admins').upsert({
-      id: user.id, subscribed: true,
-      subscribed_at: Date.now(),
-      subscription_end_date: subEnd,
-      last_payment_id: payId
-    }, { onConflict: 'id' }).catch(function(){});
-    _sb.from('payments').insert({
-      admin_id: user.id, razorpay_id: payId, amount: 3000, purpose: 'sanjineer_cloud_subscription'
-    }).catch(function(){});
-    safeLS.setItem('cm_sub_end', subEnd);
-    var _user = _pendingAuthUser || _adminSBUser;
-    var _email = _pendingAuthEmail || (_user && _user.email) || '';
-    _pendingAuthApp = null; _pendingAuthUser = null; _pendingAuthEmail = null;
-    onAdminLoginSuccess(_email, _user, null);
-  } else {
-    toast('✅ Subscription activated! Cloud ready.', 'ok');
-    refreshCloudModalState(); updateCloudBtn();
+
+  if (!user) {
+    // Edge case: no user object — try getting from Supabase session
+    if (_sb) {
+      _sb.auth.getUser().then(function(r) {
+        if (r.data && r.data.user) {
+          _adminSBUser = r.data.user;
+          onSubscriptionPaymentSuccess(response); // retry with user
+        } else {
+          toast('✅ Payment done! Please login again to activate.', 'ok');
+          closePayLanding(); openCloudModal();
+        }
+      });
+    } else {
+      toast('✅ Payment saved! Open Cloud → Login to activate.', 'ok');
+      closePayLanding(); openCloudModal();
+    }
+    return;
   }
+
+  if (_sb) {
+    // Write to DB — retried 3 times to ensure it lands
+    var _writeSubscription = function(tries) {
+      _sb.from('admins').upsert({
+        id: user.id,
+        email: user.email || safeLS.getItem(ADMIN_EMAIL_KEY) || '',
+        subscribed: true,
+        subscribed_at: Date.now(),
+        subscription_end_date: subEnd,
+        last_payment_id: payId
+      }, { onConflict: 'id' }).then(function(r) {
+        if (r.error && tries > 0) setTimeout(function(){ _writeSubscription(tries-1); }, 2000);
+      });
+      _sb.from('payments').insert({
+        admin_id: user.id, razorpay_id: payId, amount: 3000, purpose: 'sanjineer_cloud_subscription'
+      }).catch(function(){});
+    };
+    _writeSubscription(3);
+  }
+
+  var _email = _pendingAuthEmail || (user && user.email) || safeLS.getItem(ADMIN_EMAIL_KEY) || '';
+  _pendingAuthApp = null; _pendingAuthUser = null; _pendingAuthEmail = null;
   closePayLanding();
-  openCloudModal();
+  onAdminLoginSuccess(_email, user, null);
+  toast('✅ Subscription activated! Welcome to Sanjineer Cloud.', 'ok');
 }
 
 // ── Patch boot to also check viewer login mode ──
@@ -6912,6 +7717,988 @@ function onSubscriptionPaymentSuccess(response) {
     });
   }
 })();
+
+// ================================================================
+// NEW FEATURES JS
+// ================================================================
+
+// ── Storage keys ─────────────────────────────────────────────────
+var VISITS_KEY  = 'cm_visits';
+var QT_KEY      = 'cm_quotations';
+var SCB_KEY     = 'cm_subcon_bills';
+var DASH_MONTH_OFFSET = 0; // 0=current, 1=prev, 2=two months ago, -1=all time
+
+function lvisits(){ try{return JSON.parse(safeLS.getItem(VISITS_KEY)||'[]');}catch(e){return[];} }
+function svisits(x){ safeLS.setItem(VISITS_KEY, JSON.stringify(x)); }
+function lqt(){ try{return JSON.parse(safeLS.getItem(QT_KEY)||'[]');}catch(e){return[];} }
+function sqt(x){ safeLS.setItem(QT_KEY, JSON.stringify(x)); }
+function lscb(){ try{return JSON.parse(safeLS.getItem(SCB_KEY)||'[]');}catch(e){return[];} }
+function sscb(x){ safeLS.setItem(SCB_KEY, JSON.stringify(x)); }
+
+// ── Dashboard Month Filter ────────────────────────────────────────
+function setDashMonth(offset) {
+  DASH_MONTH_OFFSET = offset;
+  document.querySelectorAll('[id^="dash-m-"]').forEach(function(b){
+    b.style.background = ''; b.style.color = '#6b7280';
+    b.style.borderColor = '#d1d5db';
+  });
+  var activeId = offset === -1 ? 'dash-m-neg1' : 'dash-m-' + offset;
+  var activeBtn = document.getElementById(activeId);
+  if (activeBtn) { activeBtn.style.background = '#4f46e5'; activeBtn.style.color = 'white'; activeBtn.style.borderColor = '#4f46e5'; }
+  var lbl = document.getElementById('dash-month-label');
+  if (offset === -1) { if(lbl) lbl.textContent = 'All time'; }
+  else {
+    var d = new Date(); d.setMonth(d.getMonth() - offset);
+    if(lbl) lbl.textContent = d.toLocaleString('en-IN',{month:'short',year:'numeric'});
+  }
+  AD = ld(); updateDash();
+}
+
+// Helper: get month key for filter
+function _dashMonthKey() {
+  if (DASH_MONTH_OFFSET === -1) return null; // all time
+  var d = new Date(); d.setMonth(d.getMonth() - DASH_MONTH_OFFSET);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+}
+
+// Init month filter label on load
+document.addEventListener('DOMContentLoaded', function(){
+  setTimeout(function(){ setDashMonth(0); }, 500);
+});
+
+// ── Copy Previous Day Attendance ──────────────────────────────────
+function copyPrevDayAttendance() {
+  var prev = new Date(DD + 'T00:00:00');
+  prev.setDate(prev.getDate() - 1);
+  var prevDate = prev.toISOString().slice(0,10);
+  var prevAtts = dedup(AD.filter(function(a){ return a.type==='attendance' && a.date===prevDate; }));
+  if (!prevAtts.length) { toast('No attendance found for ' + prevDate, 'err'); return; }
+  var already = dedup(AD.filter(function(a){ return a.type==='attendance' && a.date===DD; }));
+  if (already.length) {
+    if (!confirm('Today already has ' + already.length + ' attendance entries. Add from yesterday anyway?')) return;
+  }
+  var added = 0;
+  prevAtts.forEach(function(a) {
+    // Only copy if not already entered today
+    var exists = already.find(function(x){ return x.name === a.name; });
+    if (!exists) {
+      var rec = { type:'attendance', date:DD, name:a.name, category:a.category, hours:a.hours, advance:0, ot_hours:0, ot_rate:a.ot_rate||0, work_done:'' };
+      add(rec); added++;
+    }
+  });
+  AD = ld(); toast('✅ Copied ' + added + ' workers from ' + prevDate, 'ok');
+  viewWorkers(); viewDaily(); updateDash();
+}
+
+// ── Export to Excel (CSV) ─────────────────────────────────────────
+function exportDailyExcel() {
+  var att = dedup(AD.filter(function(a){ return a.type==='attendance' && a.date===DD; }));
+  if (!att.length) { toast('No attendance to export for today', 'err'); return; }
+  var rows = [['Date','Worker','Category','Hours','OT Hours','OT Rate','Advance','Regular Cost','OT Cost','Total Cost']];
+  att.forEach(function(a) {
+    var worker = AD.find(function(w){ return w.type==='worker' && w.name===a.name; });
+    var rate = worker ? (parseFloat(worker.hourly_wage)||0) : 0;
+    var otRate = parseFloat(a.ot_rate||0);
+    var regCost = (parseFloat(a.hours)||0) * rate;
+    var otCost  = (parseFloat(a.ot_hours)||0) * otRate;
+    rows.push([a.date, a.name, a.category||'', a.hours||0, a.ot_hours||0, otRate, a.advance||0, regCost.toFixed(0), otCost.toFixed(0), (regCost+otCost).toFixed(0)]);
+  });
+  var csv = rows.map(function(r){ return r.map(function(c){ return '"'+String(c).replace(/"/g,'""')+'"'; }).join(','); }).join('\n');
+  var blob = new Blob([csv], {type:'text/csv'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a'); a.href = url; a.download = 'Attendance_'+DD+'.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 3000);
+  toast('✅ Excel exported!', 'ok');
+}
+
+function exportAttendanceExcel(workerName, monthKey) {
+  var atts = dedup(AD.filter(function(a){ return a.type==='attendance' && (!workerName || a.name===workerName) && (!monthKey || (a.date||'').startsWith(monthKey)); }));
+  if (!atts.length) { toast('No attendance data to export', 'err'); return; }
+  var rows = [['Date','Worker','Category','Hours','OT Hours','OT Rate','Advance','Regular Cost','OT Cost','Total Cost']];
+  atts.forEach(function(a) {
+    var worker = AD.find(function(w){ return w.type==='worker' && w.name===a.name; });
+    var rate = worker ? (parseFloat(worker.hourly_wage)||0) : 0;
+    var otRate = parseFloat(a.ot_rate||0);
+    var regCost = (parseFloat(a.hours)||0) * rate;
+    var otCost  = (parseFloat(a.ot_hours)||0) * otRate;
+    rows.push([a.date, a.name, a.category||'', a.hours||0, a.ot_hours||0, otRate, a.advance||0, regCost.toFixed(0), otCost.toFixed(0), (regCost+otCost).toFixed(0)]);
+  });
+  var csv = rows.map(function(r){ return r.map(function(c){ return '"'+String(c).replace(/"/g,'""')+'"'; }).join(','); }).join('\n');
+  var blob = new Blob([csv], {type:'text/csv'});
+  var url = URL.createObjectURL(blob);
+  var fname = 'Attendance' + (workerName?'_'+workerName.replace(/\s/g,'_'):'') + (monthKey?'_'+monthKey:'') + '.csv';
+  var a = document.createElement('a'); a.href = url; a.download = fname;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 3000);
+  toast('✅ Exported!', 'ok');
+}
+
+// ── Material Reorder WhatsApp ─────────────────────────────────────
+function reorderWhatsApp() {
+  var low = getLowStock();
+  if (!low.length) { toast('No low stock items', 'ok'); return; }
+  var p = lprof()||{};
+  var msg = '🏗️ *' + (p.company||'Site') + '* — Material Reorder Request\n\n';
+  msg += '⚠️ *Low Stock Items:*\n';
+  low.forEach(function(i){ msg += '• ' + i.name + ': *' + getbal(i) + ' ' + i.unit + '* remaining (min: ' + i.minQty + ')\n'; });
+  msg += '\n📅 Date: ' + new Date().toLocaleDateString('en-IN');
+  var url = 'https://wa.me/?text=' + encodeURIComponent(msg);
+  window.open(url, '_blank');
+}
+
+function updateMaterialReorderBar() {
+  var low = getLowStock();
+  var bar = document.getElementById('mat-reorder-bar');
+  var ct  = document.getElementById('mat-low-count');
+  if (bar) bar.style.display = low.length ? 'flex' : 'none';
+  if (ct)  ct.textContent = '⚠️ ' + low.length + ' item' + (low.length!==1?'s':'') + ' low on stock';
+}
+
+// ── Overdue Notification on App Load ─────────────────────────────
+function checkOverdueNotifications() {
+  var today = ist();
+  var alerts = [];
+  // Overdue punch list items
+  var pl = lpl();
+  var overdueItems = pl.filter(function(p){ return p.due && p.due < today && p.status !== 'resolved'; });
+  if (overdueItems.length) alerts.push('📋 ' + overdueItems.length + ' punch list item' + (overdueItems.length>1?'s are':' is') + ' overdue!');
+  // Schedule milestones delayed
+  var ms = lms();
+  var delayed = ms.filter(function(m){ return m.end && m.end < today && m.status !== '✅ Completed'; });
+  if (delayed.length) alerts.push('📅 ' + delayed.length + ' schedule milestone' + (delayed.length>1?'s are':' is') + ' past due!');
+  // Subscription expiry
+  var subEnd = parseInt(safeLS.getItem('cm_sub_end')||'0');
+  if (subEnd && subEnd > Date.now() && subEnd - Date.now() < 7*24*60*60*1000) {
+    var days = Math.ceil((subEnd-Date.now())/(24*60*60*1000));
+    alerts.push('💳 Cloud subscription expires in ' + days + ' day' + (days>1?'s':'') + '!');
+  }
+  if (alerts.length) {
+    setTimeout(function(){
+      alerts.forEach(function(msg, i){
+        setTimeout(function(){ toast('⚠️ ' + msg, 'err'); }, i * 2500);
+      });
+    }, 2000);
+  }
+}
+
+// ── Purchase Order ────────────────────────────────────────────────
+var PO_KEY       = 'cm_po';
+var SUPPLIER_KEY = 'cm_suppliers';
+var _poLineCount = 0;
+
+function lpo(){ try{return JSON.parse(safeLS.getItem(PO_KEY)||'[]');}catch(e){return[];} }
+function spo(x){ safeLS.setItem(PO_KEY, JSON.stringify(x)); }
+function lsuppliers(){ try{return JSON.parse(safeLS.getItem(SUPPLIER_KEY)||'[]');}catch(e){return[];} }
+function ssuppliers(x){ safeLS.setItem(SUPPLIER_KEY, JSON.stringify(x)); }
+
+function loadPOTab() {
+  var dateEl = document.getElementById('po-date');
+  if (dateEl && !dateEl.value) dateEl.value = ist();
+  var noEl = document.getElementById('po-no');
+  if (noEl && !noEl.value) noEl.value = 'PO-' + String(lpo().length + 1).padStart(3,'0');
+  if (!document.getElementById('po-lines-body').children.length) addPOLine();
+  renderPOSuppliersList();
+  renderPOSupplierDropdown();
+  renderPORecords();
+  calcPOTotal();
+}
+
+function togglePoSupplierForm() {
+  var f = document.getElementById('po-supplier-form');
+  if (f) f.style.display = f.style.display === 'none' ? 'block' : 'none';
+}
+
+function savePoSupplier() {
+  var name    = (document.getElementById('pos-name')||{}).value.trim();
+  var contact = (document.getElementById('pos-contact')||{}).value.trim();
+  var gst     = (document.getElementById('pos-gst')||{}).value.trim();
+  var addr    = (document.getElementById('pos-addr')||{}).value.trim();
+  if (!name) { toast('Enter supplier name','err'); return; }
+  var sups = lsuppliers();
+  sups.unshift({ id: Date.now().toString(36), name:name, contact:contact, gst:gst, addr:addr });
+  ssuppliers(sups);
+  ['pos-name','pos-contact','pos-gst','pos-addr'].forEach(function(id){ var el=document.getElementById(id); if(el)el.value=''; });
+  document.getElementById('po-supplier-form').style.display = 'none';
+  toast('✅ Supplier saved!','ok');
+  renderPOSuppliersList();
+  renderPOSupplierDropdown();
+}
+
+function renderPOSuppliersList() {
+  var el = document.getElementById('po-suppliers-list'); if (!el) return;
+  var sups = lsuppliers();
+  if (!sups.length) { el.innerHTML='<p class="text-gray-400 text-xs text-center py-2">No suppliers yet</p>'; return; }
+  el.innerHTML = sups.map(function(s){
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 6px;border-bottom:1px solid #f0fdf4;font-size:11px">'
+      +'<div><p style="font-weight:700;color:#374151">'+s.name+'</p>'
+      +(s.contact?'<p style="font-size:9px;color:#6b7280">📞 '+s.contact+'</p>':'')
+      +(s.gst?'<p style="font-size:9px;color:#6b7280">GST: '+s.gst+'</p>':'')+'</div>'
+      +'<button onclick="deleteSupplier(\''+s.id+'\')" style="background:#fee2e2;color:#dc2626;border:none;border-radius:5px;font-size:10px;padding:2px 8px;cursor:pointer;font-weight:700">✕</button>'
+      +'</div>';
+  }).join('');
+}
+
+function deleteSupplier(id) {
+  askDel('Delete this supplier?', function(){
+    ssuppliers(lsuppliers().filter(function(s){return s.id!==id;}));
+    renderPOSuppliersList(); renderPOSupplierDropdown(); toast('Deleted','ok');
+  });
+}
+
+function renderPOSupplierDropdown() {
+  var sel = document.getElementById('po-supplier'); if (!sel) return;
+  var cur = sel.value;
+  var sups = lsuppliers();
+  sel.innerHTML = '<option value="">Select Supplier</option>'
+    + sups.map(function(s){ return '<option value="'+s.id+'" '+(cur===s.id?'selected':'')+'>'+s.name+'</option>'; }).join('');
+}
+
+function addPOLine() {
+  var tbody = document.getElementById('po-lines-body'); if (!tbody) return;
+  var id = ++_poLineCount;
+  var tr = document.createElement('tr');
+  tr.id = 'po-row-' + id;
+  tr.innerHTML = '<td class="px-1 py-1"><input type="text" id="po-desc-'+id+'" placeholder="Item / Material" class="w-full px-2 py-1 border border-gray-200 rounded-lg text-xs focus:outline-none" oninput="calcPOTotal()"></td>'
+    +'<td class="px-1 py-1"><input type="text" id="po-unit-'+id+'" placeholder="bags" class="w-14 px-2 py-1 border border-gray-200 rounded-lg text-xs text-center focus:outline-none"></td>'
+    +'<td class="px-1 py-1"><input type="number" id="po-qty-'+id+'" placeholder="0" step="any" class="w-14 px-2 py-1 border border-gray-200 rounded-lg text-xs text-center focus:outline-none" oninput="calcPOTotal()"></td>'
+    +'<td class="px-1 py-1"><input type="number" id="po-rate-'+id+'" placeholder="0" step="any" class="w-16 px-2 py-1 border border-gray-200 rounded-lg text-xs text-center focus:outline-none" oninput="calcPOTotal()"></td>'
+    +'<td class="px-1 py-1 text-right text-xs font-bold text-gray-700" id="po-amt-'+id+'">₹0</td>'
+    +'<td class="px-1 py-1"><button onclick="removePOLine('+id+')" class="text-red-400 text-sm font-bold">✕</button></td>';
+  tbody.appendChild(tr);
+}
+
+function removePOLine(id) {
+  var row = document.getElementById('po-row-'+id); if (row) row.remove();
+  calcPOTotal();
+}
+
+function calcPOTotal() {
+  var tbody = document.getElementById('po-lines-body'); if (!tbody) return;
+  var subtotal = 0;
+  tbody.querySelectorAll('tr').forEach(function(tr){
+    var id = tr.id.replace('po-row-','');
+    var qty  = parseFloat((document.getElementById('po-qty-'+id)||{}).value)||0;
+    var rate = parseFloat((document.getElementById('po-rate-'+id)||{}).value)||0;
+    var amt  = qty * rate; subtotal += amt;
+    var amtEl = document.getElementById('po-amt-'+id); if (amtEl) amtEl.textContent = fc(amt);
+  });
+  var gstPct = parseFloat((document.getElementById('po-gst')||{}).value)||0;
+  var gstAmt = subtotal * gstPct / 100;
+  var total  = subtotal + gstAmt;
+  var sub = document.getElementById('po-subtotal'); if(sub) sub.textContent = fc(subtotal);
+  var ga  = document.getElementById('po-gst-amt'); if(ga) ga.textContent = fc(gstAmt);
+  var tot = document.getElementById('po-total');   if(tot) tot.textContent = fc(total);
+}
+
+function savePO() {
+  var poNo     = (document.getElementById('po-no')||{}).value||'PO-001';
+  var date     = (document.getElementById('po-date')||{}).value||ist();
+  var supId    = (document.getElementById('po-supplier')||{}).value;
+  var delivery = (document.getElementById('po-delivery')||{}).value;
+  var site     = (document.getElementById('po-site')||{}).value.trim();
+  var notes    = (document.getElementById('po-notes')||{}).value.trim();
+  var gstPct   = parseFloat((document.getElementById('po-gst')||{}).value)||0;
+  var sup      = lsuppliers().find(function(s){return s.id===supId;})||null;
+  var tbody    = document.getElementById('po-lines-body');
+  var lines    = [];
+  if (tbody) tbody.querySelectorAll('tr').forEach(function(tr){
+    var id   = tr.id.replace('po-row-','');
+    var desc = (document.getElementById('po-desc-'+id)||{}).value||'';
+    var unit = (document.getElementById('po-unit-'+id)||{}).value||'';
+    var qty  = parseFloat((document.getElementById('po-qty-'+id)||{}).value)||0;
+    var rate = parseFloat((document.getElementById('po-rate-'+id)||{}).value)||0;
+    if (desc || qty) lines.push({desc:desc, unit:unit, qty:qty, rate:rate, amt:qty*rate});
+  });
+  if (!lines.length) { toast('Add at least one item','err'); return; }
+  var subtotal = lines.reduce(function(s,l){return s+l.amt;},0);
+  var total    = subtotal + subtotal * gstPct / 100;
+  var records  = lpo();
+  records.unshift({ id:Date.now().toString(36), poNo:poNo, date:date, sup:sup, delivery:delivery, site:site, notes:notes, gstPct:gstPct, lines:lines, total:total });
+  spo(records);
+  toast('✅ Purchase Order saved!','ok');
+  renderPORecords();
+  generatePOPDF(false, records[0]);
+}
+
+function generatePOPDF(saveRec, record) {
+  var p   = lprof()||{};
+  var rec = record;
+  if (!rec) {
+    // Build from form
+    var poNo     = (document.getElementById('po-no')||{}).value||'PO-001';
+    var date     = (document.getElementById('po-date')||{}).value||ist();
+    var supId    = (document.getElementById('po-supplier')||{}).value;
+    var delivery = (document.getElementById('po-delivery')||{}).value;
+    var site     = (document.getElementById('po-site')||{}).value.trim();
+    var notes    = (document.getElementById('po-notes')||{}).value.trim();
+    var gstPct   = parseFloat((document.getElementById('po-gst')||{}).value)||0;
+    var sup      = lsuppliers().find(function(s){return s.id===supId;})||null;
+    var tbody    = document.getElementById('po-lines-body');
+    var lines    = [];
+    if (tbody) tbody.querySelectorAll('tr').forEach(function(tr){
+      var id   = tr.id.replace('po-row-','');
+      var desc = (document.getElementById('po-desc-'+id)||{}).value||'';
+      var unit = (document.getElementById('po-unit-'+id)||{}).value||'';
+      var qty  = parseFloat((document.getElementById('po-qty-'+id)||{}).value)||0;
+      var rate = parseFloat((document.getElementById('po-rate-'+id)||{}).value)||0;
+      if (desc||qty) lines.push({desc:desc,unit:unit,qty:qty,rate:rate,amt:qty*rate});
+    });
+    if (!lines.length) { toast('Add at least one item','err'); return; }
+    var subtotal = lines.reduce(function(s,l){return s+l.amt;},0);
+    rec = { poNo:poNo, date:date, sup:sup, delivery:delivery, site:site, notes:notes, gstPct:gstPct, lines:lines, total:subtotal+subtotal*gstPct/100 };
+  }
+  var hc     = p.headerColor||'linear-gradient(135deg,#4f46e5,#7c3aed)';
+  var hSolid = hc.indexOf('gradient')!==-1?'#059669':hc;
+  var gstAmt = rec.total - rec.total/(1+rec.gstPct/100);
+  var subtotal = rec.total - gstAmt;
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Purchase Order '+rec.poNo+'</title><style>'+pcs()+'</style></head><body>'
+    +'<div class="bar"><button class="bb" onclick="window.close()">← Back</button><span style="flex:1;font-weight:700">Purchase Order — '+rec.poNo+'</span><button class="bp" onclick="window.print()">🖶 Print</button><button class="bx" onclick="window.close()">✕</button></div>'
+    +'<div class="content">'
+    +_pdfHeader('Sanjineer', p.company||'',
+      '',
+      '<p style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.8);text-transform:uppercase;letter-spacing:.04em">Purchase Order</p>'
+      +'<p style="font-size:14px;font-weight:900;color:white;margin-top:3px">'+rec.poNo+'</p>'
+      +'<p style="font-size:10px;color:rgba(255,255,255,0.7);margin-top:2px">'+fd(rec.date)+'</p>'
+    )
+    // Supplier + delivery info
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">'
+    +'<div style="background:#f8fafc;border-radius:10px;padding:10px">'
+    +'<p style="font-size:9px;font-weight:700;color:#6b7280;text-transform:uppercase;margin-bottom:3px">Supplier</p>'
+    +'<p style="font-size:13px;font-weight:800;color:#1f2937">'+(rec.sup?rec.sup.name:'—')+'</p>'
+    +(rec.sup&&rec.sup.contact?'<p style="font-size:10px;color:#6b7280;margin-top:2px">📞 '+rec.sup.contact+'</p>':'')
+    +(rec.sup&&rec.sup.gst?'<p style="font-size:9px;color:#6b7280">GST: '+rec.sup.gst+'</p>':'')
+    +(rec.sup&&rec.sup.addr?'<p style="font-size:9px;color:#6b7280">'+rec.sup.addr+'</p>':'')
+    +'</div>'
+    +'<div style="background:#f8fafc;border-radius:10px;padding:10px">'
+    +'<p style="font-size:9px;font-weight:700;color:#6b7280;text-transform:uppercase;margin-bottom:3px">Delivery Details</p>'
+    +(rec.delivery?'<p style="font-size:11px;color:#374151"><strong>By:</strong> '+fd(rec.delivery)+'</p>':'')
+    +(rec.site?'<p style="font-size:11px;color:#374151"><strong>Site:</strong> '+rec.site+'</p>':'')
+    +(p.address?'<p style="font-size:10px;color:#6b7280">'+p.address+'</p>':'')
+    +'</div></div>'
+    // Items table
+    +'<table><thead><tr style="background:'+hSolid+';color:white">'
+    +'<th style="padding:8px 10px;text-align:left">Item / Material</th>'
+    +'<th style="padding:8px 10px;text-align:center">Unit</th>'
+    +'<th style="padding:8px 10px;text-align:center">Qty</th>'
+    +'<th style="padding:8px 10px;text-align:right">Rate (₹)</th>'
+    +'<th style="padding:8px 10px;text-align:right">Amount (₹)</th>'
+    +'</tr></thead><tbody>'
+    +rec.lines.map(function(l,i){
+      return '<tr style="background:'+(i%2?'#f9fafb':'white')+'">'
+        +'<td style="padding:7px 10px;font-weight:600">'+l.desc+'</td>'
+        +'<td style="padding:7px 10px;text-align:center">'+(l.unit||'—')+'</td>'
+        +'<td style="padding:7px 10px;text-align:center">'+l.qty+'</td>'
+        +'<td style="padding:7px 10px;text-align:right">'+fc(l.rate)+'</td>'
+        +'<td style="padding:7px 10px;text-align:right;font-weight:700">'+fc(l.amt)+'</td>'
+        +'</tr>';
+    }).join('')
+    +'</tbody><tfoot>'
+    +'<tr><td colspan="4" style="padding:7px 10px;text-align:right;font-weight:700">Subtotal</td><td style="padding:7px 10px;text-align:right;font-weight:700">'+fc(subtotal)+'</td></tr>'
+    +(rec.gstPct?'<tr><td colspan="4" style="padding:7px 10px;text-align:right">GST ('+rec.gstPct+'%)</td><td style="padding:7px 10px;text-align:right">'+fc(gstAmt)+'</td></tr>':'')
+    +'<tr style="background:'+hSolid+';color:white">'
+    +'<td colspan="4" style="padding:9px 10px;text-align:right;font-weight:900;font-size:14px">TOTAL AMOUNT</td>'
+    +'<td style="padding:9px 10px;text-align:right;font-weight:900;font-size:14px">'+fc(rec.total)+'</td>'
+    +'</tr></tfoot></table>'
+    +(rec.notes?'<div style="margin-top:14px;padding:10px;background:#f8fafc;border-radius:8px"><p style="font-size:10px;font-weight:700;color:#374151;margin-bottom:3px">Terms & Notes:</p><p style="font-size:11px;color:#6b7280">'+rec.notes+'</p></div>':'')
+    +'<div style="margin-top:36px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px">'
+    +'<div><div style="border-top:1.5px solid #374151;padding-top:4px;font-size:10px;color:#6b7280">Prepared By</div><p style="font-size:11px;font-weight:700;color:#374151;margin-top:4px">'+(p.engineer||p.company||'')+'</p><p style="font-size:9px;color:#9ca3af;margin-top:2px">Name & Designation</p></div>'
+    +'<div style="text-align:center"><div style="border-top:1.5px solid #374151;padding-top:4px;font-size:10px;color:#6b7280">Authorised By</div><p style="font-size:11px;color:#9ca3af;margin-top:4px">Signature & Date</p></div>'
+    +'<div style="text-align:right"><div style="border-top:1.5px solid #374151;padding-top:4px;font-size:10px;color:#6b7280">Supplier Acknowledgement</div><p style="font-size:11px;color:#9ca3af;margin-top:4px">Signature & Date</p></div>'
+    +'</div>'
+    +pftr()+'</div></body></html>';
+  opw(html);
+}
+
+function renderPORecords() {
+  var el = document.getElementById('po-records-list'); if (!el) return;
+  var records = lpo();
+  if (!records.length) { el.innerHTML='<p class="text-gray-400 text-center py-3 text-xs">No POs saved yet</p>'; return; }
+  el.innerHTML = records.map(function(r){
+    return '<div style="background:white;border-radius:10px;border:1px solid #e5e7eb;padding:7px 10px;margin-bottom:6px;box-shadow:0 2px 6px rgba(0,0,0,0.06)">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">'
+      +'<p style="font-weight:800;color:#1f2937;font-size:12px">'+r.poNo+' — '+(r.sup?r.sup.name:'No Supplier')+'</p>'
+      +'<div style="display:flex;gap:5px">'
+      +'<button onclick="generatePOPDF(false,'+JSON.stringify(r).replace(/'/g,"&#39;")+' )" style="font-size:10px;padding:3px 16px;background:#d1fae5;color:#059669;border:none;border-radius:5px;cursor:pointer;font-weight:700">Print</button>'
+      +'<button onclick="deletePO(\''+r.id+'\')" style="width:20px;height:20px;display:flex;align-items:center;justify-content:center;background:#fee2e2;color:#dc2626;border:none;border-radius:5px;cursor:pointer;font-weight:800;font-size:11px">×</button>'
+      +'</div></div>'
+      +'<div style="display:flex;justify-content:space-between">'
+      +'<p style="font-size:10px;color:#9ca3af">'+fd(r.date)+(r.delivery?' · Delivery: '+fd(r.delivery):'')+'</p>'
+      +'<p style="font-weight:800;font-size:12px;color:#059669">'+fc(r.total)+'</p>'
+      +'</div></div>';
+  }).join('');
+}
+
+function deletePO(id) {
+  askDel('Delete this Purchase Order?', function(){
+    spo(lpo().filter(function(r){return r.id!==id;}));
+    renderPORecords(); toast('Deleted','ok');
+  });
+}
+
+function openMasterAtt() {
+  var modal = document.getElementById('master-att-modal');
+  if (!modal) return;
+  var dateEl = document.getElementById('ma-date');
+  if (dateEl) dateEl.value = DD;
+  var lbl = document.getElementById('master-att-date-lbl');
+  if (lbl) lbl.textContent = 'For: ' + fdl(DD);
+  document.getElementById('ma-hours').value = '8';
+  document.getElementById('ma-advance').value = '';
+  var msg = document.getElementById('master-att-msg'); if(msg) msg.style.display='none';
+  renderMasterAttWorkers();
+  modal.style.display = 'flex';
+}
+function closeMasterAtt() {
+  document.getElementById('master-att-modal').style.display = 'none';
+}
+
+function renderMasterAttWorkers() {
+  var el = document.getElementById('master-att-worker-list'); if (!el) return;
+  AD = ld();
+  var workers = AD.filter(function(a){ return a.type === 'worker'; });
+  if (!workers.length) { el.innerHTML='<p class="text-gray-400 text-center py-4 text-xs">No workers added yet</p>'; return; }
+  // Group by category
+  var grp = {};
+  workers.forEach(function(w){
+    var cat = w.category || 'Other';
+    if (!grp[cat]) grp[cat] = [];
+    grp[cat].push(w);
+  });
+  // Check already attended today
+  var targetDate = (document.getElementById('ma-date')||{}).value || DD;
+  var attended = dedup(AD.filter(function(a){ return a.type==='attendance' && a.date===targetDate; })).map(function(a){return a.name;});
+
+  el.innerHTML = Object.keys(grp).map(function(cat){
+    var catWorkers = grp[cat];
+    return '<div style="margin-bottom:10px">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">'
+      +'<p style="font-size:10px;font-weight:800;color:#4f46e5;text-transform:uppercase;letter-spacing:.04em">'+cat+'</p>'
+      +'<span style="font-size:9px;color:#9ca3af">'+catWorkers.length+' workers</span>'
+      +'</div>'
+      +catWorkers.map(function(w){
+        var alreadyDone = attended.indexOf(w.name) !== -1;
+        var chkId = 'ma-chk-'+w.__id;
+        return '<label style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;margin-bottom:3px;cursor:pointer;background:'+(alreadyDone?'#f0fdf4':'#f8fafc')+';border:1px solid '+(alreadyDone?'#86efac':'#e5e7eb')+'">'
+          +'<input type="checkbox" id="'+chkId+'" data-wid="'+w.__id+'" data-name="'+w.name+'" '+(alreadyDone?'checked disabled':'')
+          +' style="width:16px;height:16px;accent-color:#4f46e5;flex-shrink:0;cursor:pointer">'
+          +'<span style="flex:1;font-size:11px;font-weight:'+(alreadyDone?'700':'600')+';color:'+(alreadyDone?'#15803d':'#374151')+'">'+w.name+(alreadyDone?' ✓':' ')+'</span>'
+          +(w.hourly_wage?'<span style="font-size:9px;color:#9ca3af">₹'+w.hourly_wage+'/hr</span>':'')
+          +'</label>';
+      }).join('')
+      +'</div>';
+  }).join('');
+}
+
+function masterAttSelectAll(val) {
+  document.querySelectorAll('#master-att-worker-list input[type="checkbox"]:not(:disabled)').forEach(function(cb){
+    cb.checked = val;
+  });
+}
+
+function saveMasterAttendance() {
+  var date    = document.getElementById('ma-date').value || DD;
+  var hours   = parseFloat(document.getElementById('ma-hours').value) || 0;
+  var advance = parseFloat(document.getElementById('ma-advance').value) || 0;
+  var msg     = document.getElementById('master-att-msg');
+
+  if (!hours) { if(msg){msg.textContent='Enter working hours first';msg.style.color='#dc2626';msg.style.display='block';} return; }
+
+  var selected = [];
+  document.querySelectorAll('#master-att-worker-list input[type="checkbox"]:not(:disabled):checked').forEach(function(cb){
+    selected.push({ wid: cb.getAttribute('data-wid'), name: cb.getAttribute('data-name') });
+  });
+
+  if (!selected.length) { if(msg){msg.textContent='Select at least one worker';msg.style.color='#dc2626';msg.style.display='block';} return; }
+
+  // Add attendance for each selected worker
+  selected.forEach(function(s){
+    var worker = AD.find(function(w){ return w.__id === s.wid; });
+    var otRate = worker ? (parseFloat(worker.ot_rate)||0) : 0;
+    add({ type:'attendance', date:date, name:s.name, category: worker ? (worker.category||'') : '', hours:hours, advance:advance, ot_hours:0, ot_rate:otRate, work_done:'' });
+  });
+
+  AD = ld();
+  toast('✅ Added attendance for ' + selected.length + ' workers!', 'ok');
+  if(msg){msg.textContent='✅ '+selected.length+' workers marked present';msg.style.color='#059669';msg.style.display='block';}
+  setTimeout(closeMasterAtt, 1200);
+  updateDash(); viewWorkers();
+}
+
+function renderBudgetVisualBars() {
+  var el = document.getElementById('bgt-visual-bars');
+  if (!el) return;
+  var bgt = lbgt();
+  if (!bgt) { el.innerHTML = '<p class="text-gray-400 text-xs text-center py-2">Set budget to see comparison</p>'; return; }
+  AD = ld();
+  var labourActual   = dedup(AD.filter(function(a){return a.type==='attendance';})).reduce(function(s,a){
+    var w = AD.find(function(x){return x.type==='worker'&&x.name===a.name;});
+    return s + (parseFloat(a.hours)||0)*(w?parseFloat(w.hourly_wage)||0:0) + (parseFloat(a.ot_hours)||0)*(parseFloat(a.ot_rate)||0);
+  },0) + AD.filter(function(a){return a.type==='contractor_payment';}).reduce(function(s,a){return s+(parseFloat(a.payment)||0);},0);
+  var materialActual = AD.filter(function(a){return a.type==='material'&&!a.is_petty_cash;}).reduce(function(s,a){return s+(parseFloat(a.cost)||0);},0);
+  var otherActual    = AD.filter(function(a){return a.type==='expense'||a.is_petty_cash;}).reduce(function(s,a){return s+(parseFloat(a.amount||a.cost)||0);},0);
+
+  var cats = [
+    {label:'👷 Labour',   budgeted:parseFloat(bgt.labour||0),   actual:labourActual,   color:'#4f46e5'},
+    {label:'🧱 Material', budgeted:parseFloat(bgt.material||0), actual:materialActual, color:'#d97706'},
+    {label:'💰 Other',    budgeted:parseFloat(bgt.other||0),    actual:otherActual,    color:'#059669'},
+  ];
+  el.innerHTML = cats.map(function(c){
+    if (!c.budgeted) return '';
+    var pct = Math.min(100, Math.round(c.actual/c.budgeted*100));
+    var over = c.actual > c.budgeted;
+    var barW = Math.min(100, pct);
+    return '<div style="margin-bottom:14px">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'
+      +'<span style="font-size:11px;font-weight:700;color:#374151">'+c.label+'</span>'
+      +'<span style="font-size:10px;color:'+(over?'#dc2626':'#374151')+';font-weight:700">'+fc(c.actual)+' / '+fc(c.budgeted)+'</span>'
+      +'</div>'
+      +'<div style="height:8px;background:#e5e7eb;border-radius:99px;overflow:hidden">'
+      +'<div style="height:100%;width:'+barW+'%;background:'+(over?'linear-gradient(90deg,#dc2626,#ef4444)':c.color)+';border-radius:99px;transition:width .4s"></div>'
+      +'</div>'
+      +'<div style="display:flex;justify-content:space-between;margin-top:2px">'
+      +'<span style="font-size:9px;color:#9ca3af">'+pct+'% used</span>'
+      +'<span style="font-size:9px;color:'+(over?'#dc2626':'#059669')+';font-weight:700">'+(over?'⚠️ Over by '+fc(c.actual-c.budgeted):'✅ '+fc(c.budgeted-c.actual)+' left')+'</span>'
+      +'</div>'
+      +'</div>';
+  }).join('');
+}
+
+// Budget visual bars called via _postSwitchTab
+
+// ── Gantt Timeline ────────────────────────────────────────────────
+function renderGantt() {
+  var el = document.getElementById('gantt-view'); if (!el) return;
+  var ms = lms(); if (!ms.length) { el.innerHTML='<p class="text-gray-400 text-xs text-center py-2">Add milestones to see Gantt chart</p>'; return; }
+  var valid = ms.filter(function(m){ return m.start && m.end; });
+  if (!valid.length) { el.innerHTML='<p class="text-gray-400 text-xs text-center py-2">Set start & end dates on milestones</p>'; return; }
+  var minDate = valid.reduce(function(s,m){ return m.start<s?m.start:s; }, valid[0].start);
+  var maxDate = valid.reduce(function(s,m){ return m.end>s?m.end:s; }, valid[0].end);
+  var totalDays = Math.max(1, (new Date(maxDate)-new Date(minDate))/(86400000));
+  var today = ist();
+  var todayPct = Math.max(0,Math.min(100,Math.round((new Date(today)-new Date(minDate))/(86400000)/totalDays*100)));
+  var statusColor = {'✅ Completed':'#059669','🔄 In Progress':'#4f46e5','⏳ Pending':'#9ca3af','⚠️ Delayed':'#dc2626'};
+  el.innerHTML = '<div style="min-width:280px;padding-top:4px">'
+    + '<div style="display:flex;justify-content:space-between;font-size:9px;color:#9ca3af;margin-bottom:12px;padding:0 2px"><span>'+minDate+'</span><span>Today</span><span>'+maxDate+'</span></div>'
+    + valid.map(function(m){
+      var s = Math.round((new Date(m.start)-new Date(minDate))/(86400000)/totalDays*100);
+      var w = Math.max(5, Math.round((new Date(m.end)-new Date(m.start))/(86400000)/totalDays*100));
+      if (s + w > 100) w = 100 - s;
+      var col = statusColor[m.status]||'#6366f1';
+      var todayLine = todayPct > 0 && todayPct < 100
+        ? '<div style="position:absolute;left:'+todayPct+'%;top:0;width:1.5px;height:100%;background:#ef4444;opacity:0.6;z-index:2"></div>'
+        : '';
+      return '<div style="margin-bottom:14px">'
+        +'<div style="font-size:10px;font-weight:700;color:#374151;margin-bottom:3px;word-break:break-word;line-height:1.3">'+m.title+'</div>'
+        +'<div style="height:16px;background:#f3f4f6;border-radius:8px;position:relative;overflow:hidden">'
+        +todayLine
+        +'<div style="position:absolute;left:'+s+'%;width:'+w+'%;height:100%;background:'+col+';border-radius:8px;opacity:0.9;transition:width .3s"></div>'
+        +'</div>'
+        +'<div style="display:flex;justify-content:space-between;margin-top:2px;font-size:9px;color:#9ca3af"><span>'+m.start+'</span><span style="color:'+col+';font-weight:700">'+m.status+'</span><span>'+m.end+'</span></div>'
+        +'</div>';
+    }).join('')
+    + '</div>';
+}
+
+// Gantt rendered via _postSwitchTab
+
+// ── Subcontractor Bill Tracker ────────────────────────────────────
+function toggleSubconBillPanel() {
+  var p = document.getElementById('subcon-bill-panel');
+  if (!p) return;
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+  if (p.style.display === 'block') {
+    // Populate contractor dropdown
+    var sel = document.getElementById('scb-contractor');
+    if (sel) {
+      var contractors = AD.filter(function(a){return a.type==='contractor';});
+      sel.innerHTML = '<option value="">Select Contractor</option>' + contractors.map(function(c){
+        return '<option value="'+c.name+'">'+c.name+'</option>';
+      }).join('');
+    }
+    var dateEl = document.getElementById('scb-date');
+    if (dateEl && !dateEl.value) dateEl.value = ist();
+  }
+}
+
+function saveSubconBill() {
+  var contractor = document.getElementById('scb-contractor').value;
+  var date = document.getElementById('scb-date').value;
+  var billNo = document.getElementById('scb-no').value.trim();
+  var amount = parseFloat(document.getElementById('scb-amount').value)||0;
+  var paid = parseFloat(document.getElementById('scb-paid').value)||0;
+  var desc = document.getElementById('scb-desc').value.trim();
+  if (!contractor || !amount) { toast('Select contractor and enter amount', 'err'); return; }
+  var bills = lscb();
+  bills.push({ id: Date.now().toString(36), contractor:contractor, date:date||ist(), billNo:billNo, amount:amount, paid:paid, desc:desc });
+  sscb(bills);
+  document.getElementById('scb-no').value = '';
+  document.getElementById('scb-amount').value = '';
+  document.getElementById('scb-paid').value = '';
+  document.getElementById('scb-desc').value = '';
+  document.getElementById('subcon-bill-panel').style.display = 'none';
+  toast('✅ Bill saved!', 'ok');
+  renderSubconBills();
+}
+
+function renderSubconBills() {
+  var el = document.getElementById('subcon-bill-list'); if (!el) return;
+  var bills = lscb();
+  if (!bills.length) { el.innerHTML='<p class="text-gray-400 text-xs text-center py-2">No bills tracked yet</p>'; return; }
+  // Group by contractor
+  var grouped = {};
+  bills.forEach(function(b){ if(!grouped[b.contractor]) grouped[b.contractor]=[]; grouped[b.contractor].push(b); });
+  el.innerHTML = Object.keys(grouped).map(function(name){
+    var list = grouped[name];
+    var totalBilled = list.reduce(function(s,b){return s+b.amount;},0);
+    var totalPaid   = list.reduce(function(s,b){return s+b.paid;},0);
+    var balance = totalBilled - totalPaid;
+    return '<div style="margin-bottom:10px;padding:8px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
+      +'<p style="font-size:12px;font-weight:800;color:#1f2937">'+name+'</p>'
+      +'<div style="display:flex;gap:8px;font-size:10px">'
+      +'<span style="color:#4f46e5;font-weight:700">Billed: '+fc(totalBilled)+'</span>'
+      +'<span style="color:#059669;font-weight:700">Paid: '+fc(totalPaid)+'</span>'
+      +'<span style="color:'+(balance>0?'#dc2626':'#059669')+';font-weight:800">Bal: '+fc(balance)+'</span>'
+      +'</div></div>'
+      +list.map(function(b){
+        var bal = b.amount - b.paid;
+        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-top:1px solid #e5e7eb;font-size:10px">'
+          +'<div><span style="color:#374151;font-weight:600">'+(b.billNo?b.billNo+' — ':'')+b.desc+'</span><br><span style="color:#9ca3af">'+b.date+'</span></div>'
+          +'<div style="text-align:right">'
+          +'<div style="font-weight:700;color:#374151">'+fc(b.amount)+'</div>'
+          +'<div style="color:'+(bal>0?'#dc2626':'#059669')+';font-weight:700">'+(bal>0?'Due: '+fc(bal):'✅ Paid')+'</div>'
+          +'</div>'
+          +'</div>';
+      }).join('')
+      +'</div>';
+  }).join('');
+}
+
+// subcon bills rendered on teams tab switch via _postSwitchTab
+
+// ── Site Visits / Inspection Log ─────────────────────────────────
+function loadVisitsTab() {
+  var dateEl = document.getElementById('vt-date');
+  if (dateEl && !dateEl.value) dateEl.value = ist();
+  renderVisitsList();
+}
+
+function saveVisit() {
+  var date    = document.getElementById('vt-date').value || ist();
+  var type    = document.getElementById('vt-type').value;
+  var visitor = document.getElementById('vt-visitor').value.trim();
+  var org     = document.getElementById('vt-org').value.trim();
+  var notes   = document.getElementById('vt-notes').value.trim();
+  var action  = document.getElementById('vt-action').value.trim();
+  if (!visitor) { toast('Enter visitor name', 'err'); return; }
+  var visits = lvisits();
+  visits.unshift({ id: Date.now().toString(36), date:date, type:type, visitor:visitor, org:org, notes:notes, action:action });
+  svisits(visits);
+  document.getElementById('vt-visitor').value = '';
+  document.getElementById('vt-org').value = '';
+  document.getElementById('vt-notes').value = '';
+  document.getElementById('vt-action').value = '';
+  toast('✅ Visit logged!', 'ok');
+  renderVisitsList();
+}
+
+function deleteVisit(id) {
+  askDel('Delete this visit log?', function(){
+    var visits = lvisits().filter(function(v){return v.id!==id;});
+    svisits(visits); renderVisitsList(); toast('Deleted','ok');
+  });
+}
+
+function renderVisitsList() {
+  var el = document.getElementById('visits-list'); if (!el) return;
+  var visits = lvisits();
+  if (!visits.length) { el.innerHTML='<p class="text-gray-400 text-center py-4 text-xs">No visits logged yet</p>'; return; }
+  var typeColor = {'Client Visit':'#4f46e5','Consultant':'#0891b2','Inspection':'#d97706','Safety Audit':'#dc2626','Quality Check':'#059669','Other':'#6b7280'};
+  el.innerHTML = visits.map(function(v){
+    var col = typeColor[v.type]||'#6b7280';
+    return '<div style="border-left:3px solid '+col+';padding:8px 10px;margin-bottom:8px;background:#f8fafc;border-radius:0 10px 10px 0">'
+      +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">'
+      +'<div><span style="background:'+col+';color:white;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px">'+v.type+'</span>'
+      +' <span style="font-size:11px;font-weight:800;color:#1f2937">'+v.visitor+'</span>'
+      +(v.org?' <span style="font-size:10px;color:#6b7280">· '+v.org+'</span>':'')
+      +'</div>'
+      +'<div style="display:flex;gap:5px;align-items:center;flex-shrink:0">'
+      +'<span style="font-size:10px;color:#9ca3af">'+v.date+'</span>'
+      +'<button onclick="deleteVisit(\''+v.id+'\')" style="background:#fee2e2;color:#dc2626;border:none;border-radius:5px;font-size:10px;padding:2px 7px;cursor:pointer;font-weight:700">✕</button>'
+      +'</div></div>'
+      +(v.notes?'<p style="font-size:10px;color:#374151;margin:3px 0">'+v.notes+'</p>':'')
+      +(v.action?'<p style="font-size:10px;color:#d97706;font-weight:700;margin-top:2px">→ Action: '+v.action+'</p>':'')
+      +'</div>';
+  }).join('');
+}
+
+function printVisitLog() {
+  var visits = lvisits();
+  if (!visits.length) { toast('No visits to print', 'err'); return; }
+  var p = lprof()||{};
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Site Visit Log</title><style>'+pcs()+'</style></head><body>'
+    +'<div class="bar"><button class="bb" onclick="window.close()">← Back</button><span style="flex:1;font-weight:700">Site Visit / Inspection Log</span><button class="bp" onclick="window.print()">🖶 Print</button><button class="bx" onclick="window.close()">✕</button></div>'
+    +'<div class="content">'
+    +_pdfHeader('Sanjineer', p.company||'', '', '<p style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.8)">Site Visit Log</p><p style="font-size:10px;color:rgba(255,255,255,0.6);margin-top:4px">'+new Date().toLocaleDateString('en-IN')+'</p>')
+    +'<table><thead><tr><th>Date</th><th>Type</th><th>Visitor</th><th>Organization</th><th>Observations</th><th>Action Required</th></tr></thead><tbody>'
+    +visits.map(function(v){
+      return '<tr><td style="padding:6px 8px;white-space:nowrap">'+v.date+'</td><td style="padding:6px 8px;font-weight:700">'+v.type+'</td><td style="padding:6px 8px;font-weight:700">'+v.visitor+'</td><td style="padding:6px 8px">'+( v.org||'—')+'</td><td style="padding:6px 8px">'+( v.notes||'—')+'</td><td style="padding:6px 8px;color:#d97706;font-weight:600">'+( v.action||'—')+'</td></tr>';
+    }).join('')
+    +'</tbody></table>'
+    +pftr()+'</div></body></html>';
+  opw(html);
+}
+
+// ── Quotation / Estimate Builder ──────────────────────────────────
+var _qtLineCount = 0;
+
+function loadQuotationTab() {
+  var dateEl = document.getElementById('qt-date');
+  if (dateEl && !dateEl.value) dateEl.value = ist();
+  var noEl = document.getElementById('qt-no');
+  if (noEl && !noEl.value) {
+    var count = lqt().length + 1;
+    noEl.value = 'QT-' + String(count).padStart(3,'0');
+  }
+  if (!document.getElementById('qt-lines-body').children.length) addQtLine();
+  renderQuotationRecords();
+  calcQtTotal();
+}
+
+function addQtLine() {
+  var tbody = document.getElementById('qt-lines-body');
+  if (!tbody) return;
+  var id = ++_qtLineCount;
+  var tr = document.createElement('tr');
+  tr.id = 'qt-row-' + id;
+  tr.innerHTML = '<td class="px-1 py-1"><input type="text" id="qt-desc-'+id+'" placeholder="Description" class="w-full px-2 py-1 border border-gray-200 rounded-lg text-xs focus:outline-none" oninput="calcQtTotal()"></td>'
+    +'<td class="px-1 py-1"><input type="text" id="qt-unit-'+id+'" placeholder="sqft" class="w-16 px-2 py-1 border border-gray-200 rounded-lg text-xs text-center focus:outline-none"></td>'
+    +'<td class="px-1 py-1"><input type="number" id="qt-qty-'+id+'" placeholder="0" step="any" class="w-14 px-2 py-1 border border-gray-200 rounded-lg text-xs text-center focus:outline-none" oninput="calcQtTotal()"></td>'
+    +'<td class="px-1 py-1"><input type="number" id="qt-rate-'+id+'" placeholder="0" step="any" class="w-16 px-2 py-1 border border-gray-200 rounded-lg text-xs text-center focus:outline-none" oninput="calcQtTotal()"></td>'
+    +'<td class="px-1 py-1 text-right text-xs font-bold text-gray-700" id="qt-amt-'+id+'">₹0</td>'
+    +'<td class="px-1 py-1"><button onclick="removeQtLine('+id+')" class="text-red-400 text-sm font-bold">✕</button></td>';
+  tbody.appendChild(tr);
+}
+
+function removeQtLine(id) {
+  var row = document.getElementById('qt-row-'+id); if (row) row.remove();
+  calcQtTotal();
+}
+
+function calcQtTotal() {
+  var tbody = document.getElementById('qt-lines-body'); if (!tbody) return;
+  var subtotal = 0;
+  tbody.querySelectorAll('tr').forEach(function(tr){
+    var id = tr.id.replace('qt-row-','');
+    var qty  = parseFloat((document.getElementById('qt-qty-'+id)||{}).value)||0;
+    var rate = parseFloat((document.getElementById('qt-rate-'+id)||{}).value)||0;
+    var amt  = qty * rate;
+    subtotal += amt;
+    var amtEl = document.getElementById('qt-amt-'+id);
+    if (amtEl) amtEl.textContent = fc(amt);
+  });
+  var gstPct = parseFloat((document.getElementById('qt-gst')||{}).value)||0;
+  var gstAmt = subtotal * gstPct / 100;
+  var total  = subtotal + gstAmt;
+  var sub = document.getElementById('qt-subtotal'); if(sub) sub.textContent = fc(subtotal);
+  var ga  = document.getElementById('qt-gst-amt'); if(ga) ga.textContent = fc(gstAmt);
+  var tot = document.getElementById('qt-total');   if(tot) tot.textContent = fc(total);
+}
+
+function saveAndPrintQuotation() {
+  generateQuotePDF(true);
+}
+
+function generateQuotePDF(saveRecord) {
+  var qtNo    = (document.getElementById('qt-no')||{}).value||'QT-001';
+  var date    = (document.getElementById('qt-date')||{}).value||ist();
+  var client  = (document.getElementById('qt-client')||{}).value||'';
+  var project = (document.getElementById('qt-project')||{}).value||'';
+  var notes   = (document.getElementById('qt-notes')||{}).value||'';
+  var gstPct  = parseFloat((document.getElementById('qt-gst')||{}).value)||0;
+  var tbody = document.getElementById('qt-lines-body');
+  var lines = [];
+  if (tbody) tbody.querySelectorAll('tr').forEach(function(tr){
+    var id = tr.id.replace('qt-row-','');
+    var desc = (document.getElementById('qt-desc-'+id)||{}).value||'';
+    var unit = (document.getElementById('qt-unit-'+id)||{}).value||'';
+    var qty  = parseFloat((document.getElementById('qt-qty-'+id)||{}).value)||0;
+    var rate = parseFloat((document.getElementById('qt-rate-'+id)||{}).value)||0;
+    if (desc || qty) lines.push({desc:desc, unit:unit, qty:qty, rate:rate, amt:qty*rate});
+  });
+  if (!lines.length) { toast('Add at least one line item', 'err'); return; }
+  var subtotal = lines.reduce(function(s,l){return s+l.amt;},0);
+  var gstAmt   = subtotal * gstPct / 100;
+  var total    = subtotal + gstAmt;
+  var p = lprof()||{};
+  // Save record
+  if (saveRecord !== false) {
+    var records = lqt();
+    records.unshift({ id:Date.now().toString(36), qtNo:qtNo, date:date, client:client, project:project, total:total, lines:lines, gstPct:gstPct, notes:notes });
+    sqt(records); renderQuotationRecords();
+  }
+  var hc = p.headerColor||'linear-gradient(135deg,#4f46e5,#7c3aed)';
+  var hSolid = hc.indexOf('gradient')!==-1?'#4f46e5':hc;
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Quotation '+qtNo+'</title><style>'+pcs()+'</style></head><body>'
+    +'<div class="bar"><button class="bb" onclick="window.close()">← Back</button><span style="flex:1;font-weight:700">Quotation — '+qtNo+'</span><button class="bp" onclick="window.print()">🖶 Print</button><button class="bx" onclick="window.close()">✕</button></div>'
+    +'<div class="content">'
+    +_pdfHeader('Sanjineer', p.company||'',
+      '',
+      '<p style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.8);text-transform:uppercase;letter-spacing:.04em">Quotation</p>'
+      +'<p style="font-size:14px;font-weight:900;color:white;margin-top:3px">'+qtNo+'</p>'
+      +'<p style="font-size:10px;color:rgba(255,255,255,0.7);margin-top:2px">'+fd(date)+'</p>'
+    )
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">'
+    +'<div style="background:#f8fafc;border-radius:10px;padding:10px"><p style="font-size:9px;font-weight:700;color:#6b7280;text-transform:uppercase;margin-bottom:3px">Quote To</p>'
+    +'<p style="font-size:13px;font-weight:800;color:#1f2937">'+(client||'—')+'</p>'+(project?'<p style="font-size:10px;color:#6b7280;margin-top:2px">'+project+'</p>':'')+'</div>'
+    +'<div style="background:#f8fafc;border-radius:10px;padding:10px"><p style="font-size:9px;font-weight:700;color:#6b7280;text-transform:uppercase;margin-bottom:3px">Reference</p>'
+    +'<p style="font-size:11px;color:#374151"><strong>Ref:</strong> '+qtNo+'</p>'
+    +'<p style="font-size:11px;color:#374151"><strong>Date:</strong> '+fd(date)+'</p></div>'
+    +'</div>'
+    +'<table><thead><tr style="background:'+hSolid+';color:white"><th style="padding:8px 10px;text-align:left">Description</th><th style="padding:8px 10px;text-align:center">Unit</th><th style="padding:8px 10px;text-align:center">Qty</th><th style="padding:8px 10px;text-align:right">Rate (₹)</th><th style="padding:8px 10px;text-align:right">Amount (₹)</th></tr></thead><tbody>'
+    +lines.map(function(l,i){
+      return '<tr style="background:'+(i%2?'#f9fafb':'white')+'"><td style="padding:7px 10px;font-weight:600">'+l.desc+'</td><td style="padding:7px 10px;text-align:center">'+( l.unit||'—')+'</td><td style="padding:7px 10px;text-align:center">'+l.qty+'</td><td style="padding:7px 10px;text-align:right">'+fc(l.rate)+'</td><td style="padding:7px 10px;text-align:right;font-weight:700">'+fc(l.amt)+'</td></tr>';
+    }).join('')
+    +'</tbody><tfoot>'
+    +'<tr><td colspan="4" style="padding:7px 10px;text-align:right;font-weight:700">Subtotal</td><td style="padding:7px 10px;text-align:right;font-weight:700">'+fc(subtotal)+'</td></tr>'
+    +(gstPct?'<tr><td colspan="4" style="padding:7px 10px;text-align:right">GST ('+gstPct+'%)</td><td style="padding:7px 10px;text-align:right">'+fc(gstAmt)+'</td></tr>':'')
+    +'<tr style="background:'+hSolid+';color:white"><td colspan="4" style="padding:9px 10px;text-align:right;font-weight:900;font-size:14px">GRAND TOTAL</td><td style="padding:9px 10px;text-align:right;font-weight:900;font-size:14px">'+fc(total)+'</td></tr>'
+    +'</tfoot></table>'
+    +(notes?'<div style="margin-top:16px;padding:12px;background:#f8fafc;border-radius:10px"><p style="font-size:10px;font-weight:700;color:#374151;margin-bottom:4px">Terms & Notes:</p><p style="font-size:11px;color:#6b7280">'+notes+'</p></div>':'')
+    +'<div style="margin-top:32px;display:grid;grid-template-columns:1fr 1fr;gap:40px">'
+    +'<div><div style="border-top:1.5px solid #374151;padding-top:4px;font-size:10px;color:#6b7280">Prepared By</div><p style="font-size:11px;font-weight:700;color:#374151;margin-top:4px">'+(p.engineer||p.company||'')+'</p></div>'
+    +'<div style="text-align:right"><div style="border-top:1.5px solid #374151;padding-top:4px;font-size:10px;color:#6b7280">Client Acceptance</div><p style="font-size:11px;color:#9ca3af;margin-top:4px">Signature & Date</p></div>'
+    +'</div>'
+    +'</div></body></html>';
+  opw(html);
+}
+
+function renderQuotationRecords() {
+  var el = document.getElementById('qt-records-list'); if (!el) return;
+  var records = lqt();
+  if (!records.length) { el.innerHTML='<p class="text-gray-400 text-center py-3 text-xs">No quotations saved yet</p>'; return; }
+  el.innerHTML = records.map(function(r){
+    return '<div style="background:white;border-radius:10px;border:1px solid #e5e7eb;padding:7px 10px;margin-bottom:6px;box-shadow:0 2px 6px rgba(0,0,0,0.08)">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">'
+      +'<p style="font-weight:800;color:#1f2937;font-size:12px">'+r.qtNo+' — '+(r.client||'No Client')+'</p>'
+      +'<div style="display:flex;gap:5px">'
+      +'<button onclick="reprintQuotation(\''+r.id+'\')" style="font-size:10px;padding:3px 16px;background:#e0e7ff;color:#4f46e5;border:none;border-radius:5px;cursor:pointer;font-weight:700">Print</button>'
+      +'<button onclick="deleteQuotation(\''+r.id+'\')" style="width:20px;height:20px;display:flex;align-items:center;justify-content:center;background:#fee2e2;color:#dc2626;border:none;border-radius:5px;cursor:pointer;font-weight:800;font-size:11px">×</button>'
+      +'</div></div>'
+      +'<div style="display:flex;justify-content:space-between">'
+      +'<p style="font-size:10px;color:#9ca3af">'+fd(r.date)+(r.project?' · '+r.project:'')+'</p>'
+      +'<p style="font-weight:800;font-size:12px;color:#4f46e5">'+fc(r.total)+'</p>'
+      +'</div></div>';
+  }).join('');
+}
+
+function reprintQuotation(id) {
+  var r = lqt().find(function(x){return x.id===id;});
+  if (!r) { toast('Not found','err'); return; }
+  // Restore form and print
+  if(document.getElementById('qt-no')) document.getElementById('qt-no').value = r.qtNo;
+  if(document.getElementById('qt-date')) document.getElementById('qt-date').value = r.date;
+  if(document.getElementById('qt-client')) document.getElementById('qt-client').value = r.client||'';
+  if(document.getElementById('qt-project')) document.getElementById('qt-project').value = r.project||'';
+  if(document.getElementById('qt-notes')) document.getElementById('qt-notes').value = r.notes||'';
+  if(document.getElementById('qt-gst')) document.getElementById('qt-gst').value = r.gstPct||0;
+  // Rebuild lines
+  var tbody = document.getElementById('qt-lines-body');
+  if (tbody) tbody.innerHTML = '';
+  _qtLineCount = 0;
+  (r.lines||[]).forEach(function(l){
+    addQtLine();
+    var id2 = _qtLineCount;
+    if(document.getElementById('qt-desc-'+id2)) document.getElementById('qt-desc-'+id2).value = l.desc;
+    if(document.getElementById('qt-unit-'+id2)) document.getElementById('qt-unit-'+id2).value = l.unit;
+    if(document.getElementById('qt-qty-'+id2)) document.getElementById('qt-qty-'+id2).value = l.qty;
+    if(document.getElementById('qt-rate-'+id2)) document.getElementById('qt-rate-'+id2).value = l.rate;
+  });
+  calcQtTotal();
+  generateQuotePDF(false);
+}
+
+function deleteQuotation(id) {
+  askDel('Delete this quotation?', function(){
+    var records = lqt().filter(function(r){return r.id!==id;});
+    sqt(records); renderQuotationRecords(); toast('Deleted','ok');
+  });
+}
+
+// ── Daily Summary WhatsApp Share ─────────────────────────────────
+function shareDailySummaryWhatsApp() {
+  AD = ld();
+  var att = dedup(AD.filter(function(a){return a.type==='attendance'&&a.date===DD;}));
+  var mats = AD.filter(function(a){return a.type==='material'&&a.date===DD&&!a.is_petty_cash;});
+  var adv = att.reduce(function(s,a){return s+(parseFloat(a.advance)||0);},0);
+  var mc  = mats.reduce(function(s,m){return s+(parseFloat(m.cost)||0);},0);
+  var wc  = att.reduce(function(s,a){
+    var w=AD.find(function(x){return x.type==='worker'&&x.name===a.name;}); var rate=w?(parseFloat(w.hourly_wage)||0):0;
+    return s+(parseFloat(a.hours)||0)*rate+(parseFloat(a.ot_hours)||0)*(parseFloat(a.ot_rate)||0);
+  },0);
+  var p = lprof()||{};
+  var meta = lm()[DD]||{};
+  var msg = '📋 *Daily Report — '+fdl(DD)+'*\n';
+  msg += '🏗️ *'+(p.company||'Site')+'*\n';
+  if (meta.weather) msg += '🌤️ Weather: '+meta.weather+'\n';
+  if (meta.status)  msg += '📝 Status: '+meta.status+'\n';
+  msg += '\n*👷 Workers: '+att.length+'*\n';
+  var grp={};
+  att.forEach(function(a){if(!grp[a.category])grp[a.category]=[];grp[a.category].push(a);});
+  Object.keys(grp).forEach(function(cat){
+    var hrs=grp[cat].reduce(function(s,a){return s+(parseFloat(a.hours)||0);},0);
+    msg += '  • '+cat+': '+grp[cat].length+' workers, '+hrs+'h\n';
+  });
+  msg += '\n*💰 Financials:*\n';
+  msg += '  • Worker Cost: '+fc(wc)+'\n';
+  msg += '  • Material: '+fc(mc)+'\n';
+  msg += '  • Advances: '+fc(adv)+'\n';
+  msg += '\n_Sent via Sanjineer App_';
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+
+// Add WhatsApp share button to daily tab on load
+(function(){
+  var _origLoadDaily = window.loadDailyReport || function(){};
+  // Add after daily tab renders
+})();
+
+// ── Overdue badge on Punch List nav button ────────────────────────
+function updateOverdueBadge() {
+  var today = ist();
+  var pl = lpl();
+  var overdue = pl.filter(function(p){ return p.due && p.due < today && p.status !== 'resolved'; }).length;
+  document.querySelectorAll('.tab-btn[data-tab="punchlist"]').forEach(function(btn){
+    var existing = btn.querySelector('.overdue-badge');
+    if (existing) existing.remove();
+    if (overdue > 0) {
+      var badge = document.createElement('span');
+      badge.className = 'overdue-badge';
+      badge.style.cssText = 'background:#ef4444;color:white;font-size:8px;font-weight:800;border-radius:99px;padding:0 4px;margin-left:3px;vertical-align:middle;display:inline-block;min-width:14px;text-align:center';
+      badge.textContent = overdue;
+      btn.appendChild(badge);
+    }
+  });
+}
+
+// Materials reorder bar updated via _postSwitchTab
+
+// ── Extra actions after tab switch (called from switchTab directly) ───
+function _postSwitchTab(name) {
+  if (name === 'punchlist')    setTimeout(updateOverdueBadge, 100);
+  if (name === 'materials')    setTimeout(updateMaterialReorderBar, 100);
+  if (name === 'budget')       setTimeout(renderBudgetVisualBars, 200);
+  if (name === 'schedule')     { setTimeout(renderGantt, 200); }
+  if (name === 'contractors')  setTimeout(renderSubconBills, 100);
+}
+
+// ── On boot: run notifications and badges ────────────────────────
+document.addEventListener('DOMContentLoaded', function(){
+  setTimeout(checkOverdueNotifications, 3000);
+  setTimeout(updateOverdueBadge, 1500);
+  // WhatsApp share removed per user request
+});
 
 </script>
 
