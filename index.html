@@ -628,7 +628,7 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
     /* CLOUD MODAL */
     #cloud-modal{display:none;}
     #cloud-modal.show{display:flex!important;}
-    .cloud-feature-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.08);}
+    .cloud-feature-row{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.08);}
     .cloud-feature-row:last-child{border-bottom:none;}
     /* VIEWER SHARE */
     #viewer-modal{display:none;}
@@ -638,7 +638,7 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
     #auth-modal.show{display:flex!important;}
     .auth-tab-btn{flex:1;padding:8px 4px;font-size:12px;font-weight:700;border:none;border-radius:10px;cursor:pointer;transition:all .18s;background:transparent;color:rgba(255,255,255,0.5);}
     .auth-tab-btn.active{background:rgba(255,255,255,0.18);color:#fff;}
-    .auth-input{width:100%;padding:10px 12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:.625rem;color:white;font-size:13px;outline:none;box-sizing:border-box;margin-bottom:8px;}
+    .auth-input{width:100%;padding:8px 10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:.5rem;color:white;font-size:12px;outline:none;box-sizing:border-box;margin-bottom:6px;}
     .auth-input::placeholder{color:rgba(255,255,255,0.4);}
     .auth-input:focus{border-color:#818cf8;}
     .perm-chip{display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.45);margin:3px 2px;transition:all .18s;box-shadow:0 2px 6px rgba(0,0,0,.2);}
@@ -968,6 +968,141 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
 </head>
 <body>
 
+<!-- ========== WELCOME OVERLAY (first-time only, before any data) ========== -->
+<div id="welcome-overlay" style="display:none;position:fixed;inset:0;z-index:99999;overflow:hidden;background:#0a0818;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem;">
+
+  <!-- Blobs -->
+  <div style="position:absolute;top:-120px;left:-80px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,#4f46e5,#7c3aed);filter:blur(80px);opacity:0.55;animation:wBlob 14s ease-in-out infinite;pointer-events:none;"></div>
+  <div style="position:absolute;bottom:-80px;right:-60px;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,#9333ea,#4f46e5);filter:blur(80px);opacity:0.55;animation:wBlob 10s ease-in-out infinite reverse;pointer-events:none;"></div>
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(245,158,11,0.18),transparent);filter:blur(60px);pointer-events:none;"></div>
+  <!-- Grid -->
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;"></div>
+  <!-- Bottom line -->
+  <div style="position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#4f46e5,#9333ea,#f59e0b,transparent);opacity:0.6;"></div>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap');
+    @keyframes wBlob{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-28px) scale(1.06);}}
+    @keyframes wFadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+    @keyframes wPulse{0%,100%{box-shadow:0 0 4px #6366f1;}50%{box-shadow:0 0 12px #6366f1,0 0 22px #6366f1aa;}}
+    .wa1{opacity:0;animation:wFadeUp .7s ease .1s forwards;}
+    .wa2{opacity:0;animation:wFadeUp .7s ease .25s forwards;}
+    .wa3{opacity:0;animation:wFadeUp .7s ease .4s forwards;}
+    .wa4{opacity:0;animation:wFadeUp .7s ease .55s forwards;}
+    .wa5{opacity:0;animation:wFadeUp .7s ease .7s forwards;}
+    .wa6{opacity:0;animation:wFadeUp .7s ease .85s forwards;}
+    .w-btn-go{position:relative;width:100%;padding:15px 24px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;border:none;border-radius:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 8px 30px rgba(79,70,229,0.45);transition:transform .18s,box-shadow .18s;overflow:hidden;}
+    .w-btn-go:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(79,70,229,0.55);}
+    .w-btn-go:active{transform:translateY(0);}
+    .w-btn-go .wshim{position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.13),transparent);transition:left .5s;}
+    .w-btn-go:hover .wshim{left:100%;}
+    .w-btn-ig{width:100%;padding:13px 20px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.85);font-family:'DM Sans',sans-serif;font-weight:500;font-size:.88rem;border-radius:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s;text-decoration:none;backdrop-filter:blur(8px);}
+    .w-btn-ig:hover{background:rgba(255,255,255,0.10);border-color:rgba(255,255,255,0.22);transform:translateY(-1px);}
+    .w-tab-chip{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.09);border-radius:99px;padding:4px 11px;font-size:11px;color:rgba(255,255,255,0.55);font-family:'DM Sans',sans-serif;}
+  </style>
+
+  <div style="position:relative;z-index:2;width:100%;max-width:320px;display:flex;flex-direction:column;align-items:center;">
+
+    <!-- Badge -->
+    <div class="wa1" style="display:inline-flex;align-items:center;gap:6px;background:rgba(99,102,241,0.18);border:1px solid rgba(99,102,241,0.35);border-radius:99px;padding:5px 14px;font-size:10.5px;font-weight:500;color:rgba(255,255,255,0.7);letter-spacing:.08em;text-transform:uppercase;margin-bottom:1.4rem;font-family:'DM Sans',sans-serif;">
+      <span style="width:6px;height:6px;border-radius:50%;background:#6366f1;flex-shrink:0;animation:wPulse 2s ease-in-out infinite;"></span>
+      Construction Management App
+    </div>
+
+    <!-- Logo -->
+    <div class="wa2" style="position:relative;margin-bottom:1.3rem;">
+      <div style="position:absolute;inset:-20px;background:radial-gradient(circle,rgba(99,102,241,0.28) 0%,transparent 70%);z-index:-1;"></div>
+      <div style="width:86px;height:86px;background:linear-gradient(135deg,#4f46e5,#9333ea);border-radius:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(99,102,241,0.5),0 0 80px rgba(99,102,241,0.18);position:relative;">
+        <div style="position:absolute;inset:-2px;border-radius:24px;border:1.5px solid rgba(255,255,255,0.15);"></div>
+        <span style="font-size:40px;line-height:1;">🏗️</span>
+      </div>
+    </div>
+
+    <!-- Headline -->
+    <h1 class="wa3" style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2.3rem,9vw,3.2rem);line-height:1.05;text-align:center;color:#fff;letter-spacing:-.02em;margin:0 0 .75rem 0;">
+      Sanj<span style="background:linear-gradient(90deg,#818cf8,#c084fc,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">ineer</span>
+    </h1>
+
+    <!-- Subtitle -->
+    <p class="wa3" style="font-size:.88rem;line-height:1.65;color:rgba(255,255,255,0.48);text-align:center;max-width:280px;margin:0 0 1.7rem 0;font-weight:300;font-family:'DM Sans',sans-serif;">Your all-in-one site management tool — built for engineers who get things done.</p>
+
+    <!-- Tab chips -->
+    <div class="wa4" style="display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-bottom:1.9rem;max-width:310px;">
+      <span class="w-tab-chip">📊 Dashboard</span>
+      <span class="w-tab-chip">📋 Daily Report</span>
+      <span class="w-tab-chip">📅 Attendance</span>
+      <span class="w-tab-chip">⚙️ Machinery</span>
+      <span class="w-tab-chip">💰 Expenses</span>
+      <span class="w-tab-chip">🧱 Materials</span>
+      <span class="w-tab-chip">🔧 Tools</span>
+      <span class="w-tab-chip">📐 Drawings</span>
+      <span class="w-tab-chip">📦 Rentals</span>
+      <span class="w-tab-chip">🏗️ Dept Work</span>
+      <span class="w-tab-chip">👥 Teams</span>
+      <span class="w-tab-chip">📊 Budget</span>
+      <span class="w-tab-chip">📅 Schedule</span>
+      <span class="w-tab-chip">📋 Punch List</span>
+      <span class="w-tab-chip">🧾 Bill</span>
+      <span class="w-tab-chip">💼 Quotation</span>
+      <span class="w-tab-chip">🏛️ Site Visits</span>
+    </div>
+
+    <!-- Buttons -->
+    <div class="wa5" style="display:flex;flex-direction:column;gap:11px;width:100%;">
+      <button class="w-btn-go" onclick="dismissWelcome()">
+        <span class="wshim"></span>
+        Get Started
+        <span style="width:22px;height:22px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;">→</span>
+      </button>
+      <a href="https://www.instagram.com/sanjineer" target="_blank" rel="noopener" class="w-btn-ig">
+        <span style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="6" stroke="white" stroke-width="2.2"/><circle cx="12" cy="12" r="4" stroke="white" stroke-width="2.2"/><circle cx="17.5" cy="6.5" r="1.2" fill="white"/></svg>
+        </span>
+        <span style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.25;">
+          <span style="font-weight:700;font-size:13px;color:#fff;">@sanjineer</span>
+          <span style="font-size:10px;color:rgba(255,255,255,0.42);">Follow for updates &amp; DM for support</span>
+        </span>
+        <svg style="margin-left:auto;opacity:0.35;flex-shrink:0;" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </a>
+    </div>
+
+    <p class="wa6" style="margin-top:1.5rem;font-size:10px;color:rgba(255,255,255,0.2);text-align:center;font-family:'DM Sans',sans-serif;letter-spacing:.03em;">Made with ❤️ for site engineers</p>
+  </div>
+</div>
+
+<script>
+// ── Welcome overlay: shows ONLY if user has never seen it AND has no data ──
+var WELCOME_FLAG = 'sanj_welcomed'; // set once dismissed, never shown again
+
+function dismissWelcome() {
+  try { localStorage.setItem(WELCOME_FLAG, '1'); } catch(e) {}
+  var el = document.getElementById('welcome-overlay');
+  if (!el) return;
+  el.style.transition = 'opacity .4s ease';
+  el.style.opacity = '0';
+  setTimeout(function(){ el.style.display = 'none'; el.style.opacity = ''; }, 430);
+}
+
+function checkShowWelcome() {
+  try {
+    // If user has already seen & dismissed it, never show again
+    if (localStorage.getItem(WELCOME_FLAG)) return;
+    // Also hide if they somehow already have data (data imported / restored)
+    var raw = localStorage.getItem('cm_data');
+    var data = raw ? JSON.parse(raw) : [];
+    if (Array.isArray(data) && data.length > 0) {
+      localStorage.setItem(WELCOME_FLAG, '1'); // mark seen, skip forever
+      return;
+    }
+    // Fresh install — show welcome
+    var el = document.getElementById('welcome-overlay');
+    if (el) el.style.display = 'flex';
+  } catch(e) {}
+}
+
+document.addEventListener('DOMContentLoaded', checkShowWelcome);
+</script>
+
 <!-- ========== MAIN APP ========== -->
 
 <div id="main-app" class="flex flex-col min-h-screen" style="max-width:480px;margin:0 auto;">
@@ -1126,8 +1261,6 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
   <!-- Dashboard Month Filter -->
   <div class="flex items-center gap-2 mb-2 overflow-x-auto" style="scrollbar-width:none">
     <button onclick="setDashMonth(0)" id="dash-m-0" class="flex-shrink-0 px-3 py-1 rounded-full text-xs font-bold border-2 border-indigo-500 bg-indigo-500 text-white">This Month</button>
-    <button onclick="setDashMonth(1)" id="dash-m-1" class="flex-shrink-0 px-3 py-1 rounded-full text-xs font-bold border-2 border-gray-300 text-gray-500">-1 Month</button>
-    <button onclick="setDashMonth(2)" id="dash-m-2" class="flex-shrink-0 px-3 py-1 rounded-full text-xs font-bold border-2 border-gray-300 text-gray-500">-2 Months</button>
     <button onclick="setDashMonth(-1)" id="dash-m-neg1" class="flex-shrink-0 px-3 py-1 rounded-full text-xs font-bold border-2 border-gray-300 text-gray-500">All Time</button>
     <span id="dash-month-label" class="flex-shrink-0 text-xs text-gray-500 font-semibold"></span>
   </div>
@@ -2577,77 +2710,77 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
 
 <!-- ====== CLOUD MODAL ====== -->
 <div id="cloud-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 items-center justify-center p-4" style="display:none">
-  <div style="background:linear-gradient(160deg,#0f0c29,#1a1740,#1e1b4b);border:1px solid rgba(255,255,255,.14);border-radius:1.75rem;width:100%;max-width:420px;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 32px 80px rgba(0,0,0,.75);">
+  <div style="background:linear-gradient(160deg,#0f0c29,#1a1740,#1e1b4b);border:1px solid rgba(255,255,255,.14);border-radius:1.4rem;width:100%;max-width:390px;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 32px 80px rgba(0,0,0,.75);">
 
     <!-- FIXED TOP -->
     <div style="flex-shrink:0;">
       <!-- Header -->
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.1rem .75rem;">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div style="width:38px;height:38px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 14px rgba(99,102,241,.5);">&#9729;&#65039;</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem .9rem .5rem;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:32px;height:32px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 3px 10px rgba(99,102,241,.5);">&#9729;&#65039;</div>
           <div>
-            <p style="font-size:15px;font-weight:900;color:#fff;line-height:1;">Sanjineer Cloud</p>
-            <p style="font-size:10px;color:#a78bfa;margin-top:1px;">Backup &middot; Sync &middot; Viewers</p>
+            <p style="font-size:13px;font-weight:900;color:#fff;line-height:1;">Sanjineer Cloud</p>
+            <p style="font-size:9px;color:#a78bfa;margin-top:1px;">Backup &middot; Sync &middot; Viewers</p>
           </div>
         </div>
-        <button onclick="closeCloudModal()" style="width:34px;height:34px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:9px;color:rgba(255,255,255,.6);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">&#10005;</button>
+        <button onclick="closeCloudModal()" style="width:28px;height:28px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:rgba(255,255,255,.6);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">&#10005;</button>
       </div>
 
       <!-- Admin status bar (only when logged in) -->
-      <div id="cloud-admin-bar" style="display:none;margin:0 1.1rem .65rem;background:linear-gradient(135deg,rgba(99,102,241,.2),rgba(139,92,246,.14));border:1px solid rgba(99,102,241,.3);border-radius:12px;padding:.65rem .85rem;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;">
-          <div style="display:flex;align-items:center;gap:7px;">
-            <div style="width:26px;height:26px;background:linear-gradient(135deg,#4f46e5,#7c3aed);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;">&#128100;</div>
+      <div id="cloud-admin-bar" style="display:none;margin:0 .9rem .5rem;background:linear-gradient(135deg,rgba(99,102,241,.2),rgba(139,92,246,.14));border:1px solid rgba(99,102,241,.3);border-radius:10px;padding:.45rem .7rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div style="width:22px;height:22px;background:linear-gradient(135deg,#4f46e5,#7c3aed);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;">&#128100;</div>
             <div>
-              <p style="font-size:10px;font-weight:800;color:#c7d2fe;line-height:1;">Admin</p>
-              <p id="cloud-admin-email" style="font-size:9px;color:#a78bfa;">&mdash;</p>
+              <p style="font-size:9px;font-weight:800;color:#c7d2fe;line-height:1;">Admin</p>
+              <p id="cloud-admin-email" style="font-size:8px;color:#a78bfa;">&mdash;</p>
             </div>
           </div>
-          <div style="display:flex;align-items:center;gap:6px;">
-            <span id="cloud-sync-dot" style="width:6px;height:6px;background:#22c55e;border-radius:50%;display:inline-block;"></span>
-            <p id="cloud-sync-time" style="font-size:9px;color:#86efac;">Syncing</p>
-            <button onclick="doAdminLogout()" style="padding:0 12px;background:rgba(239,68,68,.2);border:1px solid rgba(239,68,68,.35);color:#fca5a5;border-radius:7px;font-size:9px;font-weight:700;cursor:pointer;">Logout</button>
+          <div style="display:flex;align-items:center;gap:5px;">
+            <span id="cloud-sync-dot" style="width:5px;height:5px;background:#22c55e;border-radius:50%;display:inline-block;"></span>
+            <p id="cloud-sync-time" style="font-size:8px;color:#86efac;">Syncing</p>
+            <button onclick="doAdminLogout()" style="padding:2px 10px;background:rgba(239,68,68,.2);border:1px solid rgba(239,68,68,.35);color:#fca5a5;border-radius:6px;font-size:9px;font-weight:700;cursor:pointer;height:auto;min-height:auto;">Logout</button>
           </div>
         </div>
-        <p id="cloud-sub-expiry" style="font-size:9px;color:#86efac;font-weight:600;">&mdash;</p>
+        <p id="cloud-sub-expiry" style="font-size:8px;color:#86efac;font-weight:600;">&mdash;</p>
       </div>
 
       <!-- TAB CHIPS: Login & Create only -->
-      <div id="cloud-tab-switcher" style="display:flex;gap:6px;padding:0 1.1rem .75rem;">
-        <button id="ctab-admin-btn" onclick="switchCloudTab('admin')" style="flex:1;padding:0 12px;font-size:11px;font-weight:800;border:none;border-radius:12px;cursor:pointer;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;box-shadow:0 4px 14px rgba(79,70,229,.45);">&#128273; Login</button>
-        <button id="ctab-create-btn" onclick="switchCloudTab('create')" style="flex:1;padding:0 12px;font-size:11px;font-weight:800;border:none;border-radius:12px;cursor:pointer;background:rgba(255,255,255,.07);color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.1);">&#10024; Create Account</button>
+      <div id="cloud-tab-switcher" style="display:flex;gap:5px;padding:0 .9rem .55rem;">
+        <button id="ctab-admin-btn" onclick="switchCloudTab('admin')" style="flex:1;height:34px;padding:0 12px;font-size:12px;font-weight:800;border:none;border-radius:10px;cursor:pointer;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;box-shadow:0 3px 12px rgba(79,70,229,.45);">&#128273; Login</button>
+        <button id="ctab-create-btn" onclick="switchCloudTab('create')" style="flex:1;height:34px;padding:0 12px;font-size:12px;font-weight:800;border:none;border-radius:10px;cursor:pointer;background:rgba(255,255,255,.07);color:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.1);">&#10024; Create Account</button>
       </div>
       <!-- Hidden viewer tab div kept for JS compatibility -->
       <div id="ctab-viewer-btn" style="display:none;"></div>
-      <div style="height:1px;background:rgba(255,255,255,.07);margin:0 1.1rem;"></div>
+      <div style="height:1px;background:rgba(255,255,255,.07);margin:0 .9rem;"></div>
     </div>
 
     <!-- SCROLLABLE BODY -->
-    <div style="overflow-y:auto;flex:1;padding:1rem 1.1rem 1.4rem;">
+    <div style="overflow-y:auto;flex:1;padding:.75rem .9rem 1rem;">
 
       <!-- LOGIN TAB (Admin + Viewer smart detect) -->
       <div id="ctab-admin" style="display:block;">
         <div id="ctab-admin-prelogin">
-          <div style="background:rgba(79,70,229,.1);border:1px solid rgba(99,102,241,.25);border-radius:14px;padding:.9rem;margin-bottom:.9rem;">
-            <p style="font-size:13px;font-weight:900;color:#c7d2fe;margin-bottom:.4rem;">&#128273; Login</p>
-            <p style="font-size:10px;color:#a78bfa;margin-bottom:.75rem;opacity:.8;">Admin or Viewer &mdash; we detect automatically</p>
-            <label style="font-size:10px;font-weight:700;color:#a78bfa;display:block;margin-bottom:3px;">Email</label>
+          <div style="background:rgba(79,70,229,.1);border:1px solid rgba(99,102,241,.25);border-radius:12px;padding:.65rem;margin-bottom:.65rem;">
+            <p style="font-size:12px;font-weight:900;color:#c7d2fe;margin-bottom:.25rem;">&#128273; Login</p>
+            <p style="font-size:9px;color:#a78bfa;margin-bottom:.55rem;opacity:.8;">Admin or Viewer &mdash; we detect automatically</p>
+            <label style="font-size:9px;font-weight:700;color:#a78bfa;display:block;margin-bottom:2px;">Email</label>
             <input id="auth-login-email" type="email" class="auth-input" placeholder="your@email.com">
-            <label style="font-size:10px;font-weight:700;color:#a78bfa;display:block;margin-bottom:3px;">Password</label>
+            <label style="font-size:9px;font-weight:700;color:#a78bfa;display:block;margin-bottom:2px;">Password</label>
             <input id="auth-login-pass" type="password" class="auth-input" placeholder="Your password">
-            <button onclick="doSmartLogin()" id="auth-login-btn" style="width:100%;padding:.85rem;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white;border:none;border-radius:12px;font-weight:800;font-size:.95rem;cursor:pointer;margin-top:4px;box-shadow:0 4px 16px rgba(79,70,229,.5);">&#128273; Login</button>
-            <p id="auth-login-err" style="font-size:11px;color:#fca5a5;text-align:center;margin-top:.4rem;display:none;"></p>
-            <div style="display:flex;align-items:center;justify-content:center;gap:5px;margin-top:8px;">
-              <span style="font-size:12px;">📩</span>
-              <p style="font-size:10px;color:#c4b5fd;">Need help? DM <a href="https://ig.me/m/sanjineer" target="_blank" rel="noopener" style="color:#f9a8d4;font-weight:800;text-decoration:none;">@Sanjineer</a> on Instagram</p>
+            <button onclick="doSmartLogin()" id="auth-login-btn" style="width:100%;padding:.75rem;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white;border:none;border-radius:11px;font-weight:800;font-size:.95rem;cursor:pointer;margin-top:4px;box-shadow:0 4px 16px rgba(79,70,229,.5);">&#128273; Login</button>
+            <p id="auth-login-err" style="font-size:11px;color:#fca5a5;text-align:center;margin-top:.35rem;display:none;"></p>
+            <div style="display:flex;align-items:center;justify-content:center;gap:5px;margin-top:7px;">
+              <span style="font-size:11px;">📩</span>
+              <p style="font-size:9px;color:#c4b5fd;">Need help? DM <a href="https://ig.me/m/sanjineer" target="_blank" rel="noopener" style="color:#f9a8d4;font-weight:800;text-decoration:none;">@Sanjineer</a> on Instagram</p>
             </div>
           </div>
-          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:.75rem .9rem;">
-            <p style="font-size:10px;font-weight:700;color:#7c3aed;margin-bottom:.5rem;">ℹ️ Admin Login — Cloud Access</p>
-            <div style="display:flex;flex-direction:column;gap:5px;">
-              <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">☁️</span><p style="font-size:10px;color:#a78bfa;">Login to access Cloud Backup, Sync & Viewer management</p></div>
-              <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">💳</span><p style="font-size:10px;color:#a78bfa;">Active ₹30/month subscription required</p></div>
-              <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">👁️</span><p style="font-size:10px;color:#a78bfa;">Viewers use a shared link — no login needed for them</p></div>
+          <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:.55rem .75rem;">
+            <p style="font-size:9px;font-weight:700;color:#7c3aed;margin-bottom:.4rem;">ℹ️ Admin Login — Cloud Access</p>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <div style="display:flex;align-items:center;gap:7px;"><span style="font-size:12px;">☁️</span><p style="font-size:9px;color:#a78bfa;">Login to access Cloud Backup, Sync & Viewer management</p></div>
+              <div style="display:flex;align-items:center;gap:7px;"><span style="font-size:12px;">💳</span><p style="font-size:9px;color:#a78bfa;">Active ₹30/month subscription required</p></div>
+              <div style="display:flex;align-items:center;gap:7px;"><span style="font-size:12px;">👁️</span><p style="font-size:9px;color:#a78bfa;">Viewers use a shared link — no login needed for them</p></div>
             </div>
           </div>
         </div>
@@ -2683,53 +2816,53 @@ service cloud.firestore {
             <button onclick="var r='rules_version = \'2\';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n    match /admins/{uid} {\n      allow read, write: if request.auth != null\n        &amp;&amp; request.auth.uid == uid;\n    }\n    match /viewers/{uid} {\n      allow read: if request.auth != null\n        &amp;&amp; request.auth.uid == uid;\n      allow write: if request.auth != null\n        &amp;&amp; exists(/databases/$(database)/documents/admins/$(request.auth.uid));\n    }\n    match /sites/{siteId} {\n      allow write: if request.auth != null\n        &amp;&amp; exists(/databases/$(database)/documents/admins/$(request.auth.uid));\n      allow read: if request.auth != null;\n    }\n  }\n}';var t=document.createElement('textarea');t.value=r.replace(/&amp;/g,'&');document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();toast('✅ Rules copied!','ok');" style="width:100%;margin-top:6px;padding:6px;background:linear-gradient(135deg,#d97706,#f59e0b);color:white;border:none;border-radius:8px;font-size:10px;font-weight:800;cursor:pointer;">📋 Copy Rules to Clipboard</button>
           </div>
           <div id="cloud-firebase-section" style="display:none;"></div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
-            <button onclick="cloudBackupNow()" style="padding:.7rem;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white;border:none;border-radius:12px;font-weight:700;font-size:.78rem;cursor:pointer;">&#11014;&#65039; Backup Now</button>
-            <button onclick="cloudRestoreNow()" style="padding:.7rem;background:linear-gradient(135deg,#0891b2,#0ea5e9);color:white;border:none;border-radius:12px;font-weight:700;font-size:.78rem;cursor:pointer;">&#11015;&#65039; Restore</button>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;">
+            <button onclick="cloudBackupNow()" style="padding:.5rem;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white;border:none;border-radius:9px;font-weight:700;font-size:.72rem;cursor:pointer;height:auto;min-height:auto;">&#11014;&#65039; Backup Now</button>
+            <button onclick="cloudRestoreNow()" style="padding:.5rem;background:linear-gradient(135deg,#0891b2,#0ea5e9);color:white;border:none;border-radius:9px;font-weight:700;font-size:.72rem;cursor:pointer;height:auto;min-height:auto;">&#11015;&#65039; Restore</button>
           </div>
           <div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;">
-              <p style="font-size:11px;font-weight:800;color:#a78bfa;">&#128101; Viewer Accounts</p>
-              <div style="display:flex;gap:5px;">
-                <button onclick="loadViewerAccountsInline()" style="padding:0 12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#c4b5fd;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;">&#128260;</button>
-                <button onclick="openViewerMgmt()" style="padding:0 12px;background:rgba(99,102,241,.25);border:1px solid rgba(129,140,248,.4);color:#c7d2fe;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;">+ New</button>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;">
+              <p style="font-size:10px;font-weight:800;color:#a78bfa;">&#128101; Viewer Accounts</p>
+              <div style="display:flex;gap:4px;">
+                <button onclick="loadViewerAccountsInline()" style="padding:2px 9px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#c4b5fd;border-radius:6px;font-size:9px;font-weight:700;cursor:pointer;height:auto;min-height:auto;">&#128260;</button>
+                <button onclick="openViewerMgmt()" style="padding:2px 9px;background:rgba(99,102,241,.25);border:1px solid rgba(129,140,248,.4);color:#c7d2fe;border-radius:6px;font-size:9px;font-weight:700;cursor:pointer;height:auto;min-height:auto;">+ New</button>
               </div>
             </div>
             <div id="viewer-accounts-inline">
-              <p style="font-size:10px;color:rgba(255,255,255,0.3);text-align:center;padding:10px;">Loading&hellip;</p>
+              <p style="font-size:9px;color:rgba(255,255,255,0.3);text-align:center;padding:8px;">Loading&hellip;</p>
             </div>
           </div>
           <!-- Unsubscribe at very bottom -->
-          <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.07);">
-            <button onclick="doUnsubscribe()" style="width:100%;padding:.6rem;background:transparent;border:1px solid rgba(239,68,68,.3);color:rgba(239,68,68,.6);border-radius:10px;font-size:11px;font-weight:700;cursor:pointer;">Unsubscribe &amp; Delete Account</button>
+          <div style="margin-top:10px;padding-top:9px;border-top:1px solid rgba(255,255,255,.07);">
+            <button onclick="doUnsubscribe()" style="width:100%;padding:.5rem;background:transparent;border:1px solid rgba(239,68,68,.3);color:rgba(239,68,68,.6);border-radius:9px;font-size:10px;font-weight:700;cursor:pointer;height:auto;min-height:auto;">Unsubscribe &amp; Delete Account</button>
           </div>
         </div>
       </div>
 
       <!-- CREATE ACCOUNT TAB -->
       <div id="ctab-create" style="display:none;">
-        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:.9rem;margin-bottom:.9rem;">
-          <p style="font-size:13px;font-weight:900;color:#c7d2fe;margin-bottom:.75rem;">&#10024; Create Admin Account</p>
-          <label style="font-size:10px;font-weight:700;color:#a78bfa;display:block;margin-bottom:3px;">Your Name</label>
+        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:.65rem .75rem;margin-bottom:.65rem;">
+          <p style="font-size:12px;font-weight:900;color:#c7d2fe;margin-bottom:.55rem;">&#10024; Create Admin Account</p>
+          <label style="font-size:9px;font-weight:700;color:#a78bfa;display:block;margin-bottom:2px;">Your Name</label>
           <input id="auth-signup-name" type="text" class="auth-input" placeholder="Site Engineer / Admin Name">
-          <label style="font-size:10px;font-weight:700;color:#a78bfa;display:block;margin-bottom:3px;">Email</label>
+          <label style="font-size:9px;font-weight:700;color:#a78bfa;display:block;margin-bottom:2px;">Email</label>
           <input id="auth-signup-email" type="email" class="auth-input" placeholder="admin@example.com">
-          <label style="font-size:10px;font-weight:700;color:#a78bfa;display:block;margin-bottom:3px;">Password (min 6 chars)</label>
+          <label style="font-size:9px;font-weight:700;color:#a78bfa;display:block;margin-bottom:2px;">Password (min 6 chars)</label>
           <input id="auth-signup-pass" type="password" class="auth-input" placeholder="Create a strong password">
-          <button onclick="doAdminSignup()" id="auth-signup-btn" style="width:100%;padding:.85rem;background:linear-gradient(135deg,#059669,#10b981);color:white;border:none;border-radius:12px;font-weight:800;font-size:.95rem;cursor:pointer;margin-top:4px;box-shadow:0 4px 16px rgba(5,150,105,.4);">&#10024; Create Admin Account</button>
-          <p id="auth-signup-err" style="font-size:11px;color:#fca5a5;text-align:center;margin-top:.4rem;display:none;"></p>
-          <p style="font-size:10px;color:#7c3aed;text-align:center;margin-top:.4rem;">Account requires &#8377;30/month subscription</p>
+          <button onclick="doAdminSignup()" id="auth-signup-btn" style="width:100%;padding:.75rem;background:linear-gradient(135deg,#059669,#10b981);color:white;border:none;border-radius:11px;font-weight:800;font-size:.9rem;cursor:pointer;margin-top:4px;box-shadow:0 4px 14px rgba(5,150,105,.4);height:auto;min-height:auto;">&#10024; Create Admin Account</button>
+          <p id="auth-signup-err" style="font-size:11px;color:#fca5a5;text-align:center;margin-top:.35rem;display:none;"></p>
+          <p style="font-size:9px;color:#7c3aed;text-align:center;margin-top:.35rem;">Account requires &#8377;30/month subscription</p>
         </div>
-        <div style="background:linear-gradient(135deg,rgba(5,150,105,.12),rgba(16,185,129,.07));border:1px solid rgba(5,150,105,.25);border-radius:12px;padding:.75rem .9rem;">
-          <p style="font-size:10px;font-weight:700;color:#86efac;margin-bottom:.5rem;">&#128203; What you get:</p>
-          <div style="display:flex;flex-direction:column;gap:5px;">
-            <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">&#9729;&#65039;</span><p style="font-size:10px;color:#6ee7b7;">Cloud Backup &amp; Sync &mdash; <strong style="color:#fbbf24;">&#8377;30/month</strong></p></div>
-            <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">&#128101;</span><p style="font-size:10px;color:#6ee7b7;">Unlimited Viewer accounts &mdash; <strong style="color:#86efac;">Free</strong></p></div>
-            <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">&#128242;</span><p style="font-size:10px;color:#6ee7b7;">Multi-device real-time sync</p></div>
-            <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:14px;">&#128274;</span><p style="font-size:10px;color:#6ee7b7;">Tab-level viewer permissions</p></div>
-            <div style="display:flex;align-items:center;justify-content:center;gap:5px;margin-top:4px;padding:6px 8px;background:rgba(131,58,180,.15);border:1px solid rgba(193,53,132,.3);border-radius:8px;">
-              <span style="font-size:12px;">📩</span>
-              <p style="font-size:10px;color:#c4b5fd;">Need help? DM <a href="https://ig.me/m/sanjineer" target="_blank" rel="noopener" style="color:#f9a8d4;font-weight:800;text-decoration:none;">@Sanjineer</a> on Instagram</p>
+        <div style="background:linear-gradient(135deg,rgba(5,150,105,.12),rgba(16,185,129,.07));border:1px solid rgba(5,150,105,.25);border-radius:10px;padding:.55rem .7rem;">
+          <p style="font-size:9px;font-weight:700;color:#86efac;margin-bottom:.35rem;">&#128203; What you get:</p>
+          <div style="display:flex;flex-direction:column;gap:3px;">
+            <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:12px;">&#9729;&#65039;</span><p style="font-size:9px;color:#6ee7b7;">Cloud Backup &amp; Sync &mdash; <strong style="color:#fbbf24;">&#8377;30/month</strong></p></div>
+            <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:12px;">&#128101;</span><p style="font-size:9px;color:#6ee7b7;">Unlimited Viewer accounts &mdash; <strong style="color:#86efac;">Free</strong></p></div>
+            <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:12px;">&#128242;</span><p style="font-size:9px;color:#6ee7b7;">Multi-device real-time sync</p></div>
+            <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:12px;">&#128274;</span><p style="font-size:9px;color:#6ee7b7;">Tab-level viewer permissions</p></div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:5px;margin-top:3px;padding:5px 7px;background:rgba(131,58,180,.15);border:1px solid rgba(193,53,132,.3);border-radius:7px;">
+              <span style="font-size:11px;">📩</span>
+              <p style="font-size:9px;color:#c4b5fd;">Need help? DM <a href="https://ig.me/m/sanjineer" target="_blank" rel="noopener" style="color:#f9a8d4;font-weight:800;text-decoration:none;">@Sanjineer</a> on Instagram</p>
             </div>
           </div>
         </div>
@@ -2841,41 +2974,41 @@ service cloud.firestore {
 </div>
 
 <!-- ====== PAYMENT LANDING MODAL ====== -->
-<div id="pay-landing-modal" class="fixed inset-0 bg-black/90 backdrop-blur-sm z-[100] items-center justify-center p-4" style="display:none">
-  <div style="background:linear-gradient(135deg,#0f172a,#1e1b4b,#312e81);border:1px solid rgba(255,255,255,.18);border-radius:1.5rem;padding:1.5rem;width:100%;max-width:400px;max-height:90vh;overflow-y:auto;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div style="width:44px;height:44px;background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 14px rgba(245,158,11,.4);">🏗️</div>
+<div id="pay-landing-modal" class="fixed inset-0 bg-black/90 backdrop-blur-sm z-[100] items-center justify-center p-3" style="display:none">
+  <div style="background:linear-gradient(135deg,#0f172a,#1e1b4b,#312e81);border:1px solid rgba(255,255,255,.18);border-radius:1.25rem;padding:1rem;width:100%;max-width:380px;max-height:92vh;overflow-y:auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:36px;height:36px;background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 3px 10px rgba(245,158,11,.4);">🏗️</div>
         <div>
-          <p style="font-size:17px;font-weight:900;color:white;line-height:1;">Sanjineer Cloud</p>
-          <p style="font-size:10px;color:#c4b5fd;">Pro Subscription Required</p>
+          <p style="font-size:14px;font-weight:900;color:white;line-height:1;">Sanjineer Cloud</p>
+          <p style="font-size:9px;color:#c4b5fd;">Pro Subscription Required</p>
         </div>
       </div>
-      <button id="pay-close-btn" onclick="_safeClosePayLanding()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:9px;color:rgba(255,255,255,.6);font-size:20px;width:34px;height:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+      <button id="pay-close-btn" onclick="_safeClosePayLanding()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:rgba(255,255,255,.6);font-size:16px;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;min-height:auto;">✕</button>
     </div>
-    <div id="pay-locked-msg" style="display:none;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:8px 12px;margin-bottom:.75rem;display:none;">
-      <p style="font-size:11px;color:#fca5a5;font-weight:700;">🔒 Subscription required to use Cloud</p>
-      <p style="font-size:10px;color:#fca5a5;margin-top:2px;opacity:.8;">Pay to activate, or <button onclick="_cancelAndLogout()" style="background:none;border:none;color:#fbbf24;font-size:10px;font-weight:700;cursor:pointer;padding:0;text-decoration:underline">cancel & logout</button></p>
+    <div id="pay-locked-msg" style="display:none;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:9px;padding:6px 10px;margin-bottom:.6rem;display:none;">
+      <p style="font-size:10px;color:#fca5a5;font-weight:700;">🔒 Subscription required to use Cloud</p>
+      <p style="font-size:9px;color:#fca5a5;margin-top:1px;opacity:.8;">Pay to activate, or <button onclick="_cancelAndLogout()" style="background:none;border:none;color:#fbbf24;font-size:9px;font-weight:700;cursor:pointer;padding:0;text-decoration:underline">cancel & logout</button></p>
     </div>
-    <div style="text-align:center;padding:1rem 0;margin-bottom:1rem;border-top:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08);">
-      <p style="color:white;font-size:36px;font-weight:900;line-height:1;">₹30<span style="font-size:14px;font-weight:400;color:#a78bfa">/month</span></p>
-      <p style="font-size:11px;color:#7c3aed;margin-top:4px">Cancel anytime · Secured by Razorpay</p>
+    <div style="text-align:center;padding:.65rem 0;margin-bottom:.7rem;border-top:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08);">
+      <p style="color:white;font-size:28px;font-weight:900;line-height:1;">₹30<span style="font-size:12px;font-weight:400;color:#a78bfa">/month</span></p>
+      <p style="font-size:10px;color:#7c3aed;margin-top:3px">Cancel anytime · Secured by Razorpay</p>
     </div>
-    <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:.875rem;padding:.875rem;margin-bottom:1rem;">
-      <div class="cloud-feature-row"><span style="font-size:16px">🔄</span><div><p class="text-white font-semibold" style="font-size:12px;line-height:1">Real-time Cloud Sync</p><p style="font-size:10px;color:#a78bfa">All devices stay in sync automatically</p></div></div>
-      <div class="cloud-feature-row"><span style="font-size:16px">👁️</span><div><p class="text-white font-semibold" style="font-size:12px;line-height:1">Viewer Accounts (Free)</p><p style="font-size:10px;color:#a78bfa">Create unlimited read-only users</p></div></div>
-      <div class="cloud-feature-row"><span style="font-size:16px">🔒</span><div><p class="text-white font-semibold" style="font-size:12px;line-height:1">Tab-level Permissions</p><p style="font-size:10px;color:#a78bfa">Control what each viewer can see & print</p></div></div>
-      <div class="cloud-feature-row"><span style="font-size:16px">💾</span><div><p class="text-white font-semibold" style="font-size:12px;line-height:1">Auto Backup</p><p style="font-size:10px;color:#a78bfa">Never lose a day's data</p></div></div>
+    <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:.75rem;padding:.65rem;margin-bottom:.75rem;">
+      <div class="cloud-feature-row"><span style="font-size:14px">🔄</span><div><p class="text-white font-semibold" style="font-size:11px;line-height:1">Real-time Cloud Sync</p><p style="font-size:9px;color:#a78bfa">All devices stay in sync automatically</p></div></div>
+      <div class="cloud-feature-row"><span style="font-size:14px">👁️</span><div><p class="text-white font-semibold" style="font-size:11px;line-height:1">Viewer Accounts (Free)</p><p style="font-size:9px;color:#a78bfa">Create unlimited read-only users</p></div></div>
+      <div class="cloud-feature-row"><span style="font-size:14px">🔒</span><div><p class="text-white font-semibold" style="font-size:11px;line-height:1">Tab-level Permissions</p><p style="font-size:9px;color:#a78bfa">Control what each viewer can see & print</p></div></div>
+      <div class="cloud-feature-row"><span style="font-size:14px">💾</span><div><p class="text-white font-semibold" style="font-size:11px;line-height:1">Auto Backup</p><p style="font-size:9px;color:#a78bfa">Never lose a day's data</p></div></div>
     </div>
-    <button onclick="startSubscriptionPayment()" id="sub-pay-btn" style="width:100%;padding:1rem;background:linear-gradient(135deg,#2563eb,#4f46e5);color:white;border:none;border-radius:.875rem;font-weight:800;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.5rem;margin-bottom:.5rem;box-shadow:0 4px 18px rgba(79,70,229,.5);">
+    <button onclick="startSubscriptionPayment()" id="sub-pay-btn" style="width:100%;padding:.8rem;background:linear-gradient(135deg,#2563eb,#4f46e5);color:white;border:none;border-radius:.75rem;font-weight:800;font-size:.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.5rem;margin-bottom:.4rem;box-shadow:0 4px 16px rgba(79,70,229,.5);min-height:auto;height:auto;">
       💳 Subscribe ₹30/month
     </button>
-    <p style="text-align:center;font-size:10px;color:#7c3aed">🔒 Powered by Razorpay · UPI / Card / NetBanking accepted</p>
-    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:.5rem;">
-      <img src="https://razorpay.com/assets/razorpay-glyph.svg" onerror="this.style.display='none'" style="height:16px;opacity:0.6">
-      <span style="font-size:10px;color:rgba(255,255,255,0.4)">Secured payment · India's #1 payment gateway</span>
+    <p style="text-align:center;font-size:9px;color:#7c3aed">🔒 Powered by Razorpay · UPI / Card / NetBanking accepted</p>
+    <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:.35rem;">
+      <img src="https://razorpay.com/assets/razorpay-glyph.svg" onerror="this.style.display='none'" style="height:14px;opacity:0.6">
+      <span style="font-size:9px;color:rgba(255,255,255,0.4)">Secured payment · India's #1 payment gateway</span>
     </div>
-    <p style="text-align:center;font-size:11px;color:rgba(255,255,255,0.45);margin-top:.75rem">
+    <p style="text-align:center;font-size:10px;color:rgba(255,255,255,0.45);margin-top:.55rem">
       Need help? DM
       <a href="https://ig.me/m/sanjineer" target="_blank" rel="noopener"
          style="color:#f59e0b;font-weight:700;text-decoration:none">
