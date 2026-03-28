@@ -571,7 +571,7 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
     body.js-ready .tab-content{}
     .stat-card{transition:transform .12s,box-shadow .12s;box-shadow:0 8px 24px rgba(0,0,0,0.35),0 2px 8px rgba(0,0,0,0.2);}
     .stat-card:active{transform:scale(0.97);}
-    .stat-card:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,0,0,0.45),0 4px 12px rgba(0,0,0,0.25);}
+    @media(hover:hover){.stat-card:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,0,0,0.45),0 4px 12px rgba(0,0,0,0.25);}}
     /* All colored gradient chips get shadow too */
     [class*="g-tobr-"],[class*="g-tor-"]{box-shadow:0 6px 20px rgba(0,0,0,0.3),0 2px 6px rgba(0,0,0,0.15);}
     [class*="g-tobr-"].stat-card,[class*="g-tor-"].stat-card{box-shadow:0 8px 24px rgba(0,0,0,0.35),0 2px 8px rgba(0,0,0,0.2);}
@@ -970,137 +970,46 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
 
 <!-- ========== WELCOME OVERLAY (first-time only, before any data) ========== -->
 <div id="welcome-overlay" style="display:none;position:fixed;inset:0;z-index:99999;overflow:hidden;background:#0a0818;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem;">
-
-  <!-- Blobs -->
   <div style="position:absolute;top:-120px;left:-80px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,#4f46e5,#7c3aed);filter:blur(80px);opacity:0.55;animation:wBlob 14s ease-in-out infinite;pointer-events:none;"></div>
   <div style="position:absolute;bottom:-80px;right:-60px;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,#9333ea,#4f46e5);filter:blur(80px);opacity:0.55;animation:wBlob 10s ease-in-out infinite reverse;pointer-events:none;"></div>
-  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(245,158,11,0.18),transparent);filter:blur(60px);pointer-events:none;"></div>
-  <!-- Grid -->
   <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;"></div>
-  <!-- Bottom line -->
   <div style="position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#4f46e5,#9333ea,#f59e0b,transparent);opacity:0.6;"></div>
-
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap');
     @keyframes wBlob{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-28px) scale(1.06);}}
-    @keyframes wFadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
-    @keyframes wPulse{0%,100%{box-shadow:0 0 4px #6366f1;}50%{box-shadow:0 0 12px #6366f1,0 0 22px #6366f1aa;}}
-    .wa1{opacity:0;animation:wFadeUp .7s ease .1s forwards;}
-    .wa2{opacity:0;animation:wFadeUp .7s ease .25s forwards;}
-    .wa3{opacity:0;animation:wFadeUp .7s ease .4s forwards;}
-    .wa4{opacity:0;animation:wFadeUp .7s ease .55s forwards;}
-    .wa5{opacity:0;animation:wFadeUp .7s ease .7s forwards;}
-    .wa6{opacity:0;animation:wFadeUp .7s ease .85s forwards;}
-    .w-btn-go{position:relative;width:100%;padding:15px 24px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;border:none;border-radius:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 8px 30px rgba(79,70,229,0.45);transition:transform .18s,box-shadow .18s;overflow:hidden;}
-    .w-btn-go:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(79,70,229,0.55);}
-    .w-btn-go:active{transform:translateY(0);}
-    .w-btn-go .wshim{position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.13),transparent);transition:left .5s;}
-    .w-btn-go:hover .wshim{left:100%;}
-    .w-btn-ig{width:100%;padding:13px 20px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.85);font-family:'DM Sans',sans-serif;font-weight:500;font-size:.88rem;border-radius:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s;text-decoration:none;backdrop-filter:blur(8px);}
-    .w-btn-ig:hover{background:rgba(255,255,255,0.10);border-color:rgba(255,255,255,0.22);transform:translateY(-1px);}
-    .w-tab-chip{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.09);border-radius:99px;padding:4px 11px;font-size:11px;color:rgba(255,255,255,0.55);font-family:'DM Sans',sans-serif;}
+    @keyframes wFUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+    @keyframes wPls{0%,100%{box-shadow:0 0 4px #6366f1;}50%{box-shadow:0 0 12px #6366f1,0 0 22px #6366f1aa;}}
+    .wa1{opacity:0;animation:wFUp .7s ease .1s forwards;}.wa2{opacity:0;animation:wFUp .7s ease .25s forwards;}
+    .wa3{opacity:0;animation:wFUp .7s ease .4s forwards;}.wa4{opacity:0;animation:wFUp .7s ease .55s forwards;}
+    .wa5{opacity:0;animation:wFUp .7s ease .7s forwards;}.wa6{opacity:0;animation:wFUp .7s ease .85s forwards;}
+    .w-go{position:relative;width:100%;padding:15px 24px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;border:none;border-radius:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 8px 30px rgba(79,70,229,0.45);transition:transform .18s,box-shadow .18s;overflow:hidden;}
+    .w-go:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(79,70,229,0.55);}
+    .w-go .wsm{position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.13),transparent);transition:left .5s;}
+    .w-go:hover .wsm{left:100%;}
+    .w-ig{width:100%;padding:13px 20px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.85);font-family:'DM Sans',sans-serif;font-weight:500;font-size:.88rem;border-radius:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s;text-decoration:none;backdrop-filter:blur(8px);}
+    .w-ig:hover{background:rgba(255,255,255,0.10);border-color:rgba(255,255,255,0.22);transform:translateY(-1px);}
+    .w-chip{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.09);border-radius:99px;padding:4px 11px;font-size:11px;color:rgba(255,255,255,0.55);font-family:'DM Sans',sans-serif;}
   </style>
-
   <div style="position:relative;z-index:2;width:100%;max-width:320px;display:flex;flex-direction:column;align-items:center;">
-
-    <!-- Badge -->
-    <div class="wa1" style="display:inline-flex;align-items:center;gap:6px;background:rgba(99,102,241,0.18);border:1px solid rgba(99,102,241,0.35);border-radius:99px;padding:5px 14px;font-size:10.5px;font-weight:500;color:rgba(255,255,255,0.7);letter-spacing:.08em;text-transform:uppercase;margin-bottom:1.4rem;font-family:'DM Sans',sans-serif;">
-      <span style="width:6px;height:6px;border-radius:50%;background:#6366f1;flex-shrink:0;animation:wPulse 2s ease-in-out infinite;"></span>
-      Construction Management App
-    </div>
-
-    <!-- Logo -->
-    <div class="wa2" style="position:relative;margin-bottom:1.3rem;">
-      <div style="position:absolute;inset:-20px;background:radial-gradient(circle,rgba(99,102,241,0.28) 0%,transparent 70%);z-index:-1;"></div>
-      <div style="width:86px;height:86px;background:linear-gradient(135deg,#4f46e5,#9333ea);border-radius:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(99,102,241,0.5),0 0 80px rgba(99,102,241,0.18);position:relative;">
-        <div style="position:absolute;inset:-2px;border-radius:24px;border:1.5px solid rgba(255,255,255,0.15);"></div>
-        <span style="font-size:40px;line-height:1;">🏗️</span>
-      </div>
-    </div>
-
-    <!-- Headline -->
-    <h1 class="wa3" style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2.3rem,9vw,3.2rem);line-height:1.05;text-align:center;color:#fff;letter-spacing:-.02em;margin:0 0 .75rem 0;">
-      Sanj<span style="background:linear-gradient(90deg,#818cf8,#c084fc,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">ineer</span>
-    </h1>
-
-    <!-- Subtitle -->
+    <div class="wa1" style="display:inline-flex;align-items:center;gap:6px;background:rgba(99,102,241,0.18);border:1px solid rgba(99,102,241,0.35);border-radius:99px;padding:5px 14px;font-size:10.5px;font-weight:500;color:rgba(255,255,255,0.7);letter-spacing:.08em;text-transform:uppercase;margin-bottom:1.4rem;font-family:'DM Sans',sans-serif;"><span style="width:6px;height:6px;border-radius:50%;background:#6366f1;flex-shrink:0;animation:wPls 2s ease-in-out infinite;"></span>Construction Management App</div>
+    <div class="wa2" style="position:relative;margin-bottom:1.3rem;"><div style="position:absolute;inset:-20px;background:radial-gradient(circle,rgba(99,102,241,0.28) 0%,transparent 70%);z-index:-1;"></div><div style="width:86px;height:86px;background:linear-gradient(135deg,#4f46e5,#9333ea);border-radius:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(99,102,241,0.5),0 0 80px rgba(99,102,241,0.18);position:relative;"><div style="position:absolute;inset:-2px;border-radius:24px;border:1.5px solid rgba(255,255,255,0.15);"></div><span style="font-size:40px;line-height:1;">🏗️</span></div></div>
+    <h1 class="wa3" style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2.3rem,9vw,3.2rem);line-height:1.05;text-align:center;color:#fff;letter-spacing:-.02em;margin:0 0 .75rem 0;">Sanj<span style="background:linear-gradient(90deg,#818cf8,#c084fc,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">ineer</span></h1>
     <p class="wa3" style="font-size:.88rem;line-height:1.65;color:rgba(255,255,255,0.48);text-align:center;max-width:280px;margin:0 0 1.7rem 0;font-weight:300;font-family:'DM Sans',sans-serif;">Your all-in-one site management tool — built for engineers who get things done.</p>
-
-    <!-- Tab chips -->
     <div class="wa4" style="display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-bottom:1.9rem;max-width:310px;">
-      <span class="w-tab-chip">📊 Dashboard</span>
-      <span class="w-tab-chip">📋 Daily Report</span>
-      <span class="w-tab-chip">📅 Attendance</span>
-      <span class="w-tab-chip">⚙️ Machinery</span>
-      <span class="w-tab-chip">💰 Expenses</span>
-      <span class="w-tab-chip">🧱 Materials</span>
-      <span class="w-tab-chip">🔧 Tools</span>
-      <span class="w-tab-chip">📐 Drawings</span>
-      <span class="w-tab-chip">📦 Rentals</span>
-      <span class="w-tab-chip">🏗️ Dept Work</span>
-      <span class="w-tab-chip">👥 Teams</span>
-      <span class="w-tab-chip">📊 Budget</span>
-      <span class="w-tab-chip">📅 Schedule</span>
-      <span class="w-tab-chip">📋 Punch List</span>
-      <span class="w-tab-chip">🧾 Bill</span>
-      <span class="w-tab-chip">💼 Quotation</span>
-      <span class="w-tab-chip">🏛️ Site Visits</span>
+      <span class="w-chip">📊 Dashboard</span><span class="w-chip">📋 Daily Report</span><span class="w-chip">📅 Attendance</span><span class="w-chip">⚙️ Machinery</span><span class="w-chip">💰 Expenses</span><span class="w-chip">🧱 Materials</span><span class="w-chip">🔧 Tools</span><span class="w-chip">📐 Drawings</span><span class="w-chip">📦 Rentals</span><span class="w-chip">🏗️ Dept Work</span><span class="w-chip">👥 Teams</span><span class="w-chip">📊 Budget</span><span class="w-chip">📅 Schedule</span><span class="w-chip">📋 Punch List</span><span class="w-chip">🧾 Bill</span><span class="w-chip">💼 Quotation</span><span class="w-chip">🏛️ Site Visits</span>
     </div>
-
-    <!-- Buttons -->
     <div class="wa5" style="display:flex;flex-direction:column;gap:11px;width:100%;">
-      <button class="w-btn-go" onclick="dismissWelcome()">
-        <span class="wshim"></span>
-        Get Started
-        <span style="width:22px;height:22px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;">→</span>
-      </button>
-      <a href="https://www.instagram.com/sanjineer" target="_blank" rel="noopener" class="w-btn-ig">
-        <span style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="6" stroke="white" stroke-width="2.2"/><circle cx="12" cy="12" r="4" stroke="white" stroke-width="2.2"/><circle cx="17.5" cy="6.5" r="1.2" fill="white"/></svg>
-        </span>
-        <span style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.25;">
-          <span style="font-weight:700;font-size:13px;color:#fff;">@sanjineer</span>
-          <span style="font-size:10px;color:rgba(255,255,255,0.42);">Follow for updates &amp; DM for support</span>
-        </span>
-        <svg style="margin-left:auto;opacity:0.35;flex-shrink:0;" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-      </a>
+      <button class="w-go" onclick="dismissWelcome()"><span class="wsm"></span>Get Started<span style="width:22px;height:22px;background:rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;">→</span></button>
+      <a href="https://www.instagram.com/sanjineer" target="_blank" rel="noopener" class="w-ig"><span style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="6" stroke="white" stroke-width="2.2"/><circle cx="12" cy="12" r="4" stroke="white" stroke-width="2.2"/><circle cx="17.5" cy="6.5" r="1.2" fill="white"/></svg></span><span style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.25;"><span style="font-weight:700;font-size:13px;color:#fff;">@sanjineer</span><span style="font-size:10px;color:rgba(255,255,255,0.42);">Follow for updates &amp; DM for support</span></span><svg style="margin-left:auto;opacity:0.35;flex-shrink:0;" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
     </div>
-
-    <p class="wa6" style="margin-top:1.5rem;font-size:10px;color:rgba(255,255,255,0.2);text-align:center;font-family:'DM Sans',sans-serif;letter-spacing:.03em;">Made with ❤️ for site engineers</p>
+    <p class="wa6" style="margin-top:1.5rem;font-size:10px;color:rgba(255,255,255,0.2);text-align:center;font-family:'DM Sans',sans-serif;">Made with ❤️ for site engineers</p>
   </div>
 </div>
-
 <script>
-// ── Welcome overlay: shows ONLY if user has never seen it AND has no data ──
-var WELCOME_FLAG = 'sanj_welcomed'; // set once dismissed, never shown again
-
-function dismissWelcome() {
-  try { localStorage.setItem(WELCOME_FLAG, '1'); } catch(e) {}
-  var el = document.getElementById('welcome-overlay');
-  if (!el) return;
-  el.style.transition = 'opacity .4s ease';
-  el.style.opacity = '0';
-  setTimeout(function(){ el.style.display = 'none'; el.style.opacity = ''; }, 430);
-}
-
-function checkShowWelcome() {
-  try {
-    // If user has already seen & dismissed it, never show again
-    if (localStorage.getItem(WELCOME_FLAG)) return;
-    // Also hide if they somehow already have data (data imported / restored)
-    var raw = localStorage.getItem('cm_data');
-    var data = raw ? JSON.parse(raw) : [];
-    if (Array.isArray(data) && data.length > 0) {
-      localStorage.setItem(WELCOME_FLAG, '1'); // mark seen, skip forever
-      return;
-    }
-    // Fresh install — show welcome
-    var el = document.getElementById('welcome-overlay');
-    if (el) el.style.display = 'flex';
-  } catch(e) {}
-}
-
-document.addEventListener('DOMContentLoaded', checkShowWelcome);
+var WELCOME_FLAG='sanj_welcomed';
+function dismissWelcome(){try{localStorage.setItem(WELCOME_FLAG,'1');}catch(e){}var el=document.getElementById('welcome-overlay');if(!el)return;el.style.transition='opacity .4s ease';el.style.opacity='0';setTimeout(function(){el.style.display='none';el.style.opacity='';},430);}
+function checkShowWelcome(){try{if(localStorage.getItem(WELCOME_FLAG))return;var raw=localStorage.getItem('cm_data');var data=raw?JSON.parse(raw):[];if(Array.isArray(data)&&data.length>0){localStorage.setItem(WELCOME_FLAG,'1');return;}var el=document.getElementById('welcome-overlay');if(el)el.style.display='flex';}catch(e){}}
+document.addEventListener('DOMContentLoaded',checkShowWelcome);
 </script>
 
 <!-- ========== MAIN APP ========== -->
@@ -1258,12 +1167,7 @@ document.addEventListener('DOMContentLoaded', checkShowWelcome);
     </div>
   </div>
 
-  <!-- Dashboard Month Filter -->
-  <div class="flex items-center gap-2 mb-2 overflow-x-auto" style="scrollbar-width:none">
-    <button onclick="setDashMonth(0)" id="dash-m-0" class="flex-shrink-0 px-3 py-1 rounded-full text-xs font-bold border-2 border-indigo-500 bg-indigo-500 text-white">This Month</button>
-    <button onclick="setDashMonth(-1)" id="dash-m-neg1" class="flex-shrink-0 px-3 py-1 rounded-full text-xs font-bold border-2 border-gray-300 text-gray-500">All Time</button>
-    <span id="dash-month-label" class="flex-shrink-0 text-xs text-gray-500 font-semibold"></span>
-  </div>
+
   <!-- Low Stock Alert -->
   <div id="dash-low-stock" class="mb-2 hidden"><div class="g-tobr-red500-rose600 rounded-xl text-white shadow-xl" style="padding:6px 10px"><p class="font-bold mb-1" style="font-size:11px">⚠️ Low Stock Alert</p><div id="dash-low-list" style="display:flex;flex-wrap:wrap;gap:4px"></div></div></div>
 
@@ -2453,39 +2357,37 @@ document.addEventListener('DOMContentLoaded', checkShowWelcome);
       <h3 style="font-size:14px;font-weight:900;color:#1f2937">⚙️ Manage Workers</h3>
       <button onclick="closeManageWorkers()" style="background:none;border:none;font-size:16px;cursor:pointer;color:#9ca3af;height:auto;min-height:auto;padding:0">✕</button>
     </div>
-    <!-- Worker Selector -->
-    <div style="margin-bottom:10px">
-      <label style="font-size:9px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Select Worker</label>
-      <select id="mw-worker-select" onchange="loadWorkerForEdit()" style="width:100%;padding:8px 10px;border:1px solid #e5e7eb;border-radius:10px;font-size:12px;background:white;color:#374151">
-        <option value="">-- Select a Worker --</option>
-      </select>
+
+    <!-- Select All / None bar -->
+    <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px">
+      <button onclick="mwSelectAll(true)" style="flex:1;background:#e0e7ff;color:#4f46e5;border:none;border-radius:8px;padding:5px 0;font-size:10px;font-weight:800;cursor:pointer">✅ Select All</button>
+      <button onclick="mwSelectAll(false)" style="flex:1;background:#f3f4f6;color:#6b7280;border:none;border-radius:8px;padding:5px 0;font-size:10px;font-weight:800;cursor:pointer">☐ Deselect All</button>
+      <span id="mw-sel-count" style="font-size:10px;font-weight:700;color:#4f46e5;white-space:nowrap">0 selected</span>
     </div>
-    <!-- Edit Panel (hidden until worker selected) -->
-    <div id="mw-edit-panel" style="display:none">
-      <!-- Status Badge -->
-      <div id="mw-status-badge" style="text-align:center;margin-bottom:10px;padding:4px 0"></div>
-      <!-- Rate Inputs -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+
+    <!-- Worker multi-select list -->
+    <div id="mw-worker-list-preview" style="max-height:220px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:10px;margin-bottom:10px"></div>
+
+    <!-- Bulk rate edit panel -->
+    <div id="mw-edit-panel" style="background:#f0f4ff;border-radius:12px;padding:10px;margin-bottom:10px">
+      <p style="font-size:10px;font-weight:800;color:#4f46e5;margin-bottom:8px">📝 Set Rates for Selected Workers</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
         <div>
           <label style="font-size:9px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:3px">Regular Rate ₹/hr</label>
-          <input type="number" id="mw-wage" step="any" style="width:100%;padding:7px 9px;border:1.5px solid #e5e7eb;border-radius:9px;font-size:12px;font-weight:700;color:#1f2937;box-sizing:border-box" placeholder="₹/hr">
+          <input type="number" id="mw-wage" step="any" style="width:100%;padding:7px 9px;border:1.5px solid #e5e7eb;border-radius:9px;font-size:12px;font-weight:700;color:#1f2937;box-sizing:border-box" placeholder="₹/hr (leave blank to keep)">
         </div>
         <div>
           <label style="font-size:9px;font-weight:800;color:#7c3aed;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:3px">OT Rate ₹/hr</label>
-          <input type="number" id="mw-ot-rate" step="any" style="width:100%;padding:7px 9px;border:1.5px solid #ddd6fe;border-radius:9px;font-size:12px;font-weight:700;color:#5b21b6;box-sizing:border-box" placeholder="₹/hr (opt)">
+          <input type="number" id="mw-ot-rate" step="any" style="width:100%;padding:7px 9px;border:1.5px solid #ddd6fe;border-radius:9px;font-size:12px;font-weight:700;color:#5b21b6;box-sizing:border-box" placeholder="₹/hr (leave blank to keep)">
         </div>
       </div>
-      <p style="font-size:9px;color:#6b7280;margin-bottom:10px;background:#f9fafb;padding:6px 8px;border-radius:7px;line-height:1.4">⚠️ Rate changes apply from the <strong>current & future months only</strong>. Past records are not affected.</p>
-      <!-- Action Buttons -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-        <button onclick="saveWorkerRates()" style="background:linear-gradient(to right,#6366f1,#8b5cf6);color:white;border:none;border-radius:10px;padding:9px 0;font-size:11px;font-weight:800;cursor:pointer;active:transform:scale(0.97)">💾 Save Rates</button>
-        <button id="mw-toggle-btn" onclick="toggleWorkerActive()" style="border:none;border-radius:10px;padding:9px 0;font-size:11px;font-weight:800;cursor:pointer"></button>
-      </div>
+      <p style="font-size:9px;color:#6b7280;margin-bottom:8px;line-height:1.4">⚠️ Only filled fields will be updated. Leave blank to keep existing rate.</p>
+      <button onclick="saveBulkWorkerRates()" style="width:100%;background:linear-gradient(to right,#6366f1,#8b5cf6);color:white;border:none;border-radius:10px;padding:9px 0;font-size:11px;font-weight:800;cursor:pointer">💾 Apply to Selected Workers</button>
     </div>
-    <!-- Worker List Preview -->
-    <div style="margin-top:10px;border-top:1px solid #f3f4f6;padding-top:10px">
-      <p style="font-size:9px;font-weight:800;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">All Workers</p>
-      <div id="mw-worker-list-preview" style="max-height:200px;overflow-y:auto"></div>
+
+    <!-- Single worker toggle active (shown when exactly 1 selected) -->
+    <div id="mw-single-panel" style="display:none;margin-bottom:8px">
+      <button id="mw-toggle-btn" onclick="toggleWorkerActive()" style="width:100%;border:none;border-radius:10px;padding:9px 0;font-size:11px;font-weight:800;cursor:pointer"></button>
     </div>
   </div>
 </div>
@@ -3909,26 +3811,17 @@ function delWorker(id) {
   });
 }
 
-// ── Manage Workers ─────────────────────────────────────────────────
+// ── Manage Workers (Multi-select) ──────────────────────────────────
 var _mwCurrentId = null;
+var _mwSelectedIds = []; // multi-select tracking
 
 function openManageWorkers() {
   AD = ld();
-  var sel = document.getElementById('mw-worker-select');
-  var prev = _mwCurrentId;
-  sel.innerHTML = '<option value="">-- Select a Worker --</option>';
-  var workers = AD.filter(function(d){ return d.type === 'worker'; });
-  workers.sort(function(a,b){ return (a.name||'').localeCompare(b.name||''); });
-  workers.forEach(function(w){
-    var opt = document.createElement('option');
-    opt.value = w.__id;
-    opt.textContent = w.name + (w.category ? ' ('+w.category+')' : '') + (w.active===false ? ' [Inactive]' : '');
-    sel.appendChild(opt);
-  });
-  if (prev) sel.value = prev;
-  _renderMwPreviewList();
-  document.getElementById('mw-edit-panel').style.display = prev ? 'block' : 'none';
-  if (prev) loadWorkerForEdit();
+  _mwSelectedIds = [];
+  _renderMwWorkerList();
+  _mwUpdateSelCount();
+  document.getElementById('mw-wage').value = '';
+  document.getElementById('mw-ot-rate').value = '';
   document.getElementById('manage-workers-modal').style.display = 'flex';
 }
 
@@ -3936,92 +3829,7 @@ function closeManageWorkers() {
   document.getElementById('manage-workers-modal').style.display = 'none';
 }
 
-function loadWorkerForEdit() {
-  var sel = document.getElementById('mw-worker-select');
-  var id = sel.value;
-  _mwCurrentId = id || null;
-  var panel = document.getElementById('mw-edit-panel');
-  if (!id) { panel.style.display = 'none'; return; }
-  var w = AD.find(function(d){ return d.__id === id; });
-  if (!w) { panel.style.display = 'none'; return; }
-  panel.style.display = 'block';
-  document.getElementById('mw-wage').value = w.hourly_wage || '';
-  document.getElementById('mw-ot-rate').value = w.ot_rate || '';
-  var isActive = w.active !== false;
-  var badge = document.getElementById('mw-status-badge');
-  badge.innerHTML = '<span style="display:inline-block;padding:3px 10px;border-radius:99px;font-size:10px;font-weight:800;background:'+(isActive?'#d1fae5':'#fee2e2')+';color:'+(isActive?'#065f46':'#991b1b')+'">'+(isActive?'✅ Active':'⛔ Inactive')+'</span>';
-  var btn = document.getElementById('mw-toggle-btn');
-  if (isActive) {
-    btn.textContent = '⛔ Mark Inactive';
-    btn.style.background = 'linear-gradient(to right,#fee2e2,#fecaca)';
-    btn.style.color = '#dc2626';
-  } else {
-    btn.textContent = '✅ Mark Active';
-    btn.style.background = 'linear-gradient(to right,#d1fae5,#a7f3d0)';
-    btn.style.color = '#059669';
-  }
-}
-
-function saveWorkerRates() {
-  if (!_mwCurrentId) { toast('Select a worker first','err'); return; }
-  var w = AD.find(function(d){ return d.__id === _mwCurrentId; });
-  if (!w) return;
-  var newWage = parseFloat(document.getElementById('mw-wage').value) || 0;
-  var newOT   = parseFloat(document.getElementById('mw-ot-rate').value) || 0;
-  var oldWage = parseFloat(w.hourly_wage) || 0;
-  var oldOT   = parseFloat(w.ot_rate) || 0;
-  if (newWage === oldWage && newOT === oldOT) { toast('No changes made','err'); return; }
-
-  // Current month string e.g. "2026-03"
-  var now = new Date();
-  var curMon = now.getFullYear() + '-' + ('0'+(now.getMonth()+1)).slice(-2);
-
-  // Lock past attendance records to old rates (if not already locked)
-  var attRecs = AD.filter(function(d){ return d.type==='attendance' && d.name===w.name; });
-  attRecs.forEach(function(a){
-    var aMonth = (a.date||'').substring(0,7);
-    if (aMonth && aMonth < curMon) {
-      // Past month: lock in old rates if not already stored
-      var updates = {};
-      var needsUpdate = false;
-      if (!a.hourly_wage || parseFloat(a.hourly_wage) === 0) {
-        updates.hourly_wage = oldWage; needsUpdate = true;
-      }
-      if (!a.ot_rate && oldOT > 0) {
-        updates.ot_rate = oldOT; needsUpdate = true;
-      }
-      if (needsUpdate) upd(a.__id, updates);
-    } else if (aMonth && aMonth >= curMon) {
-      // Current/future month: update to new rates and recalculate payment
-      var hrs = parseFloat(a.hours) || 0;
-      var otH = parseFloat(a.ot_hours) || 0;
-      var newPay = hrs * newWage + otH * newOT;
-      upd(a.__id, { hourly_wage: newWage, ot_rate: newOT, payment: newPay });
-    }
-  });
-
-  // Update worker record
-  upd(_mwCurrentId, { hourly_wage: newWage, ot_rate: newOT });
-  AD = ld();
-  toast('Rates updated from ' + curMon.replace('-','/'), 'ok');
-  viewWorkers();
-  updateDash();
-  openManageWorkers(); // refresh modal
-}
-
-function toggleWorkerActive() {
-  if (!_mwCurrentId) return;
-  var w = AD.find(function(d){ return d.__id === _mwCurrentId; });
-  if (!w) return;
-  var nowActive = w.active !== false;
-  upd(_mwCurrentId, { active: !nowActive });
-  AD = ld();
-  toast(w.name + (nowActive ? ' marked inactive' : ' marked active'), 'ok');
-  viewWorkers();
-  openManageWorkers();
-}
-
-function _renderMwPreviewList() {
+function _renderMwWorkerList() {
   var el = document.getElementById('mw-worker-list-preview');
   if (!el) return;
   var workers = AD.filter(function(d){ return d.type==='worker'; });
@@ -4029,15 +3837,118 @@ function _renderMwPreviewList() {
   workers.sort(function(a,b){ return (a.name||'').localeCompare(b.name||''); });
   el.innerHTML = workers.map(function(w){
     var isActive = w.active !== false;
-    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 8px;border-radius:8px;margin-bottom:4px;background:'+(isActive?'#f9fafb':'#fef2f2')+'">'
-      +'<div>'
-      +'<p style="font-size:11px;font-weight:800;color:'+(isActive?'#1f2937':'#9ca3af')+'">'+w.name+'</p>'
-      +'<p style="font-size:9px;color:#6b7280">'+w.category+' · '+fc(w.hourly_wage)+'/hr'+(parseFloat(w.ot_rate)>0?' | OT: '+fc(w.ot_rate)+'/hr':'')+'</p>'
+    var isSel = _mwSelectedIds.indexOf(w.__id) !== -1;
+    return '<div onclick="mwToggleWorker(\''+w.__id+'\')" style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:9px;margin-bottom:4px;cursor:pointer;border:2px solid '+(isSel?'#6366f1':'#e5e7eb')+';background:'+(isSel?'#eef2ff':'#f9fafb')+';transition:all .12s">'
+      +'<div style="width:18px;height:18px;border-radius:5px;border:2px solid '+(isSel?'#6366f1':'#d1d5db')+';background:'+(isSel?'#6366f1':'white')+';display:flex;align-items:center;justify-content:center;flex-shrink:0">'
+      +(isSel?'<span style="color:white;font-size:11px;font-weight:900">✓</span>':'')+'</div>'
+      +'<div style="flex:1;min-width:0">'
+      +'<p style="font-size:12px;font-weight:800;color:'+(isActive?'#1f2937':'#9ca3af')+'">'+w.name+(isActive?'':' <span style="font-size:9px;color:#ef4444">[Inactive]</span>')+'</p>'
+      +'<p style="font-size:9.5px;color:#6b7280">'+w.category+' · '+fc(w.hourly_wage||0)+'/hr'+(parseFloat(w.ot_rate)>0?' | OT: '+fc(w.ot_rate)+'/hr':'')+'</p>'
       +'</div>'
-      +'<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;background:'+(isActive?'#d1fae5':'#fee2e2')+';color:'+(isActive?'#065f46':'#991b1b')+'">'+(isActive?'Active':'Inactive')+'</span>'
+      +'<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;background:'+(isActive?'#d1fae5':'#fee2e2')+';color:'+(isActive?'#065f46':'#991b1b')+';flex-shrink:0">'+(isActive?'Active':'Inactive')+'</span>'
       +'</div>';
   }).join('');
 }
+
+function mwToggleWorker(id) {
+  var idx = _mwSelectedIds.indexOf(id);
+  if (idx === -1) _mwSelectedIds.push(id);
+  else _mwSelectedIds.splice(idx, 1);
+  _renderMwWorkerList();
+  _mwUpdateSelCount();
+  // Show/hide single-worker toggle button
+  var sp = document.getElementById('mw-single-panel');
+  if (sp) {
+    if (_mwSelectedIds.length === 1) {
+      sp.style.display = 'block';
+      var w = AD.find(function(d){ return d.__id === _mwSelectedIds[0]; });
+      var btn = document.getElementById('mw-toggle-btn');
+      if (w && btn) {
+        var isActive = w.active !== false;
+        btn.textContent = isActive ? '⛔ Mark Inactive' : '✅ Mark Active';
+        btn.style.background = isActive ? 'linear-gradient(to right,#fee2e2,#fecaca)' : 'linear-gradient(to right,#d1fae5,#a7f3d0)';
+        btn.style.color = isActive ? '#dc2626' : '#059669';
+      }
+    } else {
+      sp.style.display = 'none';
+    }
+  }
+}
+
+function mwSelectAll(sel) {
+  var workers = AD.filter(function(d){ return d.type==='worker'; });
+  _mwSelectedIds = sel ? workers.map(function(w){ return w.__id; }) : [];
+  _renderMwWorkerList();
+  _mwUpdateSelCount();
+  var sp = document.getElementById('mw-single-panel');
+  if (sp) sp.style.display = 'none';
+}
+
+function _mwUpdateSelCount() {
+  var el = document.getElementById('mw-sel-count');
+  if (el) el.textContent = _mwSelectedIds.length + ' selected';
+}
+
+function saveBulkWorkerRates() {
+  if (!_mwSelectedIds.length) { toast('Select at least one worker','err'); return; }
+  var wageStr = document.getElementById('mw-wage').value.trim();
+  var otStr   = document.getElementById('mw-ot-rate').value.trim();
+  if (!wageStr && !otStr) { toast('Enter at least one rate to update','err'); return; }
+  var newWage = wageStr !== '' ? parseFloat(wageStr) : null;
+  var newOT   = otStr   !== '' ? parseFloat(otStr)   : null;
+  var now = new Date();
+  var curMon = now.getFullYear() + '-' + ('0'+(now.getMonth()+1)).slice(-2);
+  var count = 0;
+  _mwSelectedIds.forEach(function(wid){
+    var w = AD.find(function(d){ return d.__id === wid; });
+    if (!w) return;
+    var applyWage = newWage !== null ? newWage : (parseFloat(w.hourly_wage)||0);
+    var applyOT   = newOT   !== null ? newOT   : (parseFloat(w.ot_rate)||0);
+    // Lock past attendance to old rates
+    var oldWage = parseFloat(w.hourly_wage)||0;
+    var oldOT   = parseFloat(w.ot_rate)||0;
+    var attRecs = AD.filter(function(d){ return d.type==='attendance'&&d.name===w.name; });
+    attRecs.forEach(function(a){
+      var aMonth = (a.date||'').substring(0,7);
+      if (aMonth && aMonth < curMon) {
+        var updates = {};
+        if (!a.hourly_wage || parseFloat(a.hourly_wage)===0) { updates.hourly_wage = oldWage; }
+        if (!a.ot_rate && oldOT > 0) { updates.ot_rate = oldOT; }
+        if (Object.keys(updates).length) upd(a.__id, updates);
+      } else if (aMonth && aMonth >= curMon) {
+        var hrs = parseFloat(a.hours)||0;
+        var otH = parseFloat(a.ot_hours)||0;
+        upd(a.__id, { hourly_wage: applyWage, ot_rate: applyOT, payment: hrs*applyWage+otH*applyOT });
+      }
+    });
+    var wUpdate = {};
+    if (newWage !== null) wUpdate.hourly_wage = applyWage;
+    if (newOT   !== null) wUpdate.ot_rate = applyOT;
+    upd(wid, wUpdate);
+    count++;
+  });
+  AD = ld();
+  toast(count+' worker'+(count>1?'s':'')+' updated ✓', 'ok');
+  viewWorkers(); updateDash();
+  openManageWorkers();
+}
+
+function toggleWorkerActive() {
+  if (_mwSelectedIds.length !== 1) return;
+  _mwCurrentId = _mwSelectedIds[0];
+  var w = AD.find(function(d){ return d.__id === _mwCurrentId; });
+  if (!w) return;
+  var nowActive = w.active !== false;
+  upd(_mwCurrentId, { active: !nowActive });
+  AD = ld();
+  toast(w.name + (nowActive ? ' marked inactive' : ' marked active'), 'ok');
+  viewWorkers(); openManageWorkers();
+}
+
+// Keep stubs for legacy calls
+function loadWorkerForEdit() {}
+function saveWorkerRates() { saveBulkWorkerRates(); }
+function _renderMwPreviewList() { _renderMwWorkerList(); }
 function openAttModal(wid, date) {
   WID=wid; var w=AD.find(function(d){ return d.__id===wid; }); if(!w) return;
   var d=date||ist();
@@ -4910,16 +4821,29 @@ function printRentalByClient(){
         +'<th style="text-align:center;background:#fee2e2;color:#dc2626;padding:3px 8px;font-size:11px;-webkit-print-color-adjust:exact;print-color-adjust:exact">Days</th>'
         +'<th style="text-align:right;background:#fee2e2;color:#dc2626;padding:3px 10px;font-size:11px;-webkit-print-color-adjust:exact;print-color-adjust:exact">Amount</th>'
         +'</tr></thead><tbody>';
+      // Group: same name + same rate + same active-days → merge qty
+      var borrowGroups = {};
+      var borrowOrder  = [];
       mBorrow.forEach(function(r){
         var days = daysActiveInMonth(r, mk);
-        var amt  = days * (parseFloat(r.rate)||0) * (parseFloat(r.qty)||1);
+        var rate = parseFloat(r.rate)||0;
+        var key  = r.rental_name.trim().toLowerCase() + '|' + rate + '|' + days;
+        if (!borrowGroups[key]) {
+          borrowGroups[key] = { name:r.rental_name, rate:rate, days:days, qty:0, start:r.borrowed_date };
+          borrowOrder.push(key);
+        }
+        borrowGroups[key].qty += (parseFloat(r.qty)||1);
+      });
+      borrowOrder.forEach(function(key){
+        var g   = borrowGroups[key];
+        var amt = g.days * g.rate * g.qty;
         mBowExp += amt; grandExp += amt;
         out += '<tr>'
-          +'<td style="font-weight:700;color:#1f2937;padding:5px 10px;font-size:12px">'+r.rental_name+'</td>'
-          +'<td style="text-align:center;font-weight:600;padding:5px 8px;font-size:12px">'+(r.qty||1)+'</td>'
-          +'<td style="text-align:center;color:#4f46e5;font-weight:700;padding:5px 8px;font-size:12px">'+fc(parseFloat(r.rate)||0)+'</td>'
-          +'<td style="text-align:center;color:#6b7280;padding:5px 8px;font-size:12px">'+fd(r.borrowed_date)+'</td>'
-          +'<td style="text-align:center;font-weight:700;color:#374151;padding:5px 8px;font-size:12px">'+days+' d</td>'
+          +'<td style="font-weight:700;color:#1f2937;padding:5px 10px;font-size:12px">'+g.name+'</td>'
+          +'<td style="text-align:center;font-weight:600;padding:5px 8px;font-size:12px">'+g.qty+'</td>'
+          +'<td style="text-align:center;color:#4f46e5;font-weight:700;padding:5px 8px;font-size:12px">'+fc(g.rate)+'</td>'
+          +'<td style="text-align:center;color:#6b7280;padding:5px 8px;font-size:12px">'+fd(g.start)+'</td>'
+          +'<td style="text-align:center;font-weight:700;color:#374151;padding:5px 8px;font-size:12px">'+g.days+' d</td>'
           +'<td style="text-align:right;font-weight:900;color:#dc2626;font-size:12px;padding:5px 10px">'+fc(amt)+'</td>'
           +'</tr>';
       });
@@ -4940,16 +4864,29 @@ function printRentalByClient(){
         +'<th style="text-align:center;background:#dcfce7;color:#059669;padding:3px 8px;font-size:11px;-webkit-print-color-adjust:exact;print-color-adjust:exact">Days</th>'
         +'<th style="text-align:right;background:#dcfce7;color:#059669;padding:3px 10px;font-size:11px;-webkit-print-color-adjust:exact;print-color-adjust:exact">Amount</th>'
         +'</tr></thead><tbody>';
+      // Group: same name + same rate + same active-days → merge qty
+      var givenGroups = {};
+      var givenOrder  = [];
       mGiven.forEach(function(r){
         var days = daysActiveInMonth(r, mk);
-        var amt  = days * (parseFloat(r.rate)||0) * (parseFloat(r.qty)||1);
+        var rate = parseFloat(r.rate)||0;
+        var key  = r.rental_name.trim().toLowerCase() + '|' + rate + '|' + days;
+        if (!givenGroups[key]) {
+          givenGroups[key] = { name:r.rental_name, rate:rate, days:days, qty:0, start:r.borrowed_date };
+          givenOrder.push(key);
+        }
+        givenGroups[key].qty += (parseFloat(r.qty)||1);
+      });
+      givenOrder.forEach(function(key){
+        var g   = givenGroups[key];
+        var amt = g.days * g.rate * g.qty;
         mGivInc += amt; grandInc += amt;
         out += '<tr>'
-          +'<td style="font-weight:700;color:#1f2937;padding:5px 10px;font-size:12px">'+r.rental_name+'</td>'
-          +'<td style="text-align:center;font-weight:600;padding:5px 8px;font-size:12px">'+(r.qty||1)+'</td>'
-          +'<td style="text-align:center;color:#4f46e5;font-weight:700;padding:5px 8px;font-size:12px">'+fc(parseFloat(r.rate)||0)+'</td>'
-          +'<td style="text-align:center;color:#6b7280;padding:5px 8px;font-size:12px">'+fd(r.borrowed_date)+'</td>'
-          +'<td style="text-align:center;font-weight:700;color:#374151;padding:5px 8px;font-size:12px">'+days+' d</td>'
+          +'<td style="font-weight:700;color:#1f2937;padding:5px 10px;font-size:12px">'+g.name+'</td>'
+          +'<td style="text-align:center;font-weight:600;padding:5px 8px;font-size:12px">'+g.qty+'</td>'
+          +'<td style="text-align:center;color:#4f46e5;font-weight:700;padding:5px 8px;font-size:12px">'+fc(g.rate)+'</td>'
+          +'<td style="text-align:center;color:#6b7280;padding:5px 8px;font-size:12px">'+fd(g.start)+'</td>'
+          +'<td style="text-align:center;font-weight:700;color:#374151;padding:5px 8px;font-size:12px">'+g.days+' d</td>'
           +'<td style="text-align:right;font-weight:900;color:#059669;font-size:12px;padding:5px 10px">'+fc(amt)+'</td>'
           +'</tr>';
       });
@@ -8499,7 +8436,6 @@ function onSubscriptionPaymentSuccess(response) {
 var VISITS_KEY  = 'cm_visits';
 var QT_KEY      = 'cm_quotations';
 var SCB_KEY     = 'cm_subcon_bills';
-var DASH_MONTH_OFFSET = 0; // 0=current, 1=prev, 2=two months ago, -1=all time
 
 function lvisits(){ try{return JSON.parse(safeLS.getItem(VISITS_KEY)||'[]');}catch(e){return[];} }
 function svisits(x){ safeLS.setItem(VISITS_KEY, JSON.stringify(x)); }
@@ -8508,36 +8444,11 @@ function sqt(x){ safeLS.setItem(QT_KEY, JSON.stringify(x)); }
 function lscb(){ try{return JSON.parse(safeLS.getItem(SCB_KEY)||'[]');}catch(e){return[];} }
 function sscb(x){ safeLS.setItem(SCB_KEY, JSON.stringify(x)); }
 
-// ── Dashboard Month Filter ────────────────────────────────────────
-function setDashMonth(offset) {
-  DASH_MONTH_OFFSET = offset;
-  document.querySelectorAll('[id^="dash-m-"]').forEach(function(b){
-    b.style.background = ''; b.style.color = '#6b7280';
-    b.style.borderColor = '#d1d5db';
-  });
-  var activeId = offset === -1 ? 'dash-m-neg1' : 'dash-m-' + offset;
-  var activeBtn = document.getElementById(activeId);
-  if (activeBtn) { activeBtn.style.background = '#4f46e5'; activeBtn.style.color = 'white'; activeBtn.style.borderColor = '#4f46e5'; }
-  var lbl = document.getElementById('dash-month-label');
-  if (offset === -1) { if(lbl) lbl.textContent = 'All time'; }
-  else {
-    var d = new Date(); d.setMonth(d.getMonth() - offset);
-    if(lbl) lbl.textContent = d.toLocaleString('en-IN',{month:'short',year:'numeric'});
-  }
-  AD = ld(); updateDash();
-}
-
-// Helper: get month key for filter
+// Dashboard always shows current month (month buttons removed)
 function _dashMonthKey() {
-  if (DASH_MONTH_OFFSET === -1) return null; // all time
-  var d = new Date(); d.setMonth(d.getMonth() - DASH_MONTH_OFFSET);
+  var d = new Date();
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
 }
-
-// Init month filter label on load
-document.addEventListener('DOMContentLoaded', function(){
-  setTimeout(function(){ setDashMonth(0); }, 500);
-});
 
 // ── Copy Previous Day Attendance ──────────────────────────────────
 function copyPrevDayAttendance() {
@@ -8722,9 +8633,34 @@ function deleteSupplier(id) {
 function renderPOSupplierDropdown() {
   var sel = document.getElementById('po-supplier'); if (!sel) return;
   var cur = sel.value;
-  var sups = lsuppliers();
+  // Saved PO suppliers
+  var saved = lsuppliers();
+  // Pull unique supplier names from Materials purchases (AD)
+  var matSups = [];
+  try {
+    AD.forEach(function(d){
+      if (d.type === 'material' && d.supplier && d.supplier.trim()) matSups.push(d.supplier.trim());
+    });
+    // Also from material store purchase transactions
+    lmat().forEach(function(m){
+      (m.transactions||[]).forEach(function(t){
+        if (t.type === 'purchase' && t.supplier && t.supplier.trim()) matSups.push(t.supplier.trim());
+      });
+    });
+  } catch(e){}
+  // Build merged list: saved PO suppliers first, then unique names from materials/expenses not already present
+  var savedNames = saved.map(function(s){ return s.name.toLowerCase(); });
+  var extraNames = [];
+  matSups.forEach(function(n){
+    if (extraNames.indexOf(n.toLowerCase()) === -1 && savedNames.indexOf(n.toLowerCase()) === -1) extraNames.push(n);
+  });
   sel.innerHTML = '<option value="">Select Supplier</option>'
-    + sups.map(function(s){ return '<option value="'+s.id+'" '+(cur===s.id?'selected':'')+'>'+s.name+'</option>'; }).join('');
+    + (saved.length ? '<optgroup label="── Saved Suppliers">'
+        + saved.map(function(s){ return '<option value="'+s.id+'" '+(cur===s.id?'selected':'')+'>'+s.name+'</option>'; }).join('')
+        + '</optgroup>' : '')
+    + (extraNames.length ? '<optgroup label="── From Materials / Expenses">'
+        + extraNames.map(function(n){ return '<option value="name:'+n+'" '+(cur==='name:'+n?'selected':'')+'>'+n+'</option>'; }).join('')
+        + '</optgroup>' : '');
 }
 
 function addPOLine() {
@@ -8963,10 +8899,10 @@ function renderMasterAttWorkers() {
       +catWorkers.map(function(w){
         var alreadyDone = attended.indexOf(w.name) !== -1;
         var chkId = 'ma-chk-'+w.__id;
-        return '<label style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;margin-bottom:3px;cursor:pointer;background:'+(alreadyDone?'#f0fdf4':'#f8fafc')+';border:1px solid '+(alreadyDone?'#86efac':'#e5e7eb')+'">'
-          +'<input type="checkbox" id="'+chkId+'" data-wid="'+w.__id+'" data-name="'+w.name+'" '+(alreadyDone?'checked disabled':'')
+        return '<label style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;margin-bottom:3px;cursor:pointer;background:'+(alreadyDone?'#fefce8':'#f8fafc')+';border:1px solid '+(alreadyDone?'#fde047':'#e5e7eb')+'">'
+          +'<input type="checkbox" id="'+chkId+'" data-wid="'+w.__id+'" data-name="'+w.name+'" data-already="'+(alreadyDone?'1':'0')+'" '+(alreadyDone?'checked':'')
           +' style="width:16px;height:16px;accent-color:#4f46e5;flex-shrink:0;cursor:pointer">'
-          +'<span style="flex:1;font-size:11px;font-weight:'+(alreadyDone?'700':'600')+';color:'+(alreadyDone?'#15803d':'#374151')+'">'+w.name+(alreadyDone?' ✓':' ')+'</span>'
+          +'<span style="flex:1;font-size:11px;font-weight:'+(alreadyDone?'700':'600')+';color:'+(alreadyDone?'#92400e':'#374151')+'">'+w.name+(alreadyDone?' ⚠️ Already marked':' ')+'</span>'
           +(w.hourly_wage?'<span style="font-size:9px;color:#9ca3af">₹'+w.hourly_wage+'/hr</span>':'')
           +'</label>';
       }).join('')
@@ -8975,60 +8911,122 @@ function renderMasterAttWorkers() {
 }
 
 function masterAttSelectAll(val) {
-  document.querySelectorAll('#master-att-worker-list input[type="checkbox"]:not(:disabled)').forEach(function(cb){
+  document.querySelectorAll('#master-att-worker-list input[type="checkbox"]').forEach(function(cb){
     cb.checked = val;
   });
 }
 
 function saveMasterAttendance() {
-  var date     = document.getElementById('ma-date').value || DD;
-  var hours    = parseFloat(document.getElementById('ma-hours').value) || 0;
-  var advance  = parseFloat(document.getElementById('ma-advance').value) || 0;
-  var otHours  = parseFloat(document.getElementById('ma-ot-hours').value) || 0;
-  var otRateGlobal = 0; // always use per-worker rate
-  var msg      = document.getElementById('master-att-msg');
+  var date        = document.getElementById('ma-date').value || DD;
+  var hours       = parseFloat(document.getElementById('ma-hours').value) || 0;
+  var advance     = parseFloat(document.getElementById('ma-advance').value) || 0;
+  var otHours     = parseFloat(document.getElementById('ma-ot-hours').value) || 0;
+  var msg         = document.getElementById('master-att-msg');
 
-  if (!hours && !otHours) { if(msg){msg.textContent='Enter working hours first';msg.style.color='#dc2626';msg.style.display='block';} return; }
+  if (!hours && !otHours) {
+    if(msg){msg.textContent='Enter working hours first';msg.style.color='#dc2626';msg.style.display='block';}
+    return;
+  }
 
+  // Collect all checked workers
   var selected = [];
-  document.querySelectorAll('#master-att-worker-list input[type="checkbox"]:not(:disabled):checked').forEach(function(cb){
-    selected.push({ wid: cb.getAttribute('data-wid'), name: cb.getAttribute('data-name') });
+  document.querySelectorAll('#master-att-worker-list input[type="checkbox"]:checked').forEach(function(cb){
+    selected.push({
+      wid:     cb.getAttribute('data-wid'),
+      name:    cb.getAttribute('data-name'),
+      already: cb.getAttribute('data-already') === '1'
+    });
   });
 
-  if (!selected.length) { if(msg){msg.textContent='Select at least one worker';msg.style.color='#dc2626';msg.style.display='block';} return; }
+  if (!selected.length) {
+    if(msg){msg.textContent='Select at least one worker';msg.style.color='#dc2626';msg.style.display='block';}
+    return;
+  }
 
-  // Add / update attendance for each selected worker
-  selected.forEach(function(s){
-    var worker = AD.find(function(w){ return w.__id === s.wid; });
-    // Per-worker OT rate: use global if set, else worker's own ot_rate, else hourly_wage
-    var otRate = worker ? (parseFloat(worker.ot_rate)||0) : 0; // strictly worker's own OT rate only
-    var regRate = worker ? (parseFloat(worker.hourly_wage)||0) : 0;
-    // FIX 5: payment = (hours*rate) + (ot_hours*ot_rate)
-    var payment = (hours * regRate) + (otHours * otRate);
-    var cat = worker ? (worker.category||'') : '';
-    // Update if already exists for this date, else insert
+  // Split into already-marked vs fresh
+  var alreadyMarked = selected.filter(function(s){ return s.already; });
+  var fresh         = selected.filter(function(s){ return !s.already; });
+
+  // Internal function to actually write attendance
+  function _writeAttendance(list, replaceExisting) {
+    list.forEach(function(s){
+      var worker  = AD.find(function(w){ return w.__id === s.wid; });
+      var otRate  = worker ? (parseFloat(worker.ot_rate)||0) : 0;
+      var regRate = worker ? (parseFloat(worker.hourly_wage)||0) : 0;
+      var payment = (hours * regRate) + (otHours * otRate);
+      var cat     = worker ? (worker.category||'') : '';
+      AD = ld();
+      var ex = dedup(AD.filter(function(a){ return a.type==='attendance'&&a.name===s.name&&a.date===date; }));
+      if (ex.length && replaceExisting) {
+        upd(ex[0].__id, {hours:hours, advance:advance, ot_hours:otHours, ot_rate:otRate, payment:payment, hourly_wage:regRate});
+      } else if (!ex.length) {
+        ins({type:'attendance', date:date, name:s.name, category:cat, hours:hours, advance:advance, ot_hours:otHours, ot_rate:otRate, payment:payment, hourly_wage:regRate, work_done:''});
+      }
+    });
+  }
+
+  function _finish(replaceExisting) {
+    // Always write fresh workers
+    _writeAttendance(fresh, false);
+    // Write already-marked workers based on choice
+    if (alreadyMarked.length) _writeAttendance(alreadyMarked, replaceExisting);
+
     AD = ld();
-    var ex = dedup(AD.filter(function(a){ return a.type==='attendance'&&a.name===s.name&&a.date===date; }));
-    if (ex.length) {
-      upd(ex[0].__id, {hours:hours, advance:advance, ot_hours:otHours, ot_rate:otRate, payment:payment, hourly_wage:regRate});
-    } else {
-      ins({ type:'attendance', date:date, name:s.name, category:cat, hours:hours, advance:advance, ot_hours:otHours, ot_rate:otRate, payment:payment, hourly_wage:regRate, work_done:'' });
-    }
-  });
+    var total = fresh.length + (replaceExisting ? alreadyMarked.length : 0);
+    var skipped = replaceExisting ? 0 : alreadyMarked.length;
+    var resultMsg = '✅ ' + total + ' worker' + (total!==1?'s':'') + ' saved';
+    if (skipped) resultMsg += ', ' + skipped + ' skipped (already marked)';
+    toast(resultMsg, 'ok');
+    if(msg){msg.textContent=resultMsg;msg.style.color='#059669';msg.style.display='block';}
+    if (date===DD) viewDaily();
+    updateDash(); viewWorkers();
+    renderMasterAttWorkers();
+    setTimeout(function(){
+      document.querySelectorAll('#master-att-worker-list input[type="checkbox"]').forEach(function(cb){ cb.checked = false; });
+    }, 150);
+  }
 
-  AD = ld();
-  toast('✅ Attendance saved for ' + selected.length + ' workers!', 'ok');
-  if(msg){msg.textContent='✅ '+selected.length+' workers marked present — change date to add more';msg.style.color='#059669';msg.style.display='block';}
-  if (date===DD) viewDaily();
-  // Update dash & workers in background, keep modal open for next entry
-  updateDash();
-  viewWorkers();
-  // Re-render checklist so attended workers show ✓ but modal stays open
-  renderMasterAttWorkers();
-  // Un-check all selectable checkboxes so user can start fresh for another date
-  setTimeout(function(){
-    document.querySelectorAll('#master-att-worker-list input[type="checkbox"]:not(:disabled)').forEach(function(cb){ cb.checked = false; });
-  }, 100);
+  // If any selected workers already have attendance — ask Replace or Skip
+  if (alreadyMarked.length > 0) {
+    // Build custom confirmation overlay
+    var existingOverlay = document.getElementById('ma-confirm-overlay');
+    if (existingOverlay) existingOverlay.remove();
+
+    var overlay = document.createElement('div');
+    overlay.id = 'ma-confirm-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:99999;display:flex;align-items:center;justify-content:center;padding:1.5rem;backdrop-filter:blur(4px)';
+
+    var names = alreadyMarked.map(function(s){ return s.name; }).join(', ');
+    overlay.innerHTML =
+      '<div style="background:white;border-radius:18px;padding:18px 16px;max-width:320px;width:100%;box-shadow:0 32px 80px rgba(0,0,0,0.5)">'
+      +'<p style="font-size:14px;font-weight:900;color:#1f2937;margin-bottom:6px">⚠️ Already Marked</p>'
+      +'<p style="font-size:11.5px;color:#374151;margin-bottom:10px;line-height:1.55">'
+      +'<strong>'+alreadyMarked.length+'</strong> worker'+(alreadyMarked.length!==1?'s are':' is')+' already marked for <strong>'+date+'</strong>:</p>'
+      +'<p style="font-size:10.5px;color:#6b7280;background:#f3f4f6;border-radius:8px;padding:6px 10px;margin-bottom:14px;line-height:1.5">'+names+'</p>'
+      +(fresh.length ? '<p style="font-size:10.5px;color:#059669;margin-bottom:12px">✅ '+fresh.length+' fresh worker'+(fresh.length!==1?'s':'')+" will always be saved.</p>" : '')
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+      +'<button id="ma-skip-btn" style="background:#f0fdf4;color:#15803d;border:2px solid #86efac;border-radius:11px;padding:10px 0;font-size:11px;font-weight:800;cursor:pointer">⏭️ Skip Already Marked<br><span style="font-size:9px;font-weight:500;color:#6b7280">Keep old data</span></button>'
+      +'<button id="ma-replace-btn" style="background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white;border:none;border-radius:11px;padding:10px 0;font-size:11px;font-weight:800;cursor:pointer">🔄 Replace All<br><span style="font-size:9px;font-weight:500;color:rgba(255,255,255,0.75)">Overwrite existing</span></button>'
+      +'</div>'
+      +'<button id="ma-cancel-btn" style="width:100%;margin-top:8px;background:none;border:none;color:#9ca3af;font-size:11px;cursor:pointer;padding:6px 0">Cancel</button>'
+      +'</div>';
+
+    document.body.appendChild(overlay);
+
+    document.getElementById('ma-skip-btn').onclick = function(){
+      overlay.remove(); _finish(false);
+    };
+    document.getElementById('ma-replace-btn').onclick = function(){
+      overlay.remove(); _finish(true);
+    };
+    document.getElementById('ma-cancel-btn').onclick = function(){
+      overlay.remove();
+    };
+
+  } else {
+    // No conflicts — save directly
+    _finish(false);
+  }
 }
 
 function renderBudgetVisualBars() {
