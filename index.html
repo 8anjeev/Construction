@@ -965,6 +965,7 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
       .fixed > div.max-w-md { max-width: 520px !important; }
     }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
 </head>
 <body>
 
@@ -1058,6 +1059,7 @@ document.addEventListener('DOMContentLoaded',checkShowWelcome);
     <button class="tab-btn flex-shrink-0 px-2.5 py-1 text-xs font-semibold text-white/70 rounded-lg" data-tab="dashboard" onclick="switchTab('dashboard')">📊 Dashboard</button>
     <button class="tab-btn flex-shrink-0 px-2.5 py-1 text-xs font-semibold text-white/70 rounded-lg" data-tab="daily" onclick="switchTab('daily')">📋 Report</button>
     <button class="tab-btn flex-shrink-0 px-2.5 py-1 text-xs font-semibold text-white/70 rounded-lg" data-tab="attendance" onclick="switchTab('attendance')">📅 Attendance</button>
+    <button class="tab-btn flex-shrink-0 px-2.5 py-1 text-xs font-semibold text-white/70 rounded-lg" data-tab="boq" onclick="switchTab('boq')">📋 BOQ DPR</button>
     <button class="tab-btn flex-shrink-0 px-2.5 py-1 text-xs font-semibold text-white/70 rounded-lg" data-tab="machinery" onclick="switchTab('machinery')">⚙️ Machinery</button>
     <button class="tab-btn flex-shrink-0 px-2.5 py-1 text-xs font-semibold text-white/70 rounded-lg" data-tab="expenses" onclick="switchTab('expenses')">💰 Expenses</button>
     <button class="tab-btn flex-shrink-0 px-2.5 py-1 text-xs font-semibold text-white/70 rounded-lg" data-tab="materials" onclick="switchTab('materials')">🧱 Materials</button>
@@ -1758,6 +1760,214 @@ document.addEventListener('DOMContentLoaded',checkShowWelcome);
   <div id="contractors-list" class="space-y-4"><p class="text-white/50 text-center py-4">No teams yet</p></div>
 </div>
 
+<!-- ===== BOQ DPR (standalone tab) ===== -->
+<div id="tab-boq" class="tab-content" style="display:none">
+
+  <!-- ══ HERO HEADER ══ -->
+  <div style="background:linear-gradient(135deg,#0f2244 0%,#1a3a6b 50%,#0f2244 100%);border-radius:18px;padding:16px 14px 14px;margin-bottom:12px;box-shadow:0 8px 32px rgba(15,34,68,0.45);position:relative;overflow:hidden">
+    <div style="position:absolute;top:-30px;right:-30px;width:100px;height:100px;border-radius:50%;background:rgba(251,191,36,0.08);pointer-events:none"></div>
+    <div style="position:absolute;bottom:-20px;left:-20px;width:70px;height:70px;border-radius:50%;background:rgba(99,102,241,0.12);pointer-events:none"></div>
+    <div style="text-align:center;margin-bottom:10px">
+      <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);border-radius:20px;padding:5px 14px">
+        <span style="font-size:14px">📋</span>
+        <span style="font-size:11px;font-weight:800;color:#c7d2fe;letter-spacing:1px;text-transform:uppercase">Daily Progress Report</span>
+      </div>
+      <div id="boq-dpr-heading-date" style="font-size:20px;font-weight:900;color:#fbbf24;margin:6px 0 2px;letter-spacing:1.5px;text-shadow:0 0 20px rgba(251,191,36,0.5)">— Select Date —</div>
+      <div style="font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:1.5px;text-transform:uppercase">BOQ Execution Schedule</div>
+    </div>
+    <div style="display:flex;align-items:flex-end;gap:8px;margin-bottom:12px">
+      <div style="flex:1">
+        <label style="font-size:9px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px">Report Date</label>
+        <input type="date" id="boq-dpr-date" onchange="boqUpdateDprHeading(this.value)"
+          style="width:100%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.22);border-radius:10px;padding:8px 10px;color:#fff;font-size:13px;font-weight:700;outline:none;-webkit-appearance:none;color-scheme:dark">
+      </div>
+      <button onclick="boqSetTodayDate()" style="background:rgba(99,102,241,0.3);color:#a5b4fc;border:1px solid rgba(99,102,241,0.45);padding:9px 12px;border-radius:10px;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">📆 Today</button>
+      <button onclick="boqCopyYesterdayToToday()" style="background:rgba(245,158,11,0.25);color:#fbbf24;border:1px solid rgba(245,158,11,0.4);padding:9px 10px;border-radius:10px;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0">⏩ Next Day</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <button onclick="boqPrintDPR()"
+        style="background:linear-gradient(135deg,#dc2626,#f59e0b);color:#fff;padding:13px 8px;border-radius:13px;font-size:11px;font-weight:800;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(220,38,38,0.45);display:flex;align-items:center;justify-content:center;gap:8px;-webkit-tap-highlight-color:transparent"
+        ontouchstart="this.style.transform='scale(0.96)'" ontouchend="this.style.transform='scale(1)'">
+        <span style="font-size:20px">🖨️</span>
+        <div><div style="font-size:12px;font-weight:800">Print PDF</div><div style="font-size:9px;opacity:0.8">DPR Report</div></div>
+      </button>
+      <button onclick="boqExportExcel()"
+        style="background:linear-gradient(135deg,#059669,#0284c7);color:#fff;padding:13px 8px;border-radius:13px;font-size:11px;font-weight:800;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(5,150,105,0.45);display:flex;align-items:center;justify-content:center;gap:8px;-webkit-tap-highlight-color:transparent"
+        ontouchstart="this.style.transform='scale(0.96)'" ontouchend="this.style.transform='scale(1)'">
+        <span style="font-size:20px">📊</span>
+        <div><div style="font-size:12px;font-weight:800">Export Excel</div><div style="font-size:9px;opacity:0.8">Download .xlsx</div></div>
+      </button>
+    </div>
+    <div id="boq-dpr-summary" style="display:none;margin-top:10px">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+        <div style="background:rgba(5,150,105,0.18);border:1px solid rgba(5,150,105,0.35);border-radius:11px;padding:8px;text-align:center">
+          <p style="font-size:8px;font-weight:700;color:#6ee7b7;text-transform:uppercase;margin:0">Items</p>
+          <p id="boq-stat-total" style="font-size:19px;font-weight:900;color:#6ee7b7;margin:2px 0 0">0</p>
+        </div>
+        <div style="background:rgba(99,102,241,0.18);border:1px solid rgba(99,102,241,0.35);border-radius:11px;padding:8px;text-align:center">
+          <p style="font-size:8px;font-weight:700;color:#a5b4fc;text-transform:uppercase;margin:0">Avg %</p>
+          <p id="boq-stat-avg" style="font-size:19px;font-weight:900;color:#a5b4fc;margin:2px 0 0">0</p>
+        </div>
+        <div style="background:rgba(245,158,11,0.18);border:1px solid rgba(245,158,11,0.35);border-radius:11px;padding:8px;text-align:center">
+          <p style="font-size:8px;font-weight:700;color:#fbbf24;text-transform:uppercase;margin:0">Active</p>
+          <p id="boq-stat-today" style="font-size:19px;font-weight:900;color:#fbbf24;margin:2px 0 0">0</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Project Info -->
+  <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
+    <div class="flex items-center justify-between mb-2">
+      <p class="text-sm font-bold text-gray-700">🏗️ Project Info</p>
+      <div style="display:flex;gap:6px">
+        <button onclick="boqFetchProjectInfo()" style="background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;padding:5px 11px;border-radius:8px;font-size:10px;font-weight:700;border:none;cursor:pointer">🔄 Auto-Fetch</button>
+        <button onclick="boqSaveProjectInfo()" style="background:linear-gradient(135deg,#059669,#047857);color:#fff;padding:5px 11px;border-radius:8px;font-size:10px;font-weight:700;border:none;cursor:pointer">💾 Save</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+      <div style="grid-column:1/-1"><label style="font-size:9px;font-weight:700;color:#6b7280;text-transform:uppercase">Name of Work</label>
+        <input id="boq-pi-work" class="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-indigo-400" placeholder="Name of Work / Project"></div>
+      <div><label style="font-size:9px;font-weight:700;color:#6b7280;text-transform:uppercase">Client</label>
+        <input id="boq-pi-client" class="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-indigo-400" placeholder="Client / Owner"></div>
+      <div><label style="font-size:9px;font-weight:700;color:#6b7280;text-transform:uppercase">Contractor</label>
+        <input id="boq-pi-contractor" class="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-indigo-400" placeholder="Contractor Name"></div>
+      <div><label style="font-size:9px;font-weight:700;color:#6b7280;text-transform:uppercase">Consultant</label>
+        <input id="boq-pi-consultant" class="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-indigo-400" placeholder="Consultant Name"></div>
+      <div><label style="font-size:9px;font-weight:700;color:#6b7280;text-transform:uppercase">Work Order No.</label>
+        <input id="boq-pi-wo" class="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-indigo-400" placeholder="Work Order No."></div>
+      <div><label style="font-size:9px;font-weight:700;color:#6b7280;text-transform:uppercase">Weather</label>
+        <select id="boq-pi-weather" class="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs bg-white focus:outline-none focus:border-indigo-400">
+          <option>Clear</option><option>Cloudy</option><option>Rainy</option><option>Windy</option><option>Foggy</option></select></div>
+      <div><label style="font-size:9px;font-weight:700;color:#6b7280;text-transform:uppercase">Commencement Date</label>
+        <input type="date" id="boq-pi-start" class="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-indigo-400"></div>
+      <div><label style="font-size:9px;font-weight:700;color:#6b7280;text-transform:uppercase">Stipulated Completion</label>
+        <input type="date" id="boq-pi-end" class="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-indigo-400"></div>
+    </div>
+  </div>
+
+  <!-- Today's Work Details card -->
+  <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
+    <div class="flex items-center justify-between mb-2">
+      <p class="text-sm font-bold text-gray-700">🌅 Today's Work Details</p>
+      <button onclick="boqOpenTodayModal()" style="background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;padding:6px 14px;border-radius:10px;font-size:11px;font-weight:700;border:none;cursor:pointer;display:flex;align-items:center;gap:5px">
+        <span>✏️</span> Fill Daily Status
+      </button>
+    </div>
+    <div id="boq-today-summary-card">
+      <p style="font-size:11px;color:#9ca3af;text-align:center;padding:12px 0">Tap "Fill Daily Status" to add today's work details</p>
+    </div>
+  </div>
+
+  <!-- Import / Add BOQ -->
+  <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
+    <div class="flex items-center justify-between mb-2">
+      <p class="text-sm font-bold text-gray-700">📂 Import / Add BOQ</p>
+      <span id="boq-import-status" style="font-size:9px;color:#6b7280"></span>
+    </div>
+    <div id="boq-drop-zone"
+      style="border:2px dashed #d1d5db;border-radius:12px;padding:14px;text-align:center;background:#f9fafb;cursor:pointer;transition:border-color .2s,background .2s"
+      onclick="boqTriggerFileInput()"
+      ondragover="event.preventDefault();event.stopPropagation();document.getElementById('boq-drop-zone').style.borderColor='#4f46e5';document.getElementById('boq-drop-zone').style.background='#eef2ff'"
+      ondragleave="document.getElementById('boq-drop-zone').style.borderColor='#d1d5db';document.getElementById('boq-drop-zone').style.background='#f9fafb'"
+      ondrop="event.preventDefault();event.stopPropagation();document.getElementById('boq-drop-zone').style.borderColor='#d1d5db';document.getElementById('boq-drop-zone').style.background='#f9fafb';boqHandleDrop(event)">
+      <div id="boq-drop-icon" style="font-size:28px;margin-bottom:5px">📂</div>
+      <p id="boq-drop-label" style="font-size:12px;font-weight:700;color:#374151;margin:0">Import Excel or PDF</p>
+      <p style="font-size:10px;color:#9ca3af;margin:3px 0 0">.xlsx / .xls / .csv / .pdf — tap or drag & drop</p>
+      <input type="file" id="boq-file-input" accept=".xlsx,.xls,.csv,.pdf" style="display:none" onchange="boqHandleFileChange(this)">
+    </div>
+    <div class="flex gap-2 mt-2">
+      <input type="text" id="boq-new-sec" placeholder="New Section name (e.g. Civil Works)" class="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-indigo-400">
+      <button onclick="boqAddSection()" style="background:#4f46e5;color:#fff;padding:8px 14px;border-radius:10px;font-size:11px;font-weight:700;border:none;white-space:nowrap">+ Section</button>
+    </div>
+  </div>
+
+  <!-- BOQ Table -->
+  <div id="boq-table-wrap" class="mb-3">
+    <div class="text-center py-10 bg-white rounded-2xl shadow-xl">
+      <span style="font-size:40px">📋</span>
+      <p class="font-semibold text-gray-600 mt-2">No BOQ data yet</p>
+      <p class="text-gray-400 text-xs mt-1">Import a file or add a section above</p>
+    </div>
+  </div>
+
+  <!-- Gantt -->
+  <div class="bg-white rounded-2xl p-3 shadow-xl mb-3" id="boq-gantt-card" style="display:none">
+    <p class="text-sm font-bold text-gray-700 mb-3">📊 BOQ Gantt Chart</p>
+    <div id="boq-gantt-view" style="overflow-x:auto"></div>
+  </div>
+
+</div><!-- end tab-boq -->
+
+<!-- ══ TODAY's WORK MODAL ══ -->
+<div id="boq-today-modal" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);overflow-y:auto;padding:16px">
+  <div style="max-width:520px;margin:0 auto;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.4)">
+    <!-- Modal header -->
+    <div style="background:linear-gradient(135deg,#0f2244,#1a3a6b);padding:14px 16px;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <p style="font-size:11px;font-weight:800;color:#c7d2fe;text-transform:uppercase;letter-spacing:1px;margin:0">Today's Work Details</p>
+        <p id="boq-modal-date-label" style="font-size:16px;font-weight:900;color:#fbbf24;margin:2px 0 0">—</p>
+      </div>
+      <button onclick="boqCloseTodayModal()" style="background:rgba(255,255,255,0.12);border:none;color:#fff;border-radius:50%;width:32px;height:32px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
+    <div style="padding:14px;max-height:75vh;overflow-y:auto">
+
+      <!-- Work Description -->
+      <div style="margin-bottom:12px">
+        <label style="font-size:9px;font-weight:700;color:#6b7280;text-transform:uppercase;display:block;margin-bottom:4px">Today's Work Description</label>
+        <textarea id="boq-td-workdesc" rows="3" placeholder="Describe work done today (e.g. RCC casting of slab at Floor 2, Brick masonry in Block B...)"
+          style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:8px 10px;font-size:12px;resize:none;outline:none;font-family:inherit"></textarea>
+      </div>
+
+      <!-- Labour Summary -->
+      <div style="margin-bottom:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <label style="font-size:9px;font-weight:700;color:#6b7280;text-transform:uppercase">👷 Labour on Site</label>
+          <button onclick="boqAddLabourRow()" style="background:#e0e7ff;color:#4f46e5;border:none;border-radius:7px;padding:4px 10px;font-size:10px;font-weight:700;cursor:pointer">+ Add</button>
+        </div>
+        <div id="boq-labour-rows">
+          <!-- dynamically added rows -->
+        </div>
+        <div id="boq-fetch-att-btn" style="text-align:center;margin-top:6px">
+          <button onclick="boqFetchAttendanceData()" style="background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;border-radius:9px;padding:7px 16px;font-size:11px;font-weight:700;cursor:pointer">🔄 Auto-Fetch from Attendance</button>
+        </div>
+      </div>
+
+      <!-- Machinery Summary -->
+      <div style="margin-bottom:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <label style="font-size:9px;font-weight:700;color:#6b7280;text-transform:uppercase">⚙️ Machinery & Equipment</label>
+          <button onclick="boqAddMachRow()" style="background:#e0e7ff;color:#4f46e5;border:none;border-radius:7px;padding:4px 10px;font-size:10px;font-weight:700;cursor:pointer">+ Add</button>
+        </div>
+        <div id="boq-mach-rows"></div>
+        <div style="text-align:center;margin-top:6px">
+          <button onclick="boqFetchMachData()" style="background:linear-gradient(135deg,#059669,#0284c7);color:#fff;border:none;border-radius:9px;padding:7px 16px;font-size:11px;font-weight:700;cursor:pointer">🔄 Auto-Fetch from Machinery</button>
+        </div>
+      </div>
+
+      <!-- Status & Remarks -->
+      <div style="margin-bottom:14px">
+        <label style="font-size:9px;font-weight:700;color:#6b7280;text-transform:uppercase;display:block;margin-bottom:4px">Status / Remarks</label>
+        <select id="boq-td-status" style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:8px;font-size:12px;background:#fff;margin-bottom:8px">
+          <option value="In Progress">🔄 In Progress</option>
+          <option value="Good Progress">✅ Good Progress</option>
+          <option value="Delayed">⚠️ Delayed</option>
+          <option value="Halted">🛑 Halted</option>
+          <option value="Completed">🎉 Completed</option>
+        </select>
+        <textarea id="boq-td-remarks" rows="2" placeholder="Additional remarks, issues, material shortage..."
+          style="width:100%;border:1.5px solid #e5e7eb;border-radius:10px;padding:8px 10px;font-size:12px;resize:none;outline:none;font-family:inherit"></textarea>
+      </div>
+
+      <!-- Save button -->
+      <button onclick="boqSaveTodayDetails()"
+        style="width:100%;background:linear-gradient(135deg,#0f2244,#1a3a6b);color:#fff;border:none;border-radius:13px;padding:14px;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(15,34,68,0.4)">
+        💾 Save Today's Report
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- ===== MACHINERY ===== -->
 <div id="tab-machinery" class="tab-content" style="display:none">
   <!-- Date selector -->
@@ -1931,42 +2141,99 @@ document.addEventListener('DOMContentLoaded',checkShowWelcome);
 
 <!-- ===== SCHEDULE ===== -->
 <div id="tab-schedule" class="tab-content" style="display:none">
-  <!-- Progress -->
-  <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
-    <div class="flex items-center justify-between mb-2">
-      <p class="text-sm font-bold text-gray-700">📊 Project Progress</p>
-      <span id="sched-pct" class="bg-indigo-100 text-indigo-700 font-black text-sm rounded-full px-2.5 py-0.5">0%</span>
+  <!-- Sub-tab nav -->
+  <div class="flex gap-2 mb-3">
+    <button id="sched-sub-btn-main" onclick="switchSchedSub('main')" class="flex-1 py-2 rounded-xl text-xs font-bold transition-all" style="background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;box-shadow:0 3px 10px rgba(79,70,229,0.3)">📅 Project Schedule</button>
+    <button id="sched-sub-btn-boq" onclick="switchSchedSub('boq')" class="flex-1 py-2 rounded-xl text-xs font-bold transition-all" style="background:#f3f4f6;color:#6b7280">📋 BOQ Schedule</button>
+  </div>
+
+  <!-- ── Sub: Project Schedule (original) ── -->
+  <div id="sched-sub-main">
+    <!-- Progress -->
+    <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-sm font-bold text-gray-700">📊 Project Progress</p>
+        <span id="sched-pct" class="bg-indigo-100 text-indigo-700 font-black text-sm rounded-full px-2.5 py-0.5">0%</span>
+      </div>
+      <div class="rounded-full overflow-hidden mb-1" style="height:8px;background:#e5e7eb"><div id="sched-bar" class="h-full rounded-full" style="width:0%;background:linear-gradient(to right,#4f46e5,#7c3aed);transition:width .4s"></div></div>
+      <div class="flex justify-between text-xs text-gray-500 mt-1"><span><span id="sched-done">0</span> done</span><span><span id="sched-total">0</span> total</span></div>
     </div>
-    <div class="rounded-full overflow-hidden mb-1" style="height:8px;background:#e5e7eb"><div id="sched-bar" class="h-full rounded-full" style="width:0%;background:linear-gradient(to right,#4f46e5,#7c3aed);transition:width .4s"></div></div>
-    <div class="flex justify-between text-xs text-gray-500 mt-1"><span><span id="sched-done">0</span> done</span><span><span id="sched-total">0</span> total</span></div>
-  </div>
-  <!-- Add Milestone -->
-  <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
-    <p class="text-sm font-bold text-gray-700 mb-3">+ Add Milestone</p>
-    <input type="text" id="ms-title" placeholder="Milestone Title" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400 mb-2">
-    <div class="grid grid-cols-2 gap-2 mb-2">
-      <input type="date" id="ms-start" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
-      <input type="date" id="ms-end" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
+    <!-- Add Milestone -->
+    <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
+      <p class="text-sm font-bold text-gray-700 mb-3">+ Add Milestone</p>
+      <input type="text" id="ms-title" placeholder="Milestone Title" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400 mb-2">
+      <div class="grid grid-cols-2 gap-2 mb-2">
+        <input type="date" id="ms-start" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
+        <input type="date" id="ms-end" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
+      </div>
+      <div class="grid grid-cols-2 gap-2 mb-3">
+        <select id="ms-status" class="px-3 py-2 border border-gray-200 rounded-xl bg-white text-sm focus:outline-none focus:border-indigo-400">
+          <option>🔄 In Progress</option><option>✅ Completed</option><option>⏳ Pending</option><option>⚠️ Delayed</option>
+        </select>
+        <input type="text" id="ms-notes" placeholder="Notes (optional)" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
+      </div>
+      <button onclick="addMilestone()" class="g-tobr-amber500-orange500 w-full text-white py-2.5 rounded-xl font-bold text-sm active:scale-95">Add Milestone</button>
     </div>
-    <div class="grid grid-cols-2 gap-2 mb-3">
-      <select id="ms-status" class="px-3 py-2 border border-gray-200 rounded-xl bg-white text-sm focus:outline-none focus:border-indigo-400">
-        <option>🔄 In Progress</option><option>✅ Completed</option><option>⏳ Pending</option><option>⚠️ Delayed</option>
-      </select>
-      <input type="text" id="ms-notes" placeholder="Notes (optional)" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400">
+    <!-- Timeline list -->
+    <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
+      <p class="text-sm font-bold text-gray-700 mb-3">📅 Project Timeline</p>
+      <div id="milestones-list"><div class="text-center py-10"><span style="font-size:40px">📅</span><p class="font-semibold text-gray-600 mt-2">No milestones yet</p><p class="text-gray-400 text-xs mt-1">Add project phases and deadlines</p></div></div>
     </div>
-    <button onclick="addMilestone()" class="g-tobr-amber500-orange500 w-full text-white py-2.5 rounded-xl font-bold text-sm active:scale-95">Add Milestone</button>
-  </div>
-  <!-- Timeline list -->
-  <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
-    <p class="text-sm font-bold text-gray-700 mb-3">📅 Project Timeline</p>
-    <div id="milestones-list"><div class="text-center py-10"><span style="font-size:40px">📅</span><p class="font-semibold text-gray-600 mt-2">No milestones yet</p><p class="text-gray-400 text-xs mt-1">Add project phases and deadlines</p></div></div>
-  </div>
-  <!-- Gantt chart - separate card below with clear spacing -->
-  <div class="bg-white rounded-2xl p-3 shadow-xl" style="margin-top:8px">
-    <p class="text-sm font-bold text-gray-700 mb-3">📊 Gantt Chart</p>
-    <div id="gantt-view" style="overflow-x:auto;min-height:40px"><p class="text-gray-400 text-xs text-center py-2">Add milestones with dates to see Gantt chart</p></div>
-  </div>
-</div>
+    <!-- Gantt chart -->
+    <div class="bg-white rounded-2xl p-3 shadow-xl" style="margin-top:8px">
+      <p class="text-sm font-bold text-gray-700 mb-3">📊 Gantt Chart</p>
+      <div id="gantt-view" style="overflow-x:auto;min-height:40px"><p class="text-gray-400 text-xs text-center py-2">Add milestones with dates to see Gantt chart</p></div>
+    </div>
+  </div><!-- end sched-sub-main -->
+
+  <!-- ── Sub: BOQ Schedule ── -->
+  <div id="sched-sub-boq" style="display:none">
+
+    <!-- Top action bar -->
+    <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-sm font-bold text-gray-700">📋 BOQ Schedule</p>
+        <button onclick="boqPrintAll()" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:6px 14px;border-radius:10px;font-size:11px;font-weight:700;border:none;cursor:pointer;display:flex;align-items:center;gap:5px">🖨️ Print PDF</button>
+      </div>
+      <!-- File import -->
+      <div style="border:2px dashed #d1d5db;border-radius:12px;padding:14px;text-align:center;background:#f9fafb;cursor:pointer" onclick="document.getElementById('boq-file-input').click()">
+        <div style="font-size:28px;margin-bottom:4px">📂</div>
+        <p style="font-size:12px;font-weight:700;color:#374151;margin:0">Import Excel or PDF</p>
+        <p style="font-size:10px;color:#9ca3af;margin:3px 0 0">Click to upload .xlsx / .xls / .csv / .pdf</p>
+        <input type="file" id="boq-file-input" accept=".xlsx,.xls,.csv,.pdf" style="display:none" onchange="boqImportFile(this)">
+      </div>
+      <!-- Or add section manually -->
+      <div class="flex gap-2 mt-2">
+        <input type="text" id="boq-new-sec" placeholder="New Section name (e.g. Civil Works)" class="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-xs focus:outline-none focus:border-indigo-400">
+        <button onclick="boqAddSection()" style="background:#4f46e5;color:#fff;padding:8px 14px;border-radius:10px;font-size:11px;font-weight:700;border:none;white-space:nowrap">+ Section</button>
+      </div>
+    </div>
+
+    <!-- Today's Work Summary (items with qty > 0 today) -->
+    <div id="boq-daily-summary" class="mb-3" style="display:none">
+      <div class="bg-white rounded-2xl p-3 shadow-xl">
+        <p style="font-size:10px;font-weight:700;color:#6b7280;margin-bottom:6px;text-transform:uppercase">🌅 Today's Items In Progress</p>
+        <div id="boq-today-list" style="font-size:11px;color:#374151"></div>
+      </div>
+    </div>
+
+    <!-- BOQ Table -->
+    <div id="boq-table-wrap" class="mb-3">
+      <div class="text-center py-10 bg-white rounded-2xl shadow-xl">
+        <span style="font-size:40px">📋</span>
+        <p class="font-semibold text-gray-600 mt-2">No BOQ data yet</p>
+        <p class="text-gray-400 text-xs mt-1">Import a file or add a section above</p>
+      </div>
+    </div>
+
+    <!-- Overall Gantt -->
+    <div class="bg-white rounded-2xl p-3 shadow-xl mb-3" id="boq-gantt-card" style="display:none">
+      <p class="text-sm font-bold text-gray-700 mb-3">📊 BOQ Gantt Chart</p>
+      <div id="boq-gantt-view" style="overflow-x:auto"></div>
+    </div>
+
+  </div><!-- end sched-sub-boq -->
+</div><!-- end tab-schedule -->
 
 <!-- ===== PUNCH LIST ===== -->
 <div id="tab-punchlist" class="tab-content" style="display:none">
@@ -2832,6 +3099,7 @@ service cloud.firestore {
           <span class="perm-chip on" data-tab="daily">📋 Daily Report</span>
           <span class="perm-chip on" data-tab="departmental">🏗️ Dept Work</span>
           <span class="perm-chip on" data-tab="attendance">📅 Attendance</span>
+          <span class="perm-chip on" data-tab="boq">📋 BOQ DPR</span>
           <span class="perm-chip on" data-tab="machinery">⚙️ Machinery</span>
           <span class="perm-chip on" data-tab="expenses">💰 Expenses</span>
           <span class="perm-chip on" data-tab="materials">🧱 Materials</span>
@@ -3345,7 +3613,7 @@ function dismissPWA(){
 // ============================================================
 // TABS
 // ============================================================
-var TABS = ['dashboard','daily','departmental','attendance','machinery','expenses','materials','tools','drawings','rentals','contractors','budget','schedule','punchlist','bill','quotation','visits'];
+var TABS = ['dashboard','daily','departmental','attendance','boq','machinery','expenses','materials','tools','drawings','rentals','contractors','budget','schedule','punchlist','bill','quotation','visits'];
 
 var _plFilter='all';
 
@@ -3379,6 +3647,7 @@ function switchTab(name) {
     else if (name === 'rentals')      viewRentals();
     else if (name === 'contractors')  viewContractors();
     else if (name === 'budget')       loadBudgetTab();
+    else if (name === 'boq')           loadBoqTab();
     else if (name === 'schedule')     loadScheduleTab();
     else if (name === 'punchlist')    loadPunchTab();
     else if (name === 'bill')         initBillTab();
@@ -6136,7 +6405,10 @@ var MS_KEY='cm_milestones';
 function lms(){try{return JSON.parse(safeLS.getItem(MS_KEY)||'[]');}catch(e){return [];}}
 function sms(x){safeLS.setItem(MS_KEY,JSON.stringify(x));}
 
-function loadScheduleTab(){renderSchedule();}
+function loadScheduleTab(){
+  if(typeof _schedSub!=='undefined'&&_schedSub==='boq') boqRender();
+  else renderSchedule();
+}
 
 function addMilestone(){
   var title=document.getElementById('ms-title').value.trim();
@@ -6180,6 +6452,827 @@ function markMsDone(id){
   if(m)m.status='✅ Completed';sms(ms);renderSchedule();toast('Marked complete!','ok');
 }
 function delMs(id){askDel('Delete this milestone?',function(){var ms=lms().filter(function(m){return m.id!==id;});sms(ms);renderSchedule();toast('Deleted','ok');});}
+
+// ============================================================
+// SCHEDULE SUB-TAB SWITCHER
+// ============================================================
+var _schedSub = 'main';
+function switchSchedSub(name){
+  _schedSub = name;
+  var mainEl = document.getElementById('sched-sub-main');
+  var boqEl  = document.getElementById('sched-sub-boq');
+  var btnMain = document.getElementById('sched-sub-btn-main');
+  var btnBoq  = document.getElementById('sched-sub-btn-boq');
+  if(mainEl) mainEl.style.display = name==='main'?'block':'none';
+  if(boqEl)  boqEl.style.display  = name==='boq' ?'block':'none';
+  if(btnMain){
+    btnMain.style.background = name==='main'?'linear-gradient(135deg,#4f46e5,#7c3aed)':'#f3f4f6';
+    btnMain.style.color = name==='main'?'#fff':'#6b7280';
+    btnMain.style.boxShadow = name==='main'?'0 3px 10px rgba(79,70,229,0.3)':'none';
+  }
+  if(btnBoq){
+    btnBoq.style.background = name==='boq'?'linear-gradient(135deg,#0d9488,#0f766e)':'#f3f4f6';
+    btnBoq.style.color = name==='boq'?'#fff':'#6b7280';
+    btnBoq.style.boxShadow = name==='boq'?'0 3px 10px rgba(13,148,136,0.3)':'none';
+  }
+  if(name==='boq') boqRender();
+  else { renderSchedule(); setTimeout(renderGantt,200); }
+}
+
+// ============================================================
+// BOQ SCHEDULE
+// ============================================================
+var BOQ_KEY    = 'cm_boq_schedule';
+var BOQ_PI_KEY = 'cm_boq_project_info';
+var BOQ_TD_KEY = 'cm_boq_today_details'; // today's work details
+
+function boqLoad(){ try{ return JSON.parse(safeLS.getItem(BOQ_KEY)||'{"sections":[]}'); }catch(e){ return {sections:[]}; } }
+function boqSave(d){ safeLS.setItem(BOQ_KEY,JSON.stringify(d)); }
+function loadBoqTab(){ boqRender(); }
+
+/* ── Project Info ── */
+function boqLoadPI(){ try{ return JSON.parse(safeLS.getItem(BOQ_PI_KEY)||'{}'); }catch(e){ return {}; } }
+function boqSaveProjectInfo(){
+  var pi={work:(document.getElementById('boq-pi-work')||{}).value||'',client:(document.getElementById('boq-pi-client')||{}).value||'',
+    contractor:(document.getElementById('boq-pi-contractor')||{}).value||'',consultant:(document.getElementById('boq-pi-consultant')||{}).value||'',
+    wo:(document.getElementById('boq-pi-wo')||{}).value||'',weather:(document.getElementById('boq-pi-weather')||{}).value||'Clear',
+    commDate:(document.getElementById('boq-pi-start')||{}).value||'',stipDate:(document.getElementById('boq-pi-end')||{}).value||''};
+  safeLS.setItem(BOQ_PI_KEY,JSON.stringify(pi)); toast('Project info saved!','ok');
+}
+function boqPopulatePI(pi){
+  var m={'boq-pi-work':pi.work,'boq-pi-client':pi.client,'boq-pi-contractor':pi.contractor,
+    'boq-pi-consultant':pi.consultant,'boq-pi-wo':pi.wo,'boq-pi-start':pi.commDate,'boq-pi-end':pi.stipDate};
+  Object.keys(m).forEach(function(id){ var el=document.getElementById(id); if(el) el.value=m[id]||''; });
+  if(pi.weather){ var ws=document.getElementById('boq-pi-weather'); if(ws) ws.value=pi.weather; }
+}
+function boqFetchProjectInfo(){
+  var keys=['cm_site_info','cm_project','cm_contract','site_info'];
+  for(var k=0;k<keys.length;k++){
+    try{ var v=safeLS.getItem(keys[k]); if(v){ var obj=JSON.parse(v),pi=boqLoadPI();
+      if(obj.name||obj.work_name) pi.work=obj.name||obj.work_name;
+      if(obj.client||obj.owner) pi.client=obj.client||obj.owner;
+      if(obj.contractor) pi.contractor=obj.contractor;
+      if(obj.consultant) pi.consultant=obj.consultant;
+      if(obj.workOrderNo||obj.wo_no) pi.wo=obj.workOrderNo||obj.wo_no;
+      if(obj.startDate||obj.commencement_date) pi.commDate=obj.startDate||obj.commencement_date;
+      if(obj.endDate||obj.completion_date) pi.stipDate=obj.endDate||obj.completion_date;
+      boqPopulatePI(pi); safeLS.setItem(BOQ_PI_KEY,JSON.stringify(pi)); toast('Project info loaded!','ok'); return;
+    }}catch(e){}
+  }
+  var saved=boqLoadPI(); if(saved.work){ boqPopulatePI(saved); toast('Loaded saved info','ok'); }
+  else toast('No project info found. Fill manually.','err');
+}
+
+/* ── Today's Work Details ── */
+function boqLoadTD(date){ try{ var all=JSON.parse(safeLS.getItem(BOQ_TD_KEY)||'{}'); return all[date]||{labour:[],machinery:[],workdesc:'',status:'In Progress',remarks:''}; }catch(e){ return {labour:[],machinery:[],workdesc:'',status:'In Progress',remarks:''}; } }
+function boqSaveTD(date,data){ try{ var all=JSON.parse(safeLS.getItem(BOQ_TD_KEY)||'{}'); all[date]=data; safeLS.setItem(BOQ_TD_KEY,JSON.stringify(all)); }catch(e){} }
+function boqOpenTodayModal(){
+  var date=(document.getElementById('boq-dpr-date')||{}).value||ist();
+  var lbl=document.getElementById('boq-modal-date-label');
+  if(lbl) lbl.textContent=boqFmtDateHeading(date);
+  var td=boqLoadTD(date);
+  var wdEl=document.getElementById('boq-td-workdesc'); if(wdEl) wdEl.value=td.workdesc||'';
+  var stEl=document.getElementById('boq-td-status'); if(stEl) stEl.value=td.status||'In Progress';
+  var rmEl=document.getElementById('boq-td-remarks'); if(rmEl) rmEl.value=td.remarks||'';
+  boqRenderLabourRows(td.labour||[]);
+  boqRenderMachRows(td.machinery||[]);
+  document.getElementById('boq-today-modal').style.display='block';
+  document.body.style.overflow='hidden';
+}
+function boqCloseTodayModal(){
+  document.getElementById('boq-today-modal').style.display='none';
+  document.body.style.overflow='';
+}
+function boqSaveTodayDetails(){
+  var date=(document.getElementById('boq-dpr-date')||{}).value||ist();
+  var labRows=document.querySelectorAll('.boq-lab-row');
+  var machRows=document.querySelectorAll('.boq-mach-row');
+  var labour=[]; labRows.forEach(function(row){
+    var cat=row.querySelector('.bl-cat')||{}; var cnt=row.querySelector('.bl-cnt')||{};
+    var hrs=row.querySelector('.bl-hrs')||{}; var wd=row.querySelector('.bl-wd')||{};
+    if(cat.value&&cnt.value) labour.push({category:cat.value,count:parseInt(cnt.value)||0,hours:parseFloat(hrs.value)||0,workDone:wd.value||''});
+  });
+  var machinery=[]; machRows.forEach(function(row){
+    var nm=row.querySelector('.bm-name')||{}; var tp=row.querySelector('.bm-type')||{};
+    var hr=row.querySelector('.bm-hrs')||{}; var st=row.querySelector('.bm-status')||{};
+    if(nm.value) machinery.push({name:nm.value,type:tp.value||'',hours:parseFloat(hr.value)||0,status:st.value||'Working'});
+  });
+  var td={
+    labour:labour,machinery:machinery,
+    workdesc:(document.getElementById('boq-td-workdesc')||{}).value||'',
+    status:(document.getElementById('boq-td-status')||{}).value||'In Progress',
+    remarks:(document.getElementById('boq-td-remarks')||{}).value||''
+  };
+  boqSaveTD(date,td);
+  boqCloseTodayModal();
+  boqRenderTodaySummaryCard(date);
+  toast('Today\'s details saved!','ok');
+}
+
+/* ── Labour rows in modal ── */
+var _labCats=['Mason','Labour','Carpenter','Helper','Fitter','Supervisor','Electrician','Plumber','Tile Mason','Engineer','Guard'];
+function boqRenderLabourRows(arr){
+  var el=document.getElementById('boq-labour-rows'); if(!el) return;
+  if(!arr.length){ el.innerHTML='<p style="font-size:10px;color:#9ca3af;text-align:center;padding:6px">No labour added yet</p>'; return; }
+  el.innerHTML=arr.map(function(row,i){
+    var opts=_labCats.map(function(c){ return '<option value="'+c+'"'+(c===row.category?' selected':'')+'>'+c+'</option>'; }).join('');
+    return '<div class="boq-lab-row" style="display:grid;grid-template-columns:2fr 60px 60px 2fr 28px;gap:4px;margin-bottom:5px;align-items:center">'
+      +'<select class="bl-cat" style="border:1px solid #e5e7eb;border-radius:7px;padding:5px 4px;font-size:10px;background:#fff">'+opts+'</select>'
+      +'<input class="bl-cnt" type="number" value="'+(row.count||0)+'" placeholder="No." style="border:1px solid #e5e7eb;border-radius:7px;padding:5px 4px;font-size:10px;text-align:center;width:100%">'
+      +'<input class="bl-hrs" type="number" step="0.5" value="'+(row.hours||8)+'" placeholder="Hrs" style="border:1px solid #e5e7eb;border-radius:7px;padding:5px 4px;font-size:10px;text-align:center;width:100%">'
+      +'<input class="bl-wd" value="'+(row.workDone||'')+'" placeholder="Work done..." style="border:1px solid #e5e7eb;border-radius:7px;padding:5px 4px;font-size:10px;width:100%">'
+      +'<button onclick="this.parentElement.remove()" style="background:#fee2e2;color:#dc2626;border:none;border-radius:6px;width:26px;height:26px;font-size:14px;cursor:pointer;line-height:1">✕</button>'
+      +'</div>';
+  }).join('');
+}
+function boqAddLabourRow(){
+  var el=document.getElementById('boq-labour-rows'); if(!el) return;
+  var dummy=el.querySelector('p'); if(dummy) el.innerHTML='';
+  var opts=_labCats.map(function(c){ return '<option value="'+c+'">'+c+'</option>'; }).join('');
+  var div=document.createElement('div');
+  div.className='boq-lab-row';
+  div.style.cssText='display:grid;grid-template-columns:2fr 60px 60px 2fr 28px;gap:4px;margin-bottom:5px;align-items:center';
+  div.innerHTML='<select class="bl-cat" style="border:1px solid #e5e7eb;border-radius:7px;padding:5px 4px;font-size:10px;background:#fff">'+opts+'</select>'
+    +'<input class="bl-cnt" type="number" value="1" placeholder="No." style="border:1px solid #e5e7eb;border-radius:7px;padding:5px 4px;font-size:10px;text-align:center;width:100%">'
+    +'<input class="bl-hrs" type="number" step="0.5" value="8" placeholder="Hrs" style="border:1px solid #e5e7eb;border-radius:7px;padding:5px 4px;font-size:10px;text-align:center;width:100%">'
+    +'<input class="bl-wd" placeholder="Work done..." style="border:1px solid #e5e7eb;border-radius:7px;padding:5px 4px;font-size:10px;width:100%">'
+    +'<button onclick="this.parentElement.remove()" style="background:#fee2e2;color:#dc2626;border:none;border-radius:6px;width:26px;height:26px;font-size:14px;cursor:pointer;line-height:1">✕</button>';
+  el.appendChild(div);
+}
+function boqFetchAttendanceData(){
+  var date=(document.getElementById('boq-dpr-date')||{}).value||ist();
+  try{
+    var AD=JSON.parse(safeLS.getItem('cm_data')||'[]');
+    var att=AD.filter(function(a){ return a.type==='attendance'&&a.date===date; });
+    if(!att.length){ toast('No attendance data for '+date,'err'); return; }
+    var grp={};
+    att.forEach(function(a){ if(!grp[a.category]) grp[a.category]={count:0,hours:0}; grp[a.category].count++; grp[a.category].hours+=(parseFloat(a.hours)||0); });
+    var labour=Object.keys(grp).map(function(cat){ return {category:cat,count:grp[cat].count,hours:grp[cat].hours,workDone:''}; });
+    boqRenderLabourRows(labour);
+    toast('Attendance fetched: '+labour.length+' categories','ok');
+  }catch(e){ toast('Could not fetch attendance','err'); }
+}
+
+/* ── Machinery rows in modal ── */
+function boqRenderMachRows(arr){
+  var el=document.getElementById('boq-mach-rows'); if(!el) return;
+  if(!arr.length){ el.innerHTML='<p style="font-size:10px;color:#9ca3af;text-align:center;padding:6px">No machinery added yet</p>'; return; }
+  el.innerHTML=arr.map(function(row){
+    var statusOpts=['Working','Standby','Breakdown','Maintenance'].map(function(s){ return '<option'+(s===row.status?' selected':'')+'>'+s+'</option>'; }).join('');
+    return '<div class="boq-mach-row" style="display:grid;grid-template-columns:2fr 1.5fr 60px 1.5fr 28px;gap:4px;margin-bottom:5px;align-items:center">'
+      +'<input class="bm-name" value="'+(row.name||'')+'" placeholder="Machine name" style="border:1px solid #e5e7eb;border-radius:7px;padding:5px 4px;font-size:10px;width:100%">'
+      +'<input class="bm-type" value="'+(row.type||'')+'" placeholder="Type/model" style="border:1px solid #e5e7eb;border-radius:7px;padding:5px 4px;font-size:10px;width:100%">'
+      +'<input class="bm-hrs" type="number" step="0.5" value="'+(row.hours||0)+'" placeholder="Hrs" style="border:1px solid #e5e7eb;border-radius:7px;padding:5px 4px;font-size:10px;text-align:center;width:100%">'
+      +'<select class="bm-status" style="border:1px solid #e5e7eb;border-radius:7px;padding:5px 4px;font-size:10px;background:#fff">'+statusOpts+'</select>'
+      +'<button onclick="this.parentElement.remove()" style="background:#fee2e2;color:#dc2626;border:none;border-radius:6px;width:26px;height:26px;font-size:14px;cursor:pointer;line-height:1">✕</button>'
+      +'</div>';
+  }).join('');
+}
+function boqAddMachRow(){
+  var el=document.getElementById('boq-mach-rows'); if(!el) return;
+  var dummy=el.querySelector('p'); if(dummy) el.innerHTML='';
+  var div=document.createElement('div');
+  div.className='boq-mach-row';
+  div.style.cssText='display:grid;grid-template-columns:2fr 1.5fr 60px 1.5fr 28px;gap:4px;margin-bottom:5px;align-items:center';
+  div.innerHTML='<input class="bm-name" placeholder="Machine name" style="border:1px solid #e5e7eb;border-radius:7px;padding:5px 4px;font-size:10px;width:100%">'
+    +'<input class="bm-type" placeholder="Type/model" style="border:1px solid #e5e7eb;border-radius:7px;padding:5px 4px;font-size:10px;width:100%">'
+    +'<input class="bm-hrs" type="number" step="0.5" value="0" placeholder="Hrs" style="border:1px solid #e5e7eb;border-radius:7px;padding:5px 4px;font-size:10px;text-align:center;width:100%">'
+    +'<select class="bm-status" style="border:1px solid #e5e7eb;border-radius:7px;padding:5px 4px;font-size:10px;background:#fff"><option>Working</option><option>Standby</option><option>Breakdown</option><option>Maintenance</option></select>'
+    +'<button onclick="this.parentElement.remove()" style="background:#fee2e2;color:#dc2626;border:none;border-radius:6px;width:26px;height:26px;font-size:14px;cursor:pointer;line-height:1">✕</button>';
+  el.appendChild(div);
+}
+function boqFetchMachData(){
+  var date=(document.getElementById('boq-dpr-date')||{}).value||ist();
+  try{
+    var store=JSON.parse(safeLS.getItem('cm_machinery')||'{}');
+    var sessions=store[date]||[];
+    if(!sessions.length){ toast('No machinery data for '+date,'err'); return; }
+    var mach=sessions.map(function(s){ return {name:s.name||'Machine',type:s.type||'',hours:s.hours||0,status:'Working'}; });
+    boqRenderMachRows(mach);
+    toast('Machinery fetched: '+mach.length+' items','ok');
+  }catch(e){ toast('Could not fetch machinery','err'); }
+}
+
+/* ── Render today summary card ── */
+function boqRenderTodaySummaryCard(date){
+  var el=document.getElementById('boq-today-summary-card'); if(!el) return;
+  var td=boqLoadTD(date);
+  var totalLabour=td.labour.reduce(function(s,l){return s+(parseInt(l.count)||0);},0);
+  var statusColor={'In Progress':'#4f46e5','Good Progress':'#059669','Delayed':'#f59e0b','Halted':'#dc2626','Completed':'#059669'}[td.status]||'#6b7280';
+  var html='';
+  if(td.workdesc){
+    html+='<div style="background:#f8faff;border-left:3px solid #4f46e5;border-radius:0 8px 8px 0;padding:8px 10px;margin-bottom:8px;font-size:11px;color:#374151">'+_esc(td.workdesc)+'</div>';
+  }
+  html+='<div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">';
+  html+='<div style="background:#eff6ff;border-radius:8px;padding:6px 12px;font-size:10px;font-weight:700;color:#1e40af">👷 '+totalLabour+' Workers</div>';
+  html+='<div style="background:#f0fdf4;border-radius:8px;padding:6px 12px;font-size:10px;font-weight:700;color:#065f46">⚙️ '+td.machinery.length+' Machines</div>';
+  html+='<div style="background:#fef9c3;border-radius:8px;padding:6px 12px;font-size:10px;font-weight:700;color:'+(statusColor)+'">'+td.status+'</div>';
+  html+='</div>';
+  if(td.labour.length){
+    html+='<table style="width:100%;border-collapse:collapse;font-size:10px;margin-bottom:6px"><thead><tr style="background:#f1f5f9">';
+    html+='<th style="padding:4px 6px;text-align:left;font-size:9px;color:#64748b;font-weight:700">Category</th>';
+    html+='<th style="padding:4px 6px;text-align:center;font-size:9px;color:#64748b;font-weight:700">Count</th>';
+    html+='<th style="padding:4px 6px;text-align:center;font-size:9px;color:#64748b;font-weight:700">Hours</th>';
+    html+='<th style="padding:4px 6px;text-align:left;font-size:9px;color:#64748b;font-weight:700">Work Done</th></tr></thead><tbody>';
+    td.labour.forEach(function(l){
+      html+='<tr style="border-bottom:1px solid #f1f5f9">';
+      html+='<td style="padding:4px 6px;font-weight:600">'+_esc(l.category)+'</td>';
+      html+='<td style="padding:4px 6px;text-align:center;color:#4f46e5;font-weight:700">'+l.count+'</td>';
+      html+='<td style="padding:4px 6px;text-align:center">'+l.hours+'h</td>';
+      html+='<td style="padding:4px 6px;color:#6b7280">'+_esc(l.workDone||'—')+'</td></tr>';
+    });
+    html+='</tbody></table>';
+  }
+  if(td.remarks){
+    html+='<div style="font-size:10px;color:#6b7280;font-style:italic">📝 '+_esc(td.remarks)+'</div>';
+  }
+  el.innerHTML=html||'<p style="font-size:11px;color:#9ca3af;text-align:center;padding:12px 0">Tap "Fill Daily Status" to add today\'s work details</p>';
+}
+
+/* ── DPR Heading ── */
+function boqFmtDateHeading(val){
+  if(!val) return '— Select Date —';
+  try{
+    var d=new Date(val+'T00:00:00');
+    var days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return days[d.getDay()]+', '+d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear();
+  }catch(e){ return val; }
+}
+function boqUpdateDprHeading(val){
+  var el=document.getElementById('boq-dpr-heading-date');
+  if(el) el.textContent=boqFmtDateHeading(val);
+}
+function boqSetTodayDate(){
+  var el=document.getElementById('boq-dpr-date');
+  if(el){ el.value=ist(); boqUpdateDprHeading(ist()); toast('Date set to today','ok'); }
+}
+function boqCopyYesterdayToToday(){
+  askDel("Move today's work → previous cumulative and reset today? (Next day advance)", function(){
+    var data=boqLoad();
+    data.sections.forEach(function(sec){
+      sec.items.forEach(function(item){
+        item.prevQty=(parseFloat(item.prevQty)||0)+(parseFloat(item.todayQty)||0);
+        item.todayQty=0;
+        var tender=parseFloat(item.tenderQty)||0;
+        if(tender>0){
+          item.prevDone=Math.min(100,Math.round(item.prevQty/tender*100*10)/10);
+          item.todayDone=0;
+        }
+      });
+    });
+    boqSave(data); boqRender();
+    var el=document.getElementById('boq-dpr-date');
+    if(el&&el.value){
+      var d=new Date(el.value); d.setDate(d.getDate()+1);
+      el.value=d.toISOString().split('T')[0];
+      boqUpdateDprHeading(el.value);
+    }
+    toast('Advanced to next day!','ok');
+  });
+}
+
+/* ── File input (iOS/Edge fix: pre-load XLSX before picker) ── */
+function boqTriggerFileInput(){
+  if(typeof XLSX==='undefined'){
+    var s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    s.onload=function(){ document.getElementById('boq-file-input').click(); };
+    document.head.appendChild(s);
+  } else { document.getElementById('boq-file-input').click(); }
+}
+function boqHandleDrop(e){
+  var files=(e.dataTransfer||{}).files;
+  if(files&&files.length>0) boqProcessFile(files[0]);
+  else toast('Could not read dropped file','err');
+}
+function boqHandleFileChange(input){
+  if(input&&input.files&&input.files.length>0){
+    boqProcessFile(input.files[0]);
+    try{ input.value=''; }catch(e){}
+  }
+}
+function boqProcessFile(file){
+  var ext=file.name.split('.').pop().toLowerCase();
+  var si=document.getElementById('boq-import-status');
+  var di=document.getElementById('boq-drop-icon');
+  var dl=document.getElementById('boq-drop-label');
+  if(si) si.textContent='Reading…';
+  if(di) di.textContent='⏳';
+  if(dl) dl.textContent='Processing '+file.name+'…';
+  if(ext==='pdf') boqImportPDF(file);
+  else boqImportExcelFixed(file);
+}
+function boqImportFile(input){ if(input&&input.files&&input.files.length) boqProcessFile(input.files[0]); }
+
+/* ── Excel import — ArrayBuffer (no iOS stall, no "Preparing file") ── */
+function boqImportExcelFixed(file){
+  var doRead=function(){
+    var reader=new FileReader();
+    reader.onload=function(e){
+      try{
+        var data=new Uint8Array(e.target.result);
+        var wb=XLSX.read(data,{type:'array',cellDates:true,cellNF:false,cellText:false});
+        var ws=wb.Sheets[wb.SheetNames[0]];
+        var rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false,blankrows:false});
+        var parsed=boqParseRowsToStructure(rows);
+        var di=document.getElementById('boq-drop-icon'),dl=document.getElementById('boq-drop-label'),si=document.getElementById('boq-import-status');
+        if(parsed.sections.length){
+          boqSave(parsed); boqRender();
+          if(di) di.textContent='✅'; if(dl) dl.textContent='Import Excel or PDF';
+          if(si) si.textContent='✅ '+parsed.sections.reduce(function(s,x){return s+x.items.length;},0)+' items in '+parsed.sections.length+' sections';
+          toast('Imported '+parsed.sections.length+' sections!','ok');
+        } else {
+          if(di) di.textContent='⚠️'; if(si) si.textContent='';
+          if(dl) dl.textContent='Import Excel or PDF';
+          toast('No BOQ structure found. Check format.','err');
+        }
+      } catch(err){
+        var di=document.getElementById('boq-drop-icon');
+        if(di) di.textContent='❌';
+        var dl=document.getElementById('boq-drop-label');
+        if(dl) dl.textContent='Import Excel or PDF';
+        toast('Error: '+err.message,'err'); console.error(err);
+      }
+    };
+    reader.onerror=function(err){ toast('Cannot read file','err'); console.error(err); };
+    reader.readAsArrayBuffer(file);
+  };
+  if(typeof XLSX!=='undefined'){ doRead(); }
+  else {
+    toast('Loading Excel engine…','ok');
+    var s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    s.onload=doRead;
+    s.onerror=function(){ toast('Excel engine failed to load','err'); };
+    document.head.appendChild(s);
+  }
+}
+function boqImportExcel(f,ext){ boqImportExcelFixed(f); }
+
+/* ── PDF import ── */
+function boqImportPDF(file){
+  if(typeof pdfjsLib!=='undefined'){ _boqParsePDFWithLib(file); return; }
+  var s=document.createElement('script');
+  s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+  s.onload=function(){ pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; _boqParsePDFWithLib(file); };
+  s.onerror=function(){ toast('Cannot load PDF engine','err'); };
+  document.head.appendChild(s);
+}
+function _boqParsePDFWithLib(file){
+  toast('Reading PDF…','ok');
+  var reader=new FileReader();
+  reader.onload=function(e){
+    pdfjsLib.getDocument({data:new Uint8Array(e.target.result)}).promise.then(function(pdf){
+      var allText='',chain=Promise.resolve();
+      for(var p=1;p<=pdf.numPages;p++){(function(pg){chain=chain.then(function(){return pdf.getPage(pg).then(function(pg){return pg.getTextContent().then(function(tc){allText+=tc.items.map(function(i){return i.str;}).join(' ')+'\n';});});});})(p);}
+      chain.then(function(){
+        var parsed=boqParseTextToStructure(allText);
+        if(parsed.sections.length){ boqSave(parsed); boqRender(); toast('PDF: '+parsed.sections.length+' sections','ok'); }
+        else toast('Could not parse PDF. Try Excel.','err');
+      });
+    }).catch(function(e){ toast('PDF error','err'); console.error(e); });
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+/* ── Section / Item CRUD ── */
+function boqNextLetter(d){ var l='ABCDEFGHIJKLMNOPQRSTUVWXYZ'; return l[d.sections.length]||(d.sections.length+1)+''; }
+function boqAddSection(){
+  var inp=document.getElementById('boq-new-sec'); var title=(inp?inp.value.trim():'');
+  if(!title){toast('Enter section name','err');return;}
+  var data=boqLoad();
+  data.sections.push({id:'sec'+Date.now(),letter:boqNextLetter(data),title:title,collapsed:false,items:[]});
+  boqSave(data); if(inp) inp.value=''; boqRender(); toast('Section added!','ok');
+}
+function boqAddItem(secId){
+  var data=boqLoad(); var sec=data.sections.find(function(s){return s.id===secId;}); if(!sec) return;
+  sec.items.push({id:'item'+Date.now(),no:sec.letter+'.'+(sec.items.length+1),desc:'New Item',unit:'',tenderQty:0,prevQty:0,todayQty:0,prevDone:0,todayDone:0,startDate:'',endDate:'',remark:''});
+  boqSave(data); boqRender();
+}
+function boqToggleSec(secId){
+  var data=boqLoad(); var sec=data.sections.find(function(s){return s.id===secId;});
+  if(sec) sec.collapsed=!sec.collapsed; boqSave(data); boqRender();
+}
+function boqDelSec(secId){ askDel('Delete this section?',function(){ var data=boqLoad(); data.sections=data.sections.filter(function(s){return s.id!==secId;}); boqSave(data); boqRender(); toast('Deleted','ok'); }); }
+function boqDelItem(secId,itemId){ var data=boqLoad(); var sec=data.sections.find(function(s){return s.id===secId;}); if(sec) sec.items=sec.items.filter(function(i){return i.id!==itemId;}); boqSave(data); boqRender(); }
+
+function boqEdit(secId,itemId,field,val){
+  var data=boqLoad(); var sec=data.sections.find(function(s){return s.id===secId;}); if(!sec) return;
+  var item=sec.items.find(function(i){return i.id===itemId;}); if(!item) return;
+  if(['tenderQty','prevQty','todayQty'].indexOf(field)>=0){ val=parseFloat(val)||0; if(val<0)val=0; }
+  item[field]=val;
+  if(field==='todayQty'||field==='prevQty'||field==='tenderQty'){
+    var tender=parseFloat(item.tenderQty)||0;
+    if(tender>0){
+      item.prevDone=Math.min(100,Math.round((parseFloat(item.prevQty)||0)/tender*100*10)/10);
+      item.todayDone=Math.min(100,Math.round((parseFloat(item.todayQty)||0)/tender*100*10)/10);
+    }
+  }
+  boqSave(data); boqUpdateBars(); boqUpdateDailySummary(); boqUpdateGantt(); boqUpdateSummaryStats();
+}
+
+/* ── Computed ── */
+function boqTotalQty(item){ return (parseFloat(item.prevQty)||0)+(parseFloat(item.todayQty)||0); }
+function boqTotalPct(item){
+  var tender=parseFloat(item.tenderQty)||0;
+  if(tender>0) return Math.min(100,Math.round(boqTotalQty(item)/tender*100*10)/10);
+  return Math.min(100,(parseFloat(item.prevDone)||0)+(parseFloat(item.todayDone)||0));
+}
+function boqBarColor(pct,s,e){
+  if(pct>=100) return '#059669';
+  var today=ist(); if(e&&e<today&&pct<100) return '#dc2626';
+  if(pct>=1) return '#4f46e5';
+  return '#d1d5db';
+}
+function boqUpdateBars(){
+  var data=boqLoad();
+  data.sections.forEach(function(sec){ sec.items.forEach(function(item){
+    var bar=document.getElementById('boq-bar-'+item.id),pctEl=document.getElementById('boq-pct-'+item.id);
+    var pct=boqTotalPct(item),col=boqBarColor(pct,item.startDate,item.endDate);
+    if(bar){bar.style.width=pct+'%';bar.style.background=col;}
+    if(pctEl){pctEl.textContent=pct+'%';pctEl.style.color=col;}
+  }); });
+}
+
+function boqUpdateSummaryStats(){
+  var data=boqLoad(); var total=0,todayA=0,pctSum=0;
+  data.sections.forEach(function(sec){ sec.items.forEach(function(item){
+    total++; if((parseFloat(item.todayQty)||0)>0) todayA++; pctSum+=boqTotalPct(item);
+  }); });
+  var avg=total>0?Math.round(pctSum/total):0;
+  var summEl=document.getElementById('boq-dpr-summary'); if(summEl) summEl.style.display=total>0?'block':'none';
+  var t=document.getElementById('boq-stat-total'); if(t) t.textContent=total;
+  var a=document.getElementById('boq-stat-avg'); if(a) a.textContent=avg+'%';
+  var td=document.getElementById('boq-stat-today'); if(td) td.textContent=todayA;
+}
+function boqUpdateDailySummary(){
+  // Only today's items shown
+  var data=boqLoad(); var tItems=[];
+  data.sections.forEach(function(sec){ sec.items.forEach(function(item){
+    if(!item.desc||item.desc==='New Item') return;
+    if((parseFloat(item.todayQty)||0)>0) tItems.push({no:item.no,desc:item.desc,qty:item.todayQty,unit:item.unit||''});
+  }); });
+  var summaryEl=document.getElementById('boq-daily-summary'); if(summaryEl) summaryEl.style.display=tItems.length?'block':'none';
+  var tEl=document.getElementById('boq-today-list');
+  if(tEl) tEl.innerHTML=tItems.length?tItems.map(function(x){ return '<div style="padding:3px 0;border-bottom:1px solid #f3f4f6"><span style="color:#4f46e5;font-weight:700">'+x.qty+' '+_esc(x.unit)+'</span> <span>'+_esc(x.no+' '+x.desc)+'</span></div>'; }).join(''):'<p style="color:#9ca3af;font-size:10px">No data</p>';
+}
+function boqUpdateGantt(){
+  var data=boqLoad(); var card=document.getElementById('boq-gantt-card'),el=document.getElementById('boq-gantt-view');
+  if(!card||!el) return;
+  var allItems=[]; data.sections.forEach(function(sec){ sec.items.forEach(function(item){ if(item.startDate&&item.endDate) allItems.push({no:item.no,desc:item.desc,start:item.startDate,end:item.endDate,pct:boqTotalPct(item)}); }); });
+  if(!allItems.length){card.style.display='none';return;}
+  card.style.display='block';
+  var minD=allItems[0].start,maxD=allItems[0].end;
+  allItems.forEach(function(i){if(i.start<minD)minD=i.start;if(i.end>maxD)maxD=i.end;});
+  var totalDays=Math.max(1,(new Date(maxD)-new Date(minD))/86400000),today=ist();
+  var todayPct=Math.max(0,Math.min(100,Math.round((new Date(today)-new Date(minD))/86400000/totalDays*100)));
+  var html='<div style="min-width:300px"><div style="display:flex;justify-content:space-between;font-size:9px;color:#9ca3af;margin-bottom:10px"><span>'+minD+'</span><span style="color:#ef4444">▼ Today</span><span>'+maxD+'</span></div>';
+  allItems.forEach(function(item){
+    var s=Math.round((new Date(item.start)-new Date(minD))/86400000/totalDays*100);
+    var w=Math.max(4,Math.round((new Date(item.end)-new Date(item.start))/86400000/totalDays*100));
+    if(s+w>100) w=100-s;
+    var fillW=Math.round(w*item.pct/100),col=boqBarColor(item.pct,item.start,item.end);
+    var tLine=todayPct>0&&todayPct<100?'<div style="position:absolute;left:'+todayPct+'%;top:0;width:1.5px;height:100%;background:#ef4444;opacity:.7;z-index:3"></div>':'';
+    html+='<div style="margin-bottom:10px"><div style="font-size:10px;font-weight:700;color:#1f2937;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+_esc(item.no+' '+item.desc)+'</div>';
+    html+='<div style="height:18px;background:#f3f4f6;border-radius:9px;position:relative;overflow:hidden">'+tLine;
+    html+='<div style="position:absolute;left:'+s+'%;width:'+w+'%;height:100%;background:'+(col+'22')+';border-radius:9px"></div>';
+    html+='<div style="position:absolute;left:'+s+'%;width:'+fillW+'%;height:100%;background:'+col+';border-radius:9px;opacity:.9"></div>';
+    html+='<div style="position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:9px;font-weight:700;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5)">'+item.pct+'%</div>';
+    html+='</div><div style="display:flex;justify-content:space-between;font-size:9px;color:#9ca3af;margin-top:2px"><span>'+item.start+'</span><span style="color:'+col+';font-weight:700">'+item.pct+'%</span><span>'+item.end+'</span></div></div>';
+  });
+  el.innerHTML=html+'</div>';
+}
+
+/* ── Main render ── */
+var TH='padding:8px 6px;font-size:9px;font-weight:700;color:#0d9488;letter-spacing:.5px;text-align:center;border-bottom:2px solid #ccfbf1;white-space:nowrap;';
+var TD='padding:6px 5px;font-size:11px;';
+function _esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function boqRender(){
+  var data=boqLoad(); var wrap=document.getElementById('boq-table-wrap'); if(!wrap) return;
+  boqPopulatePI(boqLoadPI());
+  var dprEl=document.getElementById('boq-dpr-date');
+  if(dprEl&&!dprEl.value){ var saved=safeLS.getItem('cm_boq_dpr_date')||ist(); dprEl.value=saved; boqUpdateDprHeading(saved); }
+  else if(dprEl&&dprEl.value) boqUpdateDprHeading(dprEl.value);
+  // Render today summary card
+  var date=dprEl&&dprEl.value?dprEl.value:ist();
+  boqRenderTodaySummaryCard(date);
+  if(!data.sections.length){
+    wrap.innerHTML='<div class="text-center py-10 bg-white rounded-2xl shadow-xl"><span style="font-size:40px">📋</span><p class="font-semibold text-gray-600 mt-2">No BOQ data yet</p><p class="text-gray-400 text-xs mt-1">Import or add a section above</p></div>';
+    boqUpdateDailySummary(); boqUpdateGantt(); boqUpdateSummaryStats(); return;
+  }
+  var html='';
+  data.sections.forEach(function(sec){
+    var avgPct=sec.items.length?Math.round(sec.items.reduce(function(s,i){return s+boqTotalPct(i);},0)/sec.items.length):0;
+    var secColor=avgPct>=100?'#059669':(avgPct>0?'#4f46e5':'#0d9488');
+    html+='<div class="bg-white rounded-2xl shadow-xl mb-2" style="overflow:hidden">';
+    html+='<div onclick="boqToggleSec(\''+sec.id+'\')" style="background:linear-gradient(135deg,#0d2d2a,#0d4a45);padding:12px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between">';
+    html+='<div style="display:flex;align-items:center;gap:8px"><span style="background:rgba(255,255,255,.15);color:#5eead4;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px">'+sec.letter+'.</span>';
+    html+='<span style="color:#5eead4;font-size:13px;font-weight:700">'+_esc(sec.title.toUpperCase())+'</span>';
+    html+='<span style="background:rgba(94,234,212,.15);color:#5eead4;font-size:10px;padding:1px 7px;border-radius:99px">'+sec.items.length+' items</span></div>';
+    html+='<div style="display:flex;align-items:center;gap:8px"><span style="color:#fbbf24;font-size:12px;font-weight:700">'+avgPct+'%</span><span style="color:#5eead4;font-size:16px">'+(sec.collapsed?'▶':'▼')+'</span></div></div>';
+    html+='<div style="height:4px;background:#1a3a36"><div style="height:100%;width:'+avgPct+'%;background:'+secColor+';transition:width .4s"></div></div>';
+    if(!sec.collapsed){
+      html+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:660px"><thead><tr style="background:#f0fdf9">';
+      html+='<th style="'+TH+'width:50px">No.</th>';
+      html+='<th style="'+TH+'min-width:160px;text-align:left">Description</th>';
+      html+='<th style="'+TH+'width:50px">Unit</th>';
+      html+='<th style="'+TH+'width:68px">Tender Qty</th>';
+      html+='<th style="'+TH+'width:70px;background:#fef9c3">Prev. Qty</th>';
+      html+='<th style="'+TH+'width:70px;background:#dcfce7">Today Qty</th>';
+      html+='<th style="'+TH+'width:68px;background:#eff6ff">Total Qty</th>';
+      html+='<th style="'+TH+'width:86px">Start</th>';
+      html+='<th style="'+TH+'width:86px">End</th>';
+      html+='<th style="'+TH+'min-width:100px">Progress</th>';
+      html+='<th style="'+TH+'width:28px"></th>';
+      html+='</tr></thead><tbody>';
+      sec.items.forEach(function(item){
+        var totalQty=boqTotalQty(item),pct=boqTotalPct(item),col=boqBarColor(pct,item.startDate,item.endDate);
+        html+='<tr style="border-bottom:1px solid #f0fdf9" onmouseover="this.style.background=\'#f9fffe\'" onmouseout="this.style.background=\'\'">';
+        html+='<td style="'+TD+'text-align:center;color:#0d9488;font-weight:700;font-size:11px">'+_esc(item.no)+'</td>';
+        html+='<td style="'+TD+'"><input value="'+_esc(item.desc)+'" onchange="boqEdit(\''+sec.id+'\',\''+item.id+'\',\'desc\',this.value)" style="width:100%;border:none;outline:none;font-size:11px;color:#1f2937;background:transparent;padding:2px 0"></td>';
+        html+='<td style="'+TD+'text-align:center"><input value="'+_esc(item.unit||'')+'" onchange="boqEdit(\''+sec.id+'\',\''+item.id+'\',\'unit\',this.value)" style="width:44px;border:1px solid #e5e7eb;border-radius:5px;text-align:center;font-size:10px;padding:2px"></td>';
+        html+='<td style="'+TD+'text-align:center"><input type="number" value="'+(item.tenderQty||0)+'" onchange="boqEdit(\''+sec.id+'\',\''+item.id+'\',\'tenderQty\',this.value)" style="width:58px;border:1px solid #e5e7eb;border-radius:5px;text-align:center;font-size:10px;padding:2px"></td>';
+        html+='<td style="'+TD+'text-align:center;background:#fef9c3"><input type="number" value="'+(item.prevQty||0)+'" onchange="boqEdit(\''+sec.id+'\',\''+item.id+'\',\'prevQty\',this.value)" style="width:60px;border:1px solid #fcd34d;border-radius:5px;text-align:center;font-size:10px;padding:2px;background:#fef9c3;font-weight:700"></td>';
+        html+='<td style="'+TD+'text-align:center;background:#dcfce7"><input type="number" value="'+(item.todayQty||0)+'" onchange="boqEdit(\''+sec.id+'\',\''+item.id+'\',\'todayQty\',this.value)" style="width:60px;border:1px solid #86efac;border-radius:5px;text-align:center;font-size:10px;padding:2px;background:#dcfce7;font-weight:700;color:#065f46"></td>';
+        html+='<td style="'+TD+'text-align:center;background:#eff6ff;font-weight:800;color:#1e40af;font-size:11px">'+totalQty+'</td>';
+        html+='<td style="'+TD+'text-align:center"><input type="date" value="'+(item.startDate||'')+'" onchange="boqEdit(\''+sec.id+'\',\''+item.id+'\',\'startDate\',this.value)" style="width:82px;border:1px solid #e5e7eb;border-radius:5px;font-size:9px;padding:2px"></td>';
+        html+='<td style="'+TD+'text-align:center"><input type="date" value="'+(item.endDate||'')+'" onchange="boqEdit(\''+sec.id+'\',\''+item.id+'\',\'endDate\',this.value)" style="width:82px;border:1px solid #e5e7eb;border-radius:5px;font-size:9px;padding:2px"></td>';
+        html+='<td style="'+TD+'padding:4px 6px">';
+        html+='<div style="height:13px;background:#f3f4f6;border-radius:7px;overflow:hidden;margin-bottom:2px"><div id="boq-bar-'+item.id+'" style="height:100%;width:'+pct+'%;background:'+col+';border-radius:7px;transition:width .3s"></div></div>';
+        html+='<div style="text-align:center"><span id="boq-pct-'+item.id+'" style="font-size:10px;font-weight:800;color:'+col+'">'+pct+'%</span></div></td>';
+        html+='<td style="'+TD+'text-align:center"><button onclick="boqDelItem(\''+sec.id+'\',\''+item.id+'\')" style="border:none;background:#fee2e2;color:#dc2626;border-radius:5px;width:22px;height:22px;font-size:13px;cursor:pointer;line-height:1">✕</button></td>';
+        html+='</tr>';
+      });
+      var totT=sec.items.reduce(function(s,i){return s+(parseFloat(i.tenderQty)||0);},0);
+      var totP=sec.items.reduce(function(s,i){return s+(parseFloat(i.prevQty)||0);},0);
+      var totD=sec.items.reduce(function(s,i){return s+(parseFloat(i.todayQty)||0);},0);
+      var totE=sec.items.reduce(function(s,i){return s+boqTotalQty(i);},0);
+      html+='<tr style="background:#e6fdf8;font-weight:700"><td colspan="3" style="'+TD+'text-align:right;font-size:10px;color:#0d9488">Section Total</td>';
+      html+='<td style="'+TD+'text-align:center;color:#0f2244">'+totT+'</td>';
+      html+='<td style="'+TD+'text-align:center;color:#92400e;background:#fef9c3">'+totP+'</td>';
+      html+='<td style="'+TD+'text-align:center;color:#065f46;background:#dcfce7">'+totD+'</td>';
+      html+='<td style="'+TD+'text-align:center;color:#1e40af;background:#eff6ff;font-weight:800">'+totE+'</td>';
+      html+='<td colspan="4" style="'+TD+'"></td></tr>';
+      html+='</tbody></table></div>';
+      html+='<div style="padding:8px 10px;border-top:1px solid #f0fdf9;display:flex;gap:8px;align-items:center">';
+      html+='<button onclick="boqAddItem(\''+sec.id+'\')" style="font-size:11px;color:#0d9488;font-weight:700;background:#f0fdf9;border:1px dashed #99f6e4;border-radius:8px;padding:6px 14px;cursor:pointer;flex:1">+ Add Item to '+sec.letter+'. '+_esc(sec.title)+'</button>';
+      html+='<button onclick="boqDelSec(\''+sec.id+'\')" style="font-size:10px;color:#9ca3af;background:none;border:1px solid #e5e7eb;border-radius:6px;padding:5px 10px;cursor:pointer">🗑</button>';
+      html+='</div>';
+    }
+    html+='</div>';
+  });
+  wrap.innerHTML=html;
+  boqUpdateDailySummary(); boqUpdateGantt(); boqUpdateSummaryStats();
+}
+
+/* ── Print PDF ── */
+function boqPrintDPR(){
+  var data=boqLoad();
+  if(!data.sections.length){toast('No BOQ data to print','err');return;}
+  var pi=boqLoadPI();
+  var dprDate=(document.getElementById('boq-dpr-date')||{}).value||ist();
+  var headDate=boqFmtDateHeading(dprDate);
+  var td=boqLoadTD(dprDate);
+  var w=window.open('','_blank');
+  if(!w){toast('Allow popups to print','err');return;}
+
+  var body='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>DPR '+dprDate+'</title><style>';
+  body+='*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;color:#111;font-size:9px}';
+  body+='.hdr{background:linear-gradient(135deg,#0f2244,#1a3a6b);color:#fff;padding:10px 14px 8px;margin-bottom:10px}';
+  body+='.hdr-badge{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:3px}';
+  body+='.hdr-date{font-size:16px;font-weight:900;color:#fbbf24;letter-spacing:1px;margin-bottom:2px}';
+  body+='.hdr-sub{font-size:7.5px;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}';
+  body+='.pi-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0;background:#f1f5f9;border-radius:6px;overflow:hidden;border:1px solid #e2e8f0;margin-bottom:0}';
+  body+='.pi-cell{padding:5px 8px;border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0}';
+  body+='.pi-cell:nth-child(4n){border-right:none}.pi-cell.wide{grid-column:1/-1}';
+  body+='.pi-label{font-size:7px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px}';
+  body+='.pi-val{font-size:9.5px;font-weight:700;color:#111;margin-top:1px}';
+  body+='table.boq{width:100%;border-collapse:collapse;margin-bottom:8px;font-size:8.5px}';
+  body+='table.boq th{background:#0d2d2a;color:#5eead4;padding:5px;text-align:center;font-size:7.5px;border:1px solid #0d2d2a;white-space:nowrap}';
+  body+='table.boq td{padding:4px 5px;border:1px solid #e2e8f0;text-align:center;vertical-align:middle}';
+  body+='table.boq td.left{text-align:left}.sec-hdr td{background:#0d2d2a;color:#5eead4;font-weight:700;font-size:8.5px;text-align:left!important;padding:5px 8px}';
+  body+='.sub-row td{background:#e6fdf8;font-weight:700;color:#0d9488}';
+  body+='.prev-col{background:#fef9c3}.today-col{background:#dcfce7;font-weight:700}.total-col{background:#eff6ff;font-weight:800;color:#1e40af}';
+  body+='.bar-wrap{height:10px;background:#f1f5f9;border-radius:5px;overflow:hidden;margin-bottom:2px}.bar-fill{height:100%;border-radius:5px}';
+  // Labour table
+  body+='.section-title{background:linear-gradient(135deg,#0f2244,#1a3a6b);color:#fff;padding:7px 10px;border-radius:6px 6px 0 0;font-size:10px;font-weight:800;margin-top:8px}';
+  body+='table.info{width:100%;border-collapse:collapse;font-size:8.5px;margin-bottom:8px}';
+  body+='table.info th{background:#1a3a6b;color:#c7d2fe;padding:4px 6px;font-size:7.5px;font-weight:700}';
+  body+='table.info td{padding:4px 6px;border:1px solid #e2e8f0}';
+  body+='table.info tr:nth-child(even) td{background:#f8faff}';
+  // Machinery table
+  body+='.mach-working{color:#059669;font-weight:700}.mach-standby{color:#f59e0b;font-weight:700}.mach-breakdown{color:#dc2626;font-weight:700}';
+  body+='@media print{@page{size:A4 landscape;margin:10mm}body{font-size:8px}}';
+  body+='</style></head><body>';
+
+  // Header
+  body+='<div class="hdr">';
+  body+='<div class="hdr-badge">📋 Daily Progress Report</div>';
+  body+='<div class="hdr-date">'+headDate+'</div>';
+  body+='<div class="hdr-sub">BOQ Execution Schedule</div>';
+  body+='<div class="pi-grid">';
+  body+='<div class="pi-cell wide"><div class="pi-label">Name of Work</div><div class="pi-val">'+_esc(pi.work||'—')+'</div></div>';
+  body+='<div class="pi-cell"><div class="pi-label">Client</div><div class="pi-val">'+_esc(pi.client||'—')+'</div></div>';
+  body+='<div class="pi-cell"><div class="pi-label">Contractor</div><div class="pi-val">'+_esc(pi.contractor||'—')+'</div></div>';
+  body+='<div class="pi-cell"><div class="pi-label">Consultant</div><div class="pi-val">'+_esc(pi.consultant||'—')+'</div></div>';
+  body+='<div class="pi-cell"><div class="pi-label">Work Order No.</div><div class="pi-val">'+_esc(pi.wo||'—')+'</div></div>';
+  body+='<div class="pi-cell"><div class="pi-label">Commencement</div><div class="pi-val">'+_esc(pi.commDate||'—')+'</div></div>';
+  body+='<div class="pi-cell"><div class="pi-label">Stipulated Completion</div><div class="pi-val">'+_esc(pi.stipDate||'—')+'</div></div>';
+  body+='<div class="pi-cell"><div class="pi-label">Weather</div><div class="pi-val">'+_esc(pi.weather||'Clear')+'</div></div>';
+  body+='</div></div>';
+
+  // BOQ Table
+  body+='<table class="boq"><thead><tr>';
+  body+='<th style="width:50px">BOQ No.</th><th style="min-width:180px;text-align:left">Description of Work</th>';
+  body+='<th>Unit</th><th>Tender Qty</th><th class="prev-col">Prev. Qty</th>';
+  body+='<th class="today-col">Today Qty</th><th class="total-col">Total Qty</th>';
+  body+='<th>Start</th><th>End</th><th style="min-width:80px">Progress</th><th>Remark</th>';
+  body+='</tr></thead><tbody>';
+  data.sections.forEach(function(sec){
+    body+='<tr class="sec-hdr"><td colspan="11">'+_esc(sec.letter+'. '+sec.title.toUpperCase())+'</td></tr>';
+    sec.items.forEach(function(item){
+      var totalQty=boqTotalQty(item),pct=boqTotalPct(item),col=boqBarColor(pct,item.startDate,item.endDate);
+      body+='<tr><td style="color:#0d9488;font-weight:700">'+_esc(item.no)+'</td>';
+      body+='<td class="left">'+_esc(item.desc)+'</td><td>'+_esc(item.unit||'')+'</td><td>'+(item.tenderQty||0)+'</td>';
+      body+='<td class="prev-col">'+(item.prevQty||0)+'</td><td class="today-col">'+(item.todayQty||0)+'</td>';
+      body+='<td class="total-col">'+totalQty+'</td>';
+      body+='<td style="font-size:7.5px">'+(item.startDate||'—')+'</td><td style="font-size:7.5px">'+(item.endDate||'—')+'</td>';
+      body+='<td><div class="bar-wrap"><div class="bar-fill" style="width:'+pct+'%;background:'+col+'"></div></div><div style="text-align:center;font-size:8px;font-weight:700;color:'+col+'">'+pct+'%</div></td>';
+      body+='<td class="left" style="font-size:7.5px">'+_esc(item.remark||'')+'</td></tr>';
+    });
+    var totT=sec.items.reduce(function(s,i){return s+(parseFloat(i.tenderQty)||0);},0);
+    var totP=sec.items.reduce(function(s,i){return s+(parseFloat(i.prevQty)||0);},0);
+    var totD=sec.items.reduce(function(s,i){return s+(parseFloat(i.todayQty)||0);},0);
+    var totE=sec.items.reduce(function(s,i){return s+boqTotalQty(i);},0);
+    body+='<tr class="sub-row"><td colspan="3" style="text-align:right;padding-right:8px">Sub-Total</td><td>'+totT+'</td><td class="prev-col">'+totP+'</td><td class="today-col">'+totD+'</td><td class="total-col">'+totE+'</td><td colspan="4"></td></tr>';
+  });
+  body+='</tbody></table>';
+
+  // Today's Work Details section
+  if(td.workdesc||td.labour.length||td.machinery.length){
+    body+='<div class="section-title">🌅 Today\'s Work Details — '+headDate+'</div>';
+    if(td.workdesc){
+      body+='<div style="background:#f8faff;border-left:3px solid #4f46e5;padding:6px 10px;margin-bottom:8px;font-size:9px;color:#374151;border-radius:0 6px 6px 0">'+_esc(td.workdesc)+'</div>';
+    }
+    // Status badge
+    var sc={'In Progress':'#4f46e5','Good Progress':'#059669','Delayed':'#f59e0b','Halted':'#dc2626','Completed':'#059669'}[td.status]||'#6b7280';
+    body+='<div style="display:inline-block;background:'+sc+';color:#fff;padding:3px 10px;border-radius:99px;font-size:8px;font-weight:700;margin-bottom:8px">'+_esc(td.status)+'</div>';
+
+    // Labour table
+    if(td.labour.length){
+      body+='<div style="margin-bottom:8px"><div style="font-size:9px;font-weight:700;color:#0f2244;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">👷 Daily Worker Summary</div>';
+      body+='<table class="info"><thead><tr><th>Category</th><th>No. of Workers</th><th>Hours</th><th>Work Done</th></tr></thead><tbody>';
+      var totalWorkers=0,totalHrs=0;
+      td.labour.forEach(function(l){
+        totalWorkers+=(parseInt(l.count)||0);
+        totalHrs+=(parseFloat(l.hours)||0);
+        body+='<tr><td style="font-weight:600">'+_esc(l.category)+'</td><td style="text-align:center;color:#4f46e5;font-weight:700">'+l.count+'</td><td style="text-align:center">'+l.hours+'h</td><td>'+_esc(l.workDone||'—')+'</td></tr>';
+      });
+      body+='<tr style="background:#e8edf5;font-weight:700"><td>Total</td><td style="text-align:center;color:#1e40af">'+totalWorkers+'</td><td style="text-align:center">'+totalHrs.toFixed(1)+'h</td><td></td></tr>';
+      body+='</tbody></table></div>';
+    }
+
+    // Machinery table
+    if(td.machinery.length){
+      body+='<div style="margin-bottom:8px"><div style="font-size:9px;font-weight:700;color:#0f2244;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">⚙️ Machinery & Equipment on Site</div>';
+      body+='<table class="info"><thead><tr><th>#</th><th>Machine / Equipment</th><th>Type / Model</th><th>Hours Used</th><th>Status</th></tr></thead><tbody>';
+      td.machinery.forEach(function(m,i){
+        var stCls={'Working':'mach-working','Standby':'mach-standby','Breakdown':'mach-breakdown'}[m.status]||'';
+        body+='<tr><td style="text-align:center;color:#6b7280">'+(i+1)+'</td><td style="font-weight:600">'+_esc(m.name)+'</td><td>'+_esc(m.type||'—')+'</td><td style="text-align:center">'+m.hours+'h</td><td class="'+stCls+'">'+_esc(m.status)+'</td></tr>';
+      });
+      body+='</tbody></table></div>';
+    }
+
+    if(td.remarks){
+      body+='<div style="font-size:8.5px;color:#6b7280;font-style:italic;padding:4px 8px;background:#f8faff;border-radius:5px;margin-bottom:8px">📝 Remarks: '+_esc(td.remarks)+'</div>';
+    }
+  }
+
+  body+='<p style="font-size:7px;color:#999;text-align:right;margin-top:4px">Printed: '+new Date().toLocaleString()+' | Sanjineer BOQ DPR</p>';
+  body+='<script>window.onload=function(){window.print();};<\/script></body></html>';
+  w.document.write(body); w.document.close();
+}
+function boqPrintAll(){ boqPrintDPR(); }
+
+/* ── Export Excel (matching PDF design colours) ── */
+function boqExportExcel(){
+  var doEx=function(){
+    var data=boqLoad();
+    if(!data.sections.length){toast('No data to export','err');return;}
+    var pi=boqLoadPI();
+    var dprDate=(document.getElementById('boq-dpr-date')||{}).value||ist();
+    var td=boqLoadTD(dprDate);
+    var wb=XLSX.utils.book_new();
+    var rows=[];
+    // Title
+    rows.push(['DAILY PROGRESS REPORT']);
+    rows.push(['Date: '+boqFmtDateHeading(dprDate)]);
+    rows.push([]);
+    rows.push(['PROJECT INFORMATION']);
+    rows.push(['Name of Work',pi.work||'—','','','Client',pi.client||'—']);
+    rows.push(['Contractor',pi.contractor||'—','','','Consultant',pi.consultant||'—']);
+    rows.push(['Work Order No.',pi.wo||'—','','','Weather',pi.weather||'Clear']);
+    rows.push(['Commencement',pi.commDate||'—','','','Stipulated Completion',pi.stipDate||'—']);
+    rows.push([]);
+    rows.push(['BOQ EXECUTION SCHEDULE']);
+    rows.push(['BOQ No.','Description of Work','Unit','Tender Qty','Prev. Qty','Today Qty','Total Qty','Start Date','End Date','Progress %','Remark']);
+    data.sections.forEach(function(sec){
+      rows.push([sec.letter+'. '+sec.title.toUpperCase(),'','','','','','','','','','']);
+      sec.items.forEach(function(item){
+        var totalQty=boqTotalQty(item),pct=boqTotalPct(item);
+        rows.push([item.no,item.desc,item.unit||'',item.tenderQty||0,item.prevQty||0,item.todayQty||0,totalQty,item.startDate||'',item.endDate||'',pct+'%',item.remark||'']);
+      });
+      rows.push(['','Sub-Total','',
+        sec.items.reduce(function(s,i){return s+(parseFloat(i.tenderQty)||0);},0),
+        sec.items.reduce(function(s,i){return s+(parseFloat(i.prevQty)||0);},0),
+        sec.items.reduce(function(s,i){return s+(parseFloat(i.todayQty)||0);},0),
+        sec.items.reduce(function(s,i){return s+boqTotalQty(i);},0),'','','','']);
+    });
+    // Today's work details
+    if(td.labour.length||td.machinery.length||td.workdesc){
+      rows.push([]); rows.push(["TODAY'S WORK DETAILS"]);
+      if(td.workdesc) rows.push(['Work Description',td.workdesc]);
+      if(td.status) rows.push(['Status',td.status]);
+      if(td.remarks) rows.push(['Remarks',td.remarks]);
+      if(td.labour.length){
+        rows.push([]); rows.push(['DAILY WORKER SUMMARY']);
+        rows.push(['Category','No. of Workers','Hours','Work Done']);
+        td.labour.forEach(function(l){ rows.push([l.category,l.count,l.hours,l.workDone||'']); });
+        rows.push(['Total',td.labour.reduce(function(s,l){return s+(parseInt(l.count)||0);},0),td.labour.reduce(function(s,l){return s+(parseFloat(l.hours)||0);},0),'']);
+      }
+      if(td.machinery.length){
+        rows.push([]); rows.push(['MACHINERY & EQUIPMENT ON SITE']);
+        rows.push(['#','Machine / Equipment','Type / Model','Hours Used','Status']);
+        td.machinery.forEach(function(m,i){ rows.push([i+1,m.name,m.type||'',m.hours,m.status]); });
+      }
+    }
+    var ws=XLSX.utils.aoa_to_sheet(rows);
+    // Column widths
+    ws['!cols']=[{wch:10},{wch:40},{wch:8},{wch:11},{wch:11},{wch:11},{wch:11},{wch:11},{wch:11},{wch:10},{wch:20}];
+    // Apply styling using XLSX styles (where supported)
+    XLSX.utils.book_append_sheet(wb,ws,'DPR '+dprDate);
+    var fname='DPR_'+dprDate.replace(/-/g,'_')+'.xlsx';
+    try{ XLSX.writeFile(wb,fname); toast('Excel exported: '+fname,'ok'); }
+    catch(e){ toast('Export failed: '+e.message,'err'); console.error(e); }
+  };
+  if(typeof XLSX!=='undefined'){ doEx(); }
+  else {
+    toast('Loading Excel engine…','ok');
+    var s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    s.onload=doEx; s.onerror=function(){ toast('Excel engine failed','err'); };
+    document.head.appendChild(s);
+  }
+}
+
+/* ── Parsers ── */
+function boqParseRowsToStructure(rows){
+  var data={sections:[]},letters='ABCDEFGHIJKLMNOPQRSTUVWXYZ',currentSec=null,secIdx=-1;
+  rows.forEach(function(row){
+    if(!row||!row.length) return;
+    var cells=row.map(function(cc){return String(cc||'').trim();});
+    var first=cells.find(function(cc){return cc!==''})||'';
+    if(!first) return;
+    var isSection=/^[A-Z]$/i.test(first)||(/^\d+$/.test(first)&&cells[1]&&!cells[1].match(/^\d/));
+    var isItem=/^[A-Z0-9]+\.\d+$/i.test(first);
+    if(isSection&&cells[1]){ secIdx++; currentSec={id:'sec'+Date.now()+secIdx,letter:letters[secIdx]||String(secIdx+1),title:cells[1]||first,collapsed:false,items:[]}; data.sections.push(currentSec); }
+    else if(isItem&&currentSec){
+      var tqty=parseFloat(cells[3])||0,prevQty=parseFloat(cells[5])||0,todayQty=parseFloat(cells[4])||0;
+      currentSec.items.push({id:'item'+Date.now()+Math.random().toString(36).substr(2,5),no:cells[0],desc:cells[1]||'Item',unit:cells[2]||'',
+        tenderQty:tqty,prevQty:prevQty,todayQty:todayQty,
+        prevDone:tqty>0?Math.min(100,Math.round(prevQty/tqty*100*10)/10):0,
+        todayDone:tqty>0?Math.min(100,Math.round(todayQty/tqty*100*10)/10):0,
+        startDate:_parseExcelDate(cells[6]||''),endDate:_parseExcelDate(cells[7]||''),remark:cells[9]||''});
+    } else if(currentSec&&first&&cells[1]){
+      currentSec.items.push({id:'item'+Date.now()+Math.random().toString(36).substr(2,5),
+        no:currentSec.letter+'.'+(currentSec.items.length+1),desc:cells[1]||first,unit:cells[2]||'',
+        tenderQty:parseFloat(cells[3])||0,prevQty:parseFloat(cells[5])||0,todayQty:parseFloat(cells[4])||0,
+        prevDone:0,todayDone:0,startDate:_parseExcelDate(cells[6]||''),endDate:_parseExcelDate(cells[7]||''),remark:''});
+    }
+  });
+  return data;
+}
+function _parseExcelDate(val){
+  if(!val) return ''; var s=String(val).trim();
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  var m=s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+  if(m){ var yr=m[3].length===2?'20'+m[3]:m[3]; return yr+'-'+m[2].padStart(2,'0')+'-'+m[1].padStart(2,'0'); }
+  var n=parseFloat(s);
+  if(!isNaN(n)&&n>40000){ var d=new Date(Math.round((n-25569)*86400*1000)); return d.toISOString().split('T')[0]; }
+  return '';
+}
+function boqParseTextToStructure(text){
+  var lines=text.split(/[\n\r]+/).map(function(l){return l.trim();}).filter(Boolean);
+  var data={sections:[]},letters='ABCDEFGHIJKLMNOPQRSTUVWXYZ',currentSec=null,secIdx=-1;
+  lines.forEach(function(line){
+    var sm=line.match(/^([A-Z])\s*[.\-:]\s*(.+)/),im=line.match(/^([A-Z0-9]+\.\d+)\s+(.+)/);
+    if(sm&&sm[2].length>3){ secIdx++; currentSec={id:'sec'+Date.now()+secIdx,letter:letters[secIdx]||sm[1],title:sm[2].replace(/₹[\d,.]+/g,'').trim(),collapsed:false,items:[]}; data.sections.push(currentSec); }
+    else if(im&&currentSec){ currentSec.items.push({id:'item'+Date.now()+Math.random().toString(36).substr(2,5),no:im[1],desc:im[2].replace(/₹[\d,.]+|\d+\s*(sqm|nos|rm|kg|mt|ls)/gi,'').trim()||'Item',unit:(im[2].match(/(sqm|nos|rm|kg|mt|ls|sqft|cum)/i)||[''])[0],tenderQty:0,prevQty:0,todayQty:0,prevDone:0,todayDone:0,startDate:'',endDate:'',remark:''}); }
+  });
+  return data;
+}
 
 // ============================================================
 // PUNCH LIST
