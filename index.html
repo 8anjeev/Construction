@@ -1420,7 +1420,7 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
   </style>
   <div style="position:relative;z-index:2;width:100%;max-width:320px;display:flex;flex-direction:column;align-items:center;">
     <div class="wa1" style="display:inline-flex;align-items:center;gap:6px;background:rgba(99,102,241,0.18);border:1px solid rgba(99,102,241,0.35);border-radius:99px;padding:5px 14px;font-size:10.5px;font-weight:500;color:rgba(255,255,255,0.7);letter-spacing:.08em;text-transform:uppercase;margin-bottom:1.4rem;font-family:'DM Sans',sans-serif;"><span style="width:6px;height:6px;border-radius:50%;background:#6366f1;flex-shrink:0;animation:wPls 2s ease-in-out infinite;"></span>Construction Management App</div>
-    <div class="wa2" style="position:relative;margin-bottom:1.3rem;"><div style="position:absolute;inset:-20px;background:radial-gradient(circle,rgba(99,102,241,0.28) 0%,transparent 70%);z-index:-1;"></div><div style="width:86px;height:86px;background:linear-gradient(145deg,#f97316,#fb923c,#fdba74);border-radius:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(249,115,22,0.55),0 0 80px rgba(249,115,22,0.2);position:relative;"><div style="position:absolute;inset:-2px;border-radius:24px;border:1.5px solid rgba(255,255,255,0.2);"></div><img crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/8anjeev/Sanjineer@main/IMG_6018.png" style="width:68px;height:68px;object-fit:contain;border-radius:14px;" onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<span style=\"font-size:40px;line-height:1\">🏗️</span>')"></div></div>
+    <div class="wa2" style="position:relative;margin-bottom:1.3rem;"><div style="position:absolute;inset:-20px;background:radial-gradient(circle,rgba(99,102,241,0.28) 0%,transparent 70%);z-index:-1;"></div><div style="width:86px;height:86px;background:linear-gradient(145deg,#f97316,#fb923c,#fdba74);border-radius:22px;overflow:hidden;box-shadow:0 0 40px rgba(249,115,22,0.55),0 0 80px rgba(249,115,22,0.2);position:relative;"><img crossorigin="anonymous" src="https://cdn.jsdelivr.net/gh/8anjeev/Sanjineer@main/assets/logo.png" style="width:86px;height:86px;object-fit:cover;display:block;" onerror="this.style.display='none'"></div></div>
     <h1 class="wa3" style="font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2.3rem,9vw,3.2rem);line-height:1.05;text-align:center;color:#fff;letter-spacing:-.02em;margin:0 0 .75rem 0;">Sanj<span style="background:linear-gradient(90deg,#818cf8,#c084fc,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">ineer</span></h1>
     <p class="wa3" style="font-size:.88rem;line-height:1.65;color:rgba(255,255,255,0.48);text-align:center;max-width:280px;margin:0 0 1.7rem 0;font-weight:300;font-family:'DM Sans',sans-serif;">Your all-in-one site management tool — built for engineers who get things done.</p>
     <div class="wa4" style="display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-bottom:1.9rem;max-width:310px;">
@@ -1464,8 +1464,8 @@ document.addEventListener('DOMContentLoaded',checkShowWelcome);
 // ── App logo loader — tries multiple CDNs, falls back to emoji ──
 (function(){
   var LOGO_URLS = [
-    'https://cdn.jsdelivr.net/gh/8anjeev/Sanjineer@main/IMG_6018.png',
-    'https://raw.githubusercontent.com/8anjeev/Sanjineer/main/IMG_6018.png'
+    'https://cdn.jsdelivr.net/gh/8anjeev/Sanjineer@main/assets/logo.png',
+    'https://raw.githubusercontent.com/8anjeev/Sanjineer/main/assets/logo.png'
   ];
   function tryLoad(urls, idx) {
     if (idx >= urls.length) { return; } // keep emoji fallback
@@ -1475,9 +1475,9 @@ document.addEventListener('DOMContentLoaded',checkShowWelcome);
       var el = document.getElementById('app-logo-img');
       var fb = document.getElementById('app-logo-fallback');
       var box = document.getElementById('app-logo-box');
-      if (el) { el.src = urls[idx]; el.style.display = 'block'; }
+      if (el) { el.src = urls[idx]; el.style.display = 'block'; el.style.width='38px'; el.style.height='38px'; el.style.objectFit='cover'; }
       if (fb) { fb.style.display = 'none'; }
-      // If this is user's company logo (not the default app logo), use white padding
+      // Logo: transparent bg, raw image only
       var isUserLogo = urls[idx] && (urls[idx].startsWith('data:') || (typeof lprof === 'function' && lprof() && lprof().logo && urls[idx] === lprof().logo));
       if (box) {
         if (isUserLogo) {
@@ -1485,25 +1485,14 @@ document.addEventListener('DOMContentLoaded',checkShowWelcome);
           box.style.border = '1.5px solid rgba(0,0,0,0.1)';
           box.style.boxShadow = '0 2px 14px rgba(0,0,0,0.15)';
         } else {
-          box.style.background = 'linear-gradient(145deg,#f97316,#fb923c,#fdba74)';
-          box.style.border = '1.5px solid rgba(255,200,100,0.35)';
-          box.style.boxShadow = '0 3px 16px rgba(249,115,22,0.55)';
+          box.style.background = 'transparent';
+          box.style.border = 'none';
+          box.style.boxShadow = 'none';
         }
       }
-      // Welcome logo
-      var wb = document.querySelector('#welcome-overlay .wa2 > div');
-      if (wb) {
-        var existing = wb.querySelector('img.wlogo');
-        if (!existing) {
-          var wimg = document.createElement('img');
-          wimg.src = urls[idx];
-          wimg.className = 'wlogo';
-          wimg.style.cssText = 'width:70px;height:70px;object-fit:contain;border-radius:14px;position:relative;z-index:1;';
-          var sp = wb.querySelector('span');
-          if (sp) sp.remove();
-          wb.appendChild(wimg);
-        }
-      }
+      // Welcome logo — update the hardcoded img src if CDN loads
+      var wImg = document.querySelector('#welcome-overlay .wa2 > div > img');
+      if (wImg) { wImg.src = urls[idx]; wImg.style.display = 'block'; }
     };
     img.onerror = function() { tryLoad(urls, idx + 1); };
     img.src = urls[idx];
@@ -1521,22 +1510,23 @@ document.addEventListener('DOMContentLoaded',checkShowWelcome);
 
 <header class="g-tor-indigo600-vpurple600-pink500 shadow-2xl" style="padding:3px 10px 4px 10px;position:relative;z-index:35">
   <div class="flex items-center gap-2" style="height:44px">
-    <!-- LEFT: App logo (always GitHub logo, fixed) + URL + Settings btn -->
-    <div class="flex items-center gap-1.5 flex-shrink-0">
-      <div id="app-logo-box" class="shadow-lg" style="width:42px;height:42px;flex-shrink:0;background:linear-gradient(145deg,#f97316,#fb923c,#fdba74);padding:4px;overflow:hidden;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border-radius:14px;border:1.5px solid rgba(255,200,100,0.35);box-shadow:0 3px 16px rgba(249,115,22,0.55);">
-        <img id="app-logo-img" src="" style="width:34px;height:34px;object-fit:contain;display:none;border-radius:10px">
-        <span id="app-logo-fallback" style="font-size:22px;line-height:1;display:flex">🏗️</span>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:3px">
-        <!-- Settings button - icon only, no border, bigger -->
+    <!-- LEFT: App logo + URL below + Settings beside logo -->
+    <div class="flex-shrink-0" style="display:flex;flex-direction:column;align-items:flex-start;gap:0;margin-top:-3px">
+      <div style="display:flex;align-items:center;gap:4px">
+        <!-- Logo box -->
+        <div id="app-logo-box" style="width:38px;height:38px;flex-shrink:0;background:transparent;padding:0;overflow:hidden;box-sizing:border-box;display:flex;align-items:center;justify-content:center;border-radius:12px;">
+          <img id="app-logo-img" src="" style="width:38px;height:38px;object-fit:cover;display:none;border-radius:11px">
+          <span id="app-logo-fallback" style="font-size:22px;line-height:1;display:flex;filter:drop-shadow(0 1px 3px rgba(0,0,0,0.3))">🏗️</span>
+        </div>
+        <!-- Settings button - right of logo -->
         <button onclick="openSettingsPanel()" id="settings-hdr-btn" title="Settings"
-          style="display:flex;align-items:center;justify-content:center;background:none;border:none;padding:2px;cursor:pointer;-webkit-tap-highlight-color:transparent;outline:none;transition:all .15s;"
+          style="display:flex;align-items:center;justify-content:center;background:none;border:none;padding:2px;cursor:pointer;-webkit-tap-highlight-color:transparent;outline:none;transition:all .15s;margin-top:-2px"
           ontouchstart="this.style.transform='scale(.92)'" ontouchend="this.style.transform='scale(1)'">
-          <span style="font-size:18px;line-height:1">⚙️</span>
+          <span style="font-size:17px;line-height:1">⚙️</span>
         </button>
-        <!-- Constant URL -->
-        <button onclick="showUrlSheet()" style="background:none;border:none;padding:0;cursor:pointer;font-size:8px;color:rgba(255,255,255,0.45);line-height:1;margin-top:2px;letter-spacing:.02em;-webkit-tap-highlight-color:transparent;outline:none;">app.sanjineer.in</button>
       </div>
+      <!-- URL sits directly below logo -->
+      <button onclick="showUrlSheet()" style="background:none;border:none;padding:0;cursor:pointer;font-size:7.5px;color:rgba(255,255,255,0.42);line-height:1;letter-spacing:.02em;margin-top:2px;margin-left:2px;-webkit-tap-highlight-color:transparent;outline:none;">app.sanjineer.in</button>
     </div>
     <!-- CENTER: Company + Engineer name -->
     <div class="flex-1 flex items-center justify-center min-w-0">
@@ -5001,15 +4991,15 @@ function snapData(snap) {
 }
 
 function ld(){try{return JSON.parse(safeLS.getItem(DB)||'[]');}catch(e){return [];}}
-function sd(d){safeLS.setItem(DB,JSON.stringify(d));}
+function sd(d){safeLS.setItem(DB,JSON.stringify(d));_scheduleCloudPush();}
 function lm(){try{return JSON.parse(safeLS.getItem(META)||'{}');}catch(e){return {};}}
-function sm(x){safeLS.setItem(META,JSON.stringify(x));}
+function sm(x){safeLS.setItem(META,JSON.stringify(x));_scheduleCloudPush();}
 function lmat(){try{return JSON.parse(safeLS.getItem(MATS)||'[]');}catch(e){return [];}}
-function smat(x){safeLS.setItem(MATS,JSON.stringify(x));}
+function smat(x){safeLS.setItem(MATS,JSON.stringify(x));_scheduleCloudPush();}
 function ldept(){try{return JSON.parse(safeLS.getItem(DEPT)||'{}');}catch(e){return {};}}
-function sdept(x){safeLS.setItem(DEPT,JSON.stringify(x));}
+function sdept(x){safeLS.setItem(DEPT,JSON.stringify(x));_scheduleCloudPush();}
 function lprof(){try{return JSON.parse(safeLS.getItem(PROF)||'null');}catch(e){return null;}}
-function sprof(x){safeLS.setItem(PROF,JSON.stringify(x));}
+function sprof(x){safeLS.setItem(PROF,JSON.stringify(x));_scheduleCloudPush();}
 function lphkeys(){try{return JSON.parse(safeLS.getItem(PHKEYS)||'{}');}catch(e){return {};}}
 function sphkeys(x){safeLS.setItem(PHKEYS,JSON.stringify(x));}
 
@@ -5151,10 +5141,12 @@ function ins(o) {
 }
 function upd(id, o) {
   var i = AD.findIndex(function(d){ return d.__id === id; });
-  if (i >= 0) { Object.keys(o).forEach(function(k){ AD[i][k] = o[k]; }); sd(AD); }
+  if (i >= 0) { Object.keys(o).forEach(function(k){ AD[i][k] = o[k]; }); AD[i].__ts = Date.now(); sd(AD); }
   return AD[i];
 }
 function del(id) {
+  // Record tombstone BEFORE removing — so other devices know this was intentionally deleted
+  _addTombstone(id, Date.now());
   AD = AD.filter(function(d){ return d.__id !== id; }); sd(AD);
 }
 
@@ -5210,27 +5202,18 @@ function applyProfile() {
   var el2 = document.getElementById('hdr-engineer');
   if (el1) el1.textContent = p ? p.company : 'Tap Edit Profile';
   if (el2) el2.textContent = p ? p.engineer : 'Set your name';
-  // If user has company logo, show it in header with white padding; else show default app logo with orange padding
+  // If user has company logo show it in header; else default app logo — both transparent bg
   var box = document.getElementById('app-logo-box');
   var logoImg = document.getElementById('app-logo-img');
   var logoFb  = document.getElementById('app-logo-fallback');
-  if (p && p.logo) {
-    if (logoImg) { logoImg.src = p.logo; logoImg.style.display = 'block'; logoImg.style.width='34px'; logoImg.style.height='34px'; }
-    if (logoFb)  { logoFb.style.display = 'none'; }
-    if (box) {
-      box.style.background  = '#ffffff';
-      box.style.border      = '1.5px solid rgba(0,0,0,0.10)';
-      box.style.boxShadow   = '0 3px 16px rgba(0,0,0,0.15)';
-      box.style.borderRadius = '14px';
-    }
-  } else {
-    // Reset to orange gradient default
-    if (box) {
-      box.style.background  = 'linear-gradient(145deg,#f97316,#fb923c,#fdba74)';
-      box.style.border      = '1.5px solid rgba(255,200,100,0.35)';
-      box.style.boxShadow   = '0 3px 16px rgba(249,115,22,0.55)';
-      box.style.borderRadius = '14px';
-    }
+  // App UI header always shows GitHub app logo — user uploaded logo never appears here
+  // (user logo only appears on PDFs)
+  if (box) {
+    box.style.background  = 'transparent';
+    box.style.border      = 'none';
+    box.style.boxShadow   = 'none';
+    box.style.borderRadius = '12px';
+    box.style.padding     = '0';
   }
   // Apply saved header colour to app header
   setTimeout(applyHeaderColor, 50);
@@ -7414,27 +7397,25 @@ function pp(){ return lprof()||{company:'',engineer:''}; }
 // ============================================================
 function _pdfBaseStyle(){
   return '*{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",Arial,sans-serif}'+
-    'body{background:#fff;color:#1f2937;font-size:12px;padding:10px 28px 24px 28px;max-width:900px;margin:0 auto}'+
+    'body{background:#fff;color:#1f2937;font-size:12px;padding:6px 18px 12px 18px;max-width:900px;margin:0 auto}'+
     '.no-print{display:block}'+
-    '@media print{.no-print{display:none!important}html,body{margin:0!important;padding:0!important;max-width:none!important}.content{zoom:0.62}@page{margin:10mm;size:A4}'+
+    '.sec-title{text-align:center;font-size:14px;font-weight:700;padding:3px 4px;margin:5px 0 3px 0}'+
+    'table th{font-size:12px!important;font-weight:700!important;padding:4px 6px!important}'+
+    'table td{font-size:12px!important;font-weight:400!important;padding:4px 6px!important}'+
+    '@media print{.no-print{display:none!important}html,body{margin:0!important;padding:0!important;max-width:none!important}.content{zoom:0.62}@page{margin:8mm;size:A4}'+
     '*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}}';
 }
 function _pdfHeader(appName, company, reportTitle, rightHtml, showEngineer){
   var prof=lprof()||{};
   var hColor = prof.headerColor || 'linear-gradient(135deg,#4f46e5,#7c3aed,#ec4899)';
   var defaultRight='<p style="font-size:13px;font-weight:800;color:white;line-height:1.3">'+reportTitle+'</p>'+'<p style="font-size:9px;color:rgba(255,255,255,0.7);margin-top:4px">'+new Date().toLocaleDateString('en-IN',{timeZone:'Asia/Kolkata',day:'numeric',month:'short',year:'numeric'})+'</p>';
-  // PDF logo: user company logo if uploaded, else GitHub app logo
+  // PDF logo: user uploaded logo if set, else GitHub app logo — always 44px
   var companyLogoSrc = prof.logo || '';
-  var appLogoSrc = 'https://cdn.jsdelivr.net/gh/8anjeev/Sanjineer@main/IMG_6018.png';
+  var appLogoSrc = 'https://cdn.jsdelivr.net/gh/8anjeev/Sanjineer@main/assets/logo.png';
+  var _isUserLogo = !!companyLogoSrc;
   var logoSrc = companyLogoSrc || appLogoSrc;
-  var appLogoSrc = 'https://cdn.jsdelivr.net/gh/8anjeev/Sanjineer@main/IMG_6018.png';
-  var logoHtml = companyLogoSrc
-    ? '<div style="width:44px;height:44px;background:#0f172a;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;padding:4px;margin-bottom:4px;overflow:hidden"><img src="'+companyLogoSrc+'" style="max-width:100%;max-height:100%;object-fit:contain" /></div>'
-    : '<div style="width:44px;height:44px;background:#0f172a;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;padding:4px;margin-bottom:4px;overflow:hidden"><img src="'+appLogoSrc+'" style="max-width:100%;max-height:100%;object-fit:contain" onerror="this.parentElement.innerHTML=\'🏗️\'" /></div>';
-    var companyLogoSrc = prof.logo || '';
-  var appLogoSrc = 'https://cdn.jsdelivr.net/gh/8anjeev/Sanjineer@main/IMG_6018.png';
-  var logoSrc = companyLogoSrc || appLogoSrc;
-  var logoHtml = '<div style="width:44px;height:44px;background:#0f172a;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;padding:4px;margin-bottom:4px;overflow:hidden"><img src="'+logoSrc+'" style="max-width:100%;max-height:100%;object-fit:contain" onerror="this.parentElement.innerHTML=\'🏗️\'" /></div>';
+  var _logoSz = _isUserLogo ? '44px' : '88px';
+  var logoHtml = '<img src="'+logoSrc+'" style="width:'+_logoSz+';height:'+_logoSz+';object-fit:contain;display:block;border-radius:8px;background:transparent;" onerror="this.style.display=\'none\'">';
   return '<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:'+hColor+';border-radius:14px;margin-bottom:18px;-webkit-print-color-adjust:exact;print-color-adjust:exact;">'
     +'<div style="text-align:left">'+logoHtml
     +'<p style="font-size:9px;color:rgba(255,255,255,0.6);line-height:1;margin-top:2px">app.sanjineer.in</p></div>'
@@ -7482,14 +7463,14 @@ var _barBg=(_p.headerColor&&_p.headerColor.indexOf('gradient')!==-1)?_p.headerCo
 return ':root{--hc:'+_hc+'}'
 +'*{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",Arial,sans-serif}'
 /* Screen: 50% bigger than before (was zoom:0.65 font:8px → now font:12px no zoom) */
-+'body{background:#fff;color:#1f2937;font-size:12px;padding:10px 28px 24px 28px}'
++'body{background:#fff;color:#1f2937;font-size:12px;padding:6px 18px 12px 18px}'
 +'.bar{position:fixed;top:0;left:0;right:0;background:'+_barBg+';color:white;display:flex;align-items:center;gap:12px;padding:18px 24px;z-index:9999}'
 +'.bar button{padding:12px 28px;border-radius:10px;border:none;cursor:pointer;font-size:15px;font-weight:700}'
 +'.bb{background:rgba(255,255,255,.2);color:white}.bp{background:#f59e0b;color:#1f2937}.bx{background:rgba(239,68,68,.25);color:white;border:1px solid rgba(239,68,68,.5)!important;min-width:52px;}'
 /* Extra space so content clears the taller bar */
 +'@media screen{.content{margin-top:126px}}'
 +'.hdr{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid var(--hc,#4f46e5);padding-bottom:12px;margin-bottom:16px}'
-+'.logo{width:44px;height:44px;background:linear-gradient(135deg,#f59e0b,#ea580c);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px}'
++'.logo{background:transparent;border-radius:10px;overflow:hidden;padding:0;display:flex;align-items:center;justify-content:center;font-size:22px}.logo img{object-fit:contain;display:block;border-radius:0}.logo-user img{width:44px;height:44px}.logo-app img{width:88px;height:88px}'
 +'.cn{font-size:18px;font-weight:900;color:var(--hc,#4f46e5)}.csub{font-size:9px;color:var(--hc,#7c3aed);font-weight:700}'
 +'.hcname{font-size:16px;font-weight:900;color:#1e1b4b;text-align:center}.hceng{font-size:11px;font-weight:700;color:#7c3aed;text-align:center}'
 +'.rt{font-size:14px;font-weight:800;color:#1e1b4b;text-align:right}.rd{font-size:12px;font-weight:700;text-align:right;margin-top:3px}'
@@ -7500,14 +7481,15 @@ return ':root{--hc:'+_hc+'}'
 +'.scv{font-size:18px;font-weight:900;margin-top:2px}'
 +'.sec{margin-bottom:16px}'
 +'.st{font-size:11px;font-weight:700;color:#374151;background:#f3f4f6;padding:4px 10px;border-left:3px solid #9ca3af;margin-bottom:0}'
-+'table{width:100%;border-collapse:collapse;font-size:11px}'
++'table{width:100%;border-collapse:collapse;font-size:12px}'
++'.sec-title,.st{text-align:center;font-size:14px;font-weight:700;padding:3px 4px;margin:5px 0 3px 0}'
 +'thead tr{background:#f3f4f6;color:#374151}'
-+'thead th{padding:5px 10px;text-align:left;font-weight:700;font-size:10px;border-bottom:1.5px solid #d1d5db}'
++'thead th{padding:4px 6px;text-align:left;font-weight:700;font-size:12px;border-bottom:1.5px solid #d1d5db}'
 +'tbody tr{border-bottom:1px solid #f3f4f6}'
 +'tbody tr:nth-child(even){background:#f9fafb}'
-+'tbody td{padding:6px 10px;color:#374151}'
++'tbody td{padding:4px 6px;color:#374151;font-size:12px;font-weight:400}'
 +'tfoot tr{background:#f3f4f6;font-weight:700}'
-+'tfoot td{padding:5px 10px;color:#374151}'
++'tfoot td{padding:4px 6px;color:#374151;font-size:12px}'
 +'.footer{margin-top:24px;padding-top:12px;border-top:2px solid #e5e7eb;display:flex;justify-content:space-between}'
 +'.sig .sl{width:140px;border-top:1.5px solid #374151;margin-top:28px}'
 +'.sig .slb{font-size:9px;color:#6b7280;margin-top:3px}'
@@ -7521,10 +7503,12 @@ var p=pp(), now=new Date();
 var hc=p.headerColor||'linear-gradient(135deg,#4f46e5,#7c3aed)';
 var isGrad=hc.indexOf('gradient')!==-1;
 var solidColor=isGrad?'#4f46e5':hc;
-// PO PDF: show company logo if set, else app logo
-var logoHtml = (companyLogoSrc)
-  ? '<div class="logo" style="background:#fff;border-radius:9px;padding:3px;box-sizing:border-box"><img src="'+companyLogoSrc+'" style="width:100%;height:100%;object-fit:contain;display:block;"/></div>'
-  : '<div class="logo" style="background:linear-gradient(145deg,#f97316,#fb923c,#fdba74);border-radius:9px;padding:3px;box-sizing:border-box"><img src="https://cdn.jsdelivr.net/gh/8anjeev/Sanjineer@main/IMG_6018.png" style="width:100%;height:100%;object-fit:contain;display:block;" onerror="this.style.display=\'none\'"/></div>';
+// PO PDF: user uploaded logo if set, else GitHub app logo — always 44px
+var companyLogoSrc = p.logo || '';
+var _isUserLogo2 = !!companyLogoSrc;
+var _poLogoSrc = companyLogoSrc || 'https://cdn.jsdelivr.net/gh/8anjeev/Sanjineer@main/assets/logo.png';
+var _poLogoSz = _isUserLogo2 ? '44px' : '88px';
+var logoHtml = '<img class="logo" src="'+_poLogoSrc+'" style="width:'+_poLogoSz+';height:'+_poLogoSz+';object-fit:contain;display:block;background:transparent;border-radius:0;" onerror="this.style.display=\'none\'">';
 return '<div class="hdr" style="border-bottom:3px solid '+solidColor+'"><div style="display:flex;align-items:center;gap:12px">'+logoHtml+'<div><div class="cn" style="color:'+solidColor+'">app.sanjineer.in</div><div class="csub" style="color:'+solidColor+'">Site Manager</div></div></div>'
 +'<div style="flex:1;padding:0 12px;text-align:center"><div class="hcname">'+(p.company||'')+'</div>'+(p.address?'<div style="font-size:10px;color:#6b7280;margin-top:3px;font-weight:400">'+p.address+'</div>':'')+'</div>'
 +'<div><div class="rt">'+title+'</div><div class="rd">'+sub+'</div><div class="rp">'+now.toLocaleString('en-IN',{timeZone:'Asia/Kolkata'})+'</div></div></div>';
@@ -7703,16 +7687,16 @@ var company=profData.company||'Sanjineer';
 var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Attendance \u2014 '+worker.name+'</title><style>'+pcs()+'\n'
 +'body{font-size:12px}*{font-family:\'Outfit\',Arial,sans-serif}'
 +'table{width:100%;border-collapse:collapse}'
-+'th{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white;padding:8px 10px;font-weight:700;text-align:left}'
-+'td{padding:7px 10px;border-bottom:1px solid #e5e7eb}'
-+'tfoot td{background:#f0f4ff;font-weight:700}'
++'th{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white;padding:4px 6px;font-weight:700;font-size:12px;text-align:left}'
++'td{padding:4px 6px;border-bottom:1px solid #e5e7eb;font-size:12px;font-weight:400}'
++'tfoot td{background:#f0f4ff;font-weight:700;font-size:12px}'
 +'</style></head><body>'
 +'<div class="bar"><button class="bb" onclick="window.close()">← Back</button><span style="flex:1;font-weight:700">Attendance \u2014 '+worker.name+'</span><button class="bp" onclick="window.print()">\u2756 Print</button><button class="bx" onclick="window.close()">✕</button></div>'
 +'<div class="content">'
 +_pdfHeader('app.sanjineer.in',company,'',
   '<p style="font-size:17px;font-weight:900;color:white;line-height:1">'+worker.name+'</p>'
   +'<p style="font-size:12px;color:rgba(255,255,255,0.9);margin-top:4px;font-weight:700">'+worker.category+(worker.team_name?' &middot; '+worker.team_name:'')+'</p>'
-  +'<p style="font-size:11px;color:#fde68a;margin-top:3px;font-weight:700">Reg: '+fc(parseFloat(worker.hourly_wage)||0)+'/hr'+(parseFloat(worker.ot_rate)>0?' &nbsp;|&nbsp; OT: '+fc(parseFloat(worker.ot_rate))+'/hr':'')+'</p>'
+  +'<p style="font-size:11px;color:#fde68a;margin-top:3px;font-weight:700">Reg- '+fc((parseFloat(worker.hourly_wage)||0)*8)+'/day'+(parseFloat(worker.ot_rate)>0?' &nbsp;|&nbsp; OT- '+fc(parseFloat(worker.ot_rate))+'/hr':'')+'</p>'
   +'<p style="font-size:11px;color:rgba(255,255,255,0.75);margin-top:3px">'+mL+'</p>'
 )
 +(allAtt.length
@@ -7732,24 +7716,24 @@ var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Attendance \u2
   var rowBal=pay-adv;
   var hrsDisplay=otHrs>0?hrs+'<span style="color:#7c3aed;font-weight:700">+'+otHrs+'h</span>':''+hrs+'h';
   return '<tr>'
-    +'<td style="padding:7px 10px;font-weight:700;color:#1f2937">'+fdl(a.date)+'</td>'
-    +'<td style="text-align:center;padding:7px 10px;color:#4f46e5;font-weight:700">'+hrsDisplay+'</td>'
-    +'<td style="text-align:right;padding:7px 10px;color:#059669;font-weight:700">'+fc(pay)+'</td>'
-    +'<td style="text-align:right;padding:7px 10px;color:#dc2626;font-weight:600">'+fc(adv)+'</td>'
-    +'<td style="text-align:right;padding:7px 10px;font-weight:700;color:'+(rowBal>=0?'#1d4ed8':'#dc2626')+'">'+fc(rowBal)+'</td>'
+    +'<td style="padding:4px 6px;font-weight:700;color:#1f2937;font-size:12px">'+fdl(a.date)+'</td>'
+    +'<td style="text-align:center;padding:4px 6px;color:#4f46e5;font-weight:700;font-size:12px">'+hrsDisplay+'</td>'
+    +'<td style="text-align:right;padding:4px 6px;color:#059669;font-weight:400;font-size:12px">'+fc(pay)+'</td>'
+    +'<td style="text-align:right;padding:4px 6px;color:#dc2626;font-weight:400;font-size:12px">'+fc(adv)+'</td>'
+    +'<td style="text-align:right;padding:4px 6px;font-weight:700;font-size:12px;color:'+(rowBal>=0?'#1d4ed8':'#dc2626')+'">'+fc(rowBal)+'</td>'
     +'</tr>';
 }).join('')+'</tbody>'
 +'<tfoot>'
 +'<tr style="background:#f0f4ff">'
-+'<td style="padding:8px 10px;font-weight:900;color:#1e1b4b">TOTAL</td>'
-+'<td style="text-align:center;padding:8px 10px;font-weight:900;color:#4f46e5">'+(totalOtHrs>0?totalHrs.toFixed(1)+'+'+totalOtHrs.toFixed(1)+'h':totalHrs.toFixed(1)+'h')+'</td>'
-+'<td style="text-align:right;padding:8px 10px;font-weight:900;color:#059669">'+fc(totalPay)+'</td>'
-+'<td style="text-align:right;padding:8px 10px;font-weight:900;color:#dc2626">'+fc(totalAdv)+'</td>'
-+'<td style="text-align:right;padding:8px 10px;font-weight:900;color:'+(bal>=0?'#1d4ed8':'#dc2626')+'">'+fc(bal)+'</td>'
++'<td style="padding:4px 6px;font-weight:900;color:#1e1b4b;font-size:12px">TOTAL</td>'
++'<td style="text-align:center;padding:4px 6px;font-weight:900;color:#4f46e5;font-size:12px">'+(totalOtHrs>0?totalHrs.toFixed(1)+'+'+totalOtHrs.toFixed(1)+'h':totalHrs.toFixed(1)+'h')+'</td>'
++'<td style="text-align:right;padding:4px 6px;font-weight:900;color:#059669;font-size:12px">'+fc(totalPay)+'</td>'
++'<td style="text-align:right;padding:4px 6px;font-weight:900;color:#dc2626;font-size:12px">'+fc(totalAdv)+'</td>'
++'<td style="text-align:right;padding:4px 6px;font-weight:900;color:'+(bal>=0?'#1d4ed8':'#dc2626')+';font-size:12px">'+fc(bal)+'</td>'
 +'</tr>'
 +'<tr style="background:'+(bal>=0?'#f0fdf4':'#fff1f2')+'">'
-+'<td colspan="4" style="padding:10px;font-weight:900;font-size:13px;color:#1e1b4b">NET PAYABLE</td>'
-+'<td style="text-align:right;padding:10px;font-weight:900;font-size:16px;color:'+(bal>=0?'#059669':'#dc2626')+'">'+fc(bal)+'</td>'
++'<td colspan="4" style="padding:5px 6px;font-weight:900;font-size:14px;text-align:center;color:#1e1b4b">NET PAYABLE</td>'
++'<td style="text-align:right;padding:5px 6px;font-weight:900;font-size:14px;color:'+(bal>=0?'#059669':'#dc2626')+'">'+fc(bal)+'</td>'
 +'</tr></tfoot></table>'
 : '<p style="padding:16px;color:#9ca3af;text-align:center">No attendance records for '+mL+'</p>')
 +pftr()+'</div></body></html>';
@@ -7996,7 +7980,7 @@ if (!safeLS.getItem('pwa_dismissed')) { var b=document.getElementById('pwa-banne
 // ============================================================
 var MACH_KEY = 'cm_machinery';
 function lmach(){try{return JSON.parse(safeLS.getItem(MACH_KEY)||'{}');}catch(e){return {};}}
-function smach(x){safeLS.setItem(MACH_KEY,JSON.stringify(x));}
+function smach(x){safeLS.setItem(MACH_KEY,JSON.stringify(x));_scheduleCloudPush();}
 
 function loadMachinery(){
   var t=ist(), sel=document.getElementById('mach-date');
@@ -8057,7 +8041,7 @@ function addMachineSession(){
   if(st&&en){var s=st.split(':'),e=en.split(':');hrs=Math.max(0,(parseInt(e[0])*60+parseInt(e[1]))-(parseInt(s[0])*60+parseInt(s[1])))/60;}
   var store=lmach();
   if(!store[d])store[d]=[];
-  store[d].push({id:'m'+Date.now(),name:name,operator:op,start:st,end:en,hours:hrs,rate:rate,cost:hrs*rate,notes:notes});
+  var _mts=Date.now(); store[d].push({id:'m'+_mts,__ts:_mts,name:name,operator:op,start:st,end:en,hours:hrs,rate:rate,cost:hrs*rate,notes:notes});
   smach(store);
   ['mach-name','mach-operator','mach-start','mach-end','mach-rate','mach-notes'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
   renderMachSessions(d);
@@ -8092,6 +8076,8 @@ function renderMachSessions(d){
 function delMachSession(d,id){
   askDel('Delete this machinery session?', function(){
     var store=lmach();
+    // Record tombstone so other devices respect this delete
+    _addTombstone('mach__'+id, Date.now());
     if(store[d])store[d]=store[d].filter(function(s){return s.id!==id;});
     smach(store);renderMachSessions(d);renderMachMonthly();toast('Deleted','ok');
   });
@@ -8198,7 +8184,7 @@ function printMachinery(){
     +'</div>'
     +machCards
     +_pdfFooter()+'</div></body></html>';
-  var w=window.open('','_blank');if(w){w.document.write(html);w.document.close();}
+  opw(html);
 }
 
 function printMachineryMonth(){
@@ -8277,7 +8263,7 @@ function printMachineryMonth(){
     +'</div>'
     +machCards
     +_pdfFooter()+'</div></body></html>';
-  var w=window.open('','_blank');if(w){w.document.write(html);w.document.close();}
+  opw(html);
 }
 
 // ============================================================
@@ -8287,7 +8273,7 @@ var DRW_KEY='cm_drawings';
 var _currentRoom='R1';
 var ROOMS=['R1','R2','R3','R4','R5','R6','R7','R8'];
 function ldrw(){try{return JSON.parse(safeLS.getItem(DRW_KEY)||'{}');}catch(e){return {};}}
-function sdrw(x){safeLS.setItem(DRW_KEY,JSON.stringify(x));}
+function sdrw(x){safeLS.setItem(DRW_KEY,JSON.stringify(x));_scheduleCloudPush();}
 
 function initDrawingsTab(){
   buildRoomTabs();renderDrawings();
@@ -8395,7 +8381,7 @@ function delDrawing(room,id){
 // ============================================================
 var BGT_KEY='cm_budget';
 function lbgt(){try{return JSON.parse(safeLS.getItem(BGT_KEY)||'null');}catch(e){return null;}}
-function sbgt(x){safeLS.setItem(BGT_KEY,JSON.stringify(x));}
+function sbgt(x){safeLS.setItem(BGT_KEY,JSON.stringify(x));_scheduleCloudPush();}
 
 function loadBudgetTab(){
   var b=lbgt();
@@ -8464,7 +8450,7 @@ function renderBudgetStats(){
 // ============================================================
 var MS_KEY='cm_milestones';
 function lms(){try{return JSON.parse(safeLS.getItem(MS_KEY)||'[]');}catch(e){return [];}}
-function sms(x){safeLS.setItem(MS_KEY,JSON.stringify(x));}
+function sms(x){safeLS.setItem(MS_KEY,JSON.stringify(x));_scheduleCloudPush();}
 
 function loadScheduleTab(){
   renderSchedule(); setTimeout(renderGantt, 200);
@@ -8790,6 +8776,46 @@ function boqCopyYesterdayToToday(){
     }
     toast('Advanced to next day!','ok');
   });
+}
+
+/* ── BOQ Auto Daily Reset at Midnight ── */
+// Runs on startup and every minute. At 00:00 AM when date changes,
+// today's qty is automatically added to prevQty and todayQty is reset to 0.
+function boqCheckAndRunDailyReset() {
+  try {
+    var today = ist(); // IST today's date string e.g. "2025-04-05"
+    var lastResetDate = safeLS.getItem('cm_boq_last_reset_date') || '';
+    if (!lastResetDate) {
+      // First launch — just record today, no rollover yet
+      safeLS.setItem('cm_boq_last_reset_date', today);
+      return;
+    }
+    if (lastResetDate === today) return; // same day, nothing to do
+    // Date has changed — run the rollover (same logic as manual "Next Day" button)
+    var data = boqLoad();
+    var hadWork = false;
+    data.sections.forEach(function(sec) {
+      sec.items.forEach(function(item) {
+        var tq = parseFloat(item.todayQty) || 0;
+        if (tq > 0) hadWork = true;
+        item.prevQty = (parseFloat(item.prevQty) || 0) + tq;
+        item.todayQty = 0;
+        var tender = parseFloat(item.tenderQty) || 0;
+        if (tender > 0) {
+          item.prevDone = Math.min(100, Math.round(item.prevQty / tender * 100 * 10) / 10);
+          item.todayDone = 0;
+        }
+      });
+    });
+    boqSave(data);
+    safeLS.setItem('cm_boq_last_reset_date', today);
+    if (hadWork) {
+      try { boqRender(); } catch(e) {}
+      // Trigger cloud backup so other devices get the reset too
+      setTimeout(function() { if (typeof cloudBackupNow === 'function') cloudBackupNow(true); }, 1000);
+      toast('📅 BOQ daily reset: Yesterday\'s work moved to cumulative!', 'ok');
+    }
+  } catch(e) {}
 }
 
 /* ── File input (iOS/Edge fix: pre-load XLSX before picker) ── */
@@ -9535,7 +9561,7 @@ function boqParseTextToStructure(text){
 // ============================================================
 var PL_KEY='cm_punchlist';
 function lpl(){try{return JSON.parse(safeLS.getItem(PL_KEY)||'[]');}catch(e){return [];}}
-function spl(x){safeLS.setItem(PL_KEY,JSON.stringify(x));}
+function spl(x){safeLS.setItem(PL_KEY,JSON.stringify(x));_scheduleCloudPush();}
 
 function loadPunchTab(){renderPunchList();}
 
@@ -9857,8 +9883,9 @@ function _buildInvoiceHTML(inv){
   var adr = p.address  || '';
   var gno = p.gst      || '';
   // Invoice: no app logo, no Sanjineer branding — only company info
+  // Invoice: user uploaded logo if set — 56px, no branding otherwise
   var logoHtml = p.logo
-    ? '<img src="' + p.logo + '" style="max-height:64px;max-width:120px;object-fit:contain;display:block;margin-bottom:8px">'
+    ? '<img src="'+p.logo+'" style="width:56px;height:56px;object-fit:contain;display:block;border-radius:8px;margin-bottom:8px;background:transparent" onerror="this.style.display=\'none\'">'
     : '';
 
   var lineRows = inv.lines.map(function(l){
@@ -10203,32 +10230,248 @@ function initFirebase(cfg, cb) {
 function autoInitCloud() {
   if (!_sb) { setTimeout(autoInitCloud, 200); return; }
   updateCloudBtn();
-  if (safeLS.getItem(ADMIN_ROLE_KEY) === 'admin') { startAutoSync(); }
+  if (safeLS.getItem(ADMIN_ROLE_KEY) === 'admin') {
+    // Pull from cloud FIRST on every app open — apply if cloud is newer than local
+    // This ensures a device always starts with the latest data from any other device
+    _adminCloudPull(true);
+    startAutoSync();
+  }
 }
 
-// -- Backup Now (Supabase) --
-function cloudBackupNow() {
-  if (!_sb) { toast('Supabase not ready', 'err'); return; }
-  if (!_adminSBUser) { toast('Login required to backup', 'err'); return; }
-  var siteId = getSiteId();
-  if (!siteId) { toast('No Site ID configured', 'err'); return; }
-  var payload = {
-    db: ld(), meta: lm(), mats: lmat(), dept: ldept(), prof: lprof(),
-    machinery: lmach(), drawings: ldrw(), budget: lbgt(), milestones: lms(),
-    rfi: [], punchlist: lpl(), safety: [],
-    nid: parseInt(safeLS.getItem('cm_nid') || '1'),
-    lastSync: Date.now(), syncedBy: _adminSBUser.email, version: '2.0'
-  };
-  _sb.from('cloud_backups').upsert({
-    admin_id: _adminSBUser.id, backup_key: siteId, data: payload
-  }, { onConflict: 'admin_id,backup_key' }).then(function(r) {
-    if (r.error) { toast('Backup failed: ' + r.error.message, 'err'); return; }
-    var now = new Date().toLocaleTimeString('en-IN', {timeZone:'Asia/Kolkata'});
-    var el = document.getElementById('cloud-sync-time');
-    if (el) el.textContent = 'Last sync: ' + now;
-    toast('☁️ Backed up to cloud!', 'ok');
-    updateCloudBtn();
+// ── MASTER RESTORE: applies ALL backed-up data to local storage ──────────────
+function _applyFullBackup(d) {
+  if (!d) return;
+  // Core tab data
+  if (d.db)         { sd(d.db); AD = ld(); }
+  if (d.meta)       sm(d.meta);
+  if (d.mats)       smat(d.mats);
+  if (d.dept)       sdept(d.dept);
+  if (d.prof)       sprof(d.prof);       // company name + logo (base64 image)
+  if (d.machinery)  smach(d.machinery);
+  if (d.drawings)   sdrw(d.drawings);
+  if (d.budget)     sbgt(d.budget);
+  if (d.milestones) sms(d.milestones);
+  if (d.punchlist)  spl(d.punchlist);
+  if (d.nid)        safeLS.setItem('cm_nid', String(d.nid));
+  // All cm_ keys (BOQ schedule, BOQ today data per date, BOQ project info,
+  //   visits, quotations, subcon bills, PO, suppliers, invoices, tools, rentals, etc.)
+  if (d.cm_all && typeof d.cm_all === 'object') {
+    Object.keys(d.cm_all).forEach(function(k) {
+      var v = d.cm_all[k];
+      if (v !== null && v !== undefined) safeLS.setItem(k, v);
+    });
+  }
+  // Legacy: old backup format (v2.1) used separate boq_schedule + extra keys
+  if (d.boq_schedule) safeLS.setItem('cm_boq_schedule', d.boq_schedule);
+  if (d.extra && typeof d.extra === 'object') {
+    Object.keys(d.extra).forEach(function(k) { if (d.extra[k] !== null && d.extra[k] !== undefined) safeLS.setItem(k, d.extra[k]); });
+  }
+  // App settings (dark mode, dashboard view, hidden tabs, signatures, guide, swipe)
+  if (d.settings) {
+    if (d.settings.dark_mode   !== undefined) safeLS.setItem('sanj_dark_mode', d.settings.dark_mode);
+    if (d.settings.dash_view   !== undefined) safeLS.setItem('sanj_dash_view', d.settings.dash_view);
+    if (d.settings.hidden_tabs !== undefined) safeLS.setItem('sanj_hidden_tabs', d.settings.hidden_tabs);
+    if (d.settings.guide       !== undefined) safeLS.setItem('sanj_guide_enabled', d.settings.guide);
+    if (d.settings.swipe       !== undefined) safeLS.setItem('sanj_swipe_enabled', d.settings.swipe);
+    if (d.settings.signatures  !== undefined && d.settings.signatures !== '[]') {
+      safeLS.setItem('sanj_signatures', d.settings.signatures);
+    }
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// TOMBSTONE STORE — tracks intentional deletes with timestamps
+// So Device B's delete always wins over Device A's old data push
+// ══════════════════════════════════════════════════════════════
+var TOMB_KEY = 'cm_tombstones';
+function _loadTombstones() {
+  try { return JSON.parse(safeLS.getItem(TOMB_KEY) || '{}'); } catch(e) { return {}; }
+}
+function _saveTombstones(t) {
+  safeLS.setItem(TOMB_KEY, JSON.stringify(t));
+}
+function _addTombstone(id, ts) {
+  var t = _loadTombstones();
+  // Only update if this delete is newer than a previously recorded delete
+  if (!t[id] || ts > t[id]) { t[id] = ts; _saveTombstones(t); }
+}
+function _mergeTombstones(localT, remoteT) {
+  // Union: keep the newest delete timestamp for each id
+  var merged = JSON.parse(JSON.stringify(localT || {}));
+  Object.keys(remoteT || {}).forEach(function(id) {
+    if (!merged[id] || remoteT[id] > merged[id]) merged[id] = remoteT[id];
   });
+  return merged;
+}
+
+// ── Smart per-record merge for array data (attendance, expenses, etc.) ──
+// Rule: newest __ts wins; if tombstone for that id is newer than __ts → deleted wins
+function _mergeRecordArrays(localArr, remoteArr, tombstones) {
+  var map = {};
+  // Index local records by __id
+  (localArr || []).forEach(function(r) {
+    if (r.__id) map[r.__id] = r;
+  });
+  // Merge remote: keep if newer __ts and not tombstoned
+  (remoteArr || []).forEach(function(r) {
+    if (!r.__id) return;
+    var tomb = tombstones[r.__id] || 0;
+    if (tomb >= (r.__ts || 0)) return; // deleted — skip
+    var local = map[r.__id];
+    if (!local || (r.__ts || 0) > (local.__ts || 0)) {
+      map[r.__id] = r; // remote is newer
+    }
+  });
+  // Filter out anything tombstoned
+  return Object.values(map).filter(function(r) {
+    var tomb = tombstones[r.__id] || 0;
+    return tomb < (r.__ts || 0);
+  });
+}
+
+// ── Smart merge for machinery store (keyed by date → array of sessions) ──
+function _mergeMachinery(local, remote, tombstones) {
+  var merged = JSON.parse(JSON.stringify(local || {}));
+  Object.keys(remote || {}).forEach(function(date) {
+    var rSessions = remote[date] || [];
+    var lSessions = merged[date] || [];
+    // Build map of local sessions by id
+    var lMap = {};
+    lSessions.forEach(function(s) { if (s.id) lMap[s.id] = s; });
+    rSessions.forEach(function(s) {
+      if (!s.id) return;
+      var tombKey = 'mach__' + s.id;
+      var tomb = tombstones[tombKey] || 0;
+      if (tomb >= (s.__ts || 0)) return; // deleted on another device — skip
+      var local = lMap[s.id];
+      if (!local || (s.__ts || 0) > (local.__ts || 0)) {
+        lMap[s.id] = s; // remote session is newer
+      }
+    });
+    // Filter out tombstoned sessions
+    merged[date] = Object.values(lMap).filter(function(s) {
+      var tombKey = 'mach__' + s.id;
+      var tomb = tombstones[tombKey] || 0;
+      return tomb < (s.__ts || 0);
+    });
+    if (merged[date].length === 0) delete merged[date];
+  });
+  return merged;
+}
+
+// -- Backup Now (Supabase) — FETCH BEFORE PUSH pattern --
+// Step 1: Fetch latest from cloud
+// Step 2: If cloud is newer, absorb it (apply to local) first
+// Step 3: Read local (now = cloud base + our edits merged)
+// Step 4: Push combined result back
+function cloudBackupNow(silent) {
+  if (!_sb) { if (!silent) toast('Supabase not ready', 'err'); return; }
+  if (!_adminSBUser) { if (!silent) toast('Login required to backup', 'err'); return; }
+  var siteId = getSiteId();
+  if (!siteId) { if (!silent) toast('No Site ID configured', 'err'); return; }
+
+  function _buildLocalPayload() {
+    var _allCmKeys = {};
+    try {
+      var _ls = window.localStorage;
+      for (var _ki = 0; _ki < _ls.length; _ki++) {
+        var _kk = _ls.key(_ki);
+        if (!_kk) continue;
+        if (_kk.indexOf('cm_') === 0) {
+          var _v = safeLS.getItem(_kk);
+          if (_v !== null) _allCmKeys[_kk] = _v;
+        }
+      }
+    } catch(e2) {}
+    return {
+      db:         ld(),
+      meta:       lm(),
+      mats:       lmat(),
+      dept:       ldept(),
+      prof:       lprof(),
+      machinery:  lmach(),
+      drawings:   ldrw(),
+      budget:     lbgt(),
+      milestones: lms(),
+      punchlist:  lpl(),
+      rfi: [], safety: [],
+      nid: parseInt(safeLS.getItem('cm_nid') || '1'),
+      cm_all: _allCmKeys,
+      settings: {
+        dark_mode:    safeLS.getItem('sanj_dark_mode') || '0',
+        dash_view:    safeLS.getItem('sanj_dash_view') || 'current',
+        hidden_tabs:  safeLS.getItem('sanj_hidden_tabs') || '[]',
+        guide:        safeLS.getItem('sanj_guide_enabled') || '1',
+        swipe:        safeLS.getItem('sanj_swipe_enabled') || '1',
+        signatures:   safeLS.getItem('sanj_signatures') || '[]'
+      },
+      lastSync: Date.now(),
+      syncedBy: _adminSBUser.email,
+      version: '3.0',
+      tombstones: _loadTombstones()  // send tombstones so other devices respect deletes
+    };
+  }
+
+  function _doPush(payload) {
+    _sb.from('cloud_backups').upsert({
+      admin_id: _adminSBUser.id, backup_key: siteId, data: payload
+    }, { onConflict: 'admin_id,backup_key' }).then(function(r) {
+      if (r.error) { if (!silent) toast('Backup failed: ' + r.error.message, 'err'); return; }
+      _lastCloudTimestamp = payload.lastSync;
+      var now = new Date().toLocaleTimeString('en-IN', {timeZone:'Asia/Kolkata'});
+      var el = document.getElementById('cloud-sync-time');
+      if (el) el.textContent = 'Synced: ' + now;
+      if (!silent) toast('☁️ Backed up to cloud!', 'ok');
+      updateCloudBtn();
+    });
+  }
+
+  // Step 1: Fetch latest cloud data first
+  _sb.from('cloud_backups')
+    .select('data,updated_at')
+    .eq('admin_id', _adminSBUser.id)
+    .eq('backup_key', siteId)
+    .single()
+    .then(function(fetchResult) {
+      var cloudData = (fetchResult.data && fetchResult.data.data) ? fetchResult.data.data : null;
+
+      if (cloudData) {
+        // Step 2: Merge tombstones first — union of local + remote deletes
+        var localTombs  = _loadTombstones();
+        var remoteTombs = cloudData.tombstones || {};
+        var mergedTombs = _mergeTombstones(localTombs, remoteTombs);
+        _saveTombstones(mergedTombs); // save merged tombstones locally
+
+        // Step 3: Smart per-record merge — newest timestamp wins, tombstone beats all
+        // Main records array (attendance, expenses, materials log)
+        var localDb    = ld();
+        var remoteDb   = cloudData.db || [];
+        var mergedDb   = _mergeRecordArrays(localDb, remoteDb, mergedTombs);
+        // Only write back if merge changed something (avoid triggering push loop)
+        if (JSON.stringify(mergedDb) !== JSON.stringify(localDb)) {
+          // Write directly to storage — bypass sd() to avoid triggering _scheduleCloudPush
+          try { safeLS.setItem('cm_db', JSON.stringify(mergedDb)); AD = mergedDb; } catch(e) {}
+        }
+
+        // Machinery — keyed by date
+        var localMach  = lmach();
+        var remoteMach = cloudData.machinery || {};
+        var mergedMach = _mergeMachinery(localMach, remoteMach, mergedTombs);
+        if (JSON.stringify(mergedMach) !== JSON.stringify(localMach)) {
+          try { safeLS.setItem('cm_machinery', JSON.stringify(mergedMach)); } catch(e) {}
+        }
+
+        // Update _lastCloudTimestamp so _adminCloudPull doesn't re-apply this
+        _lastCloudTimestamp = cloudData.lastSync || _lastCloudTimestamp;
+      }
+
+      // Step 4: Build payload from merged local state and push
+      _doPush(_buildLocalPayload());
+    })
+    .catch(function() {
+      // Offline or first backup — push local directly
+      _doPush(_buildLocalPayload());
+    });
 }
 
 // -- Restore from Cloud (Supabase) --
@@ -10241,28 +10484,141 @@ function cloudRestoreNow() {
   _sb.from('cloud_backups').select('data').eq('admin_id', _adminSBUser.id).eq('backup_key', siteId).single().then(function(r) {
     if (r.error || !r.data) { toast('No cloud data found for this Site ID', 'err'); return; }
     var d = r.data.data;
-    if (d.db) sd(d.db);
-    if (d.meta) sm(d.meta);
-    if (d.mats) smat(d.mats);
-    if (d.dept) sdept(d.dept);
-    if (d.prof) sprof(d.prof);
-    if (d.machinery) smach(d.machinery);
-    if (d.drawings) sdrw(d.drawings);
-    if (d.budget) sbgt(d.budget);
-    if (d.milestones) sms(d.milestones);
-    if (d.punchlist) spl(d.punchlist);
+    _applyFullBackup(d);
+    // also keep legacy field compat for very old backups
     if (d.nid) safeLS.setItem('cm_nid', d.nid);
     AD = ld(); applyProfile(); renderDashboard();
     toast('✅ Data restored from cloud!', 'ok');
   });
 }
 
-// -- Auto Sync (every 2 min) --
+// -- Auto Sync (bidirectional: push changes + pull remote changes every 25s) --
+var _adminRealtimeChannel = null;
+var _lastCloudTimestamp = 0;  // track remote lastSync to detect remote changes
+
+function _applyCloudData(d, silent) {
+  if (!d) return;
+  var remoteTs = d.lastSync || 0;
+  if (remoteTs && remoteTs < _lastCloudTimestamp) return; // already applied
+  _lastCloudTimestamp = remoteTs;
+
+  // Smart merge: tombstones + per-record timestamps — same logic as cloudBackupNow
+  var localTombs  = _loadTombstones();
+  var remoteTombs = d.tombstones || {};
+  var mergedTombs = _mergeTombstones(localTombs, remoteTombs);
+  _saveTombstones(mergedTombs);
+
+  // Merge main records
+  var mergedDb = _mergeRecordArrays(ld(), d.db || [], mergedTombs);
+  try { safeLS.setItem('cm_db', JSON.stringify(mergedDb)); AD = mergedDb; } catch(e) {}
+
+  // Merge machinery
+  var mergedMach = _mergeMachinery(lmach(), d.machinery || {}, mergedTombs);
+  try { safeLS.setItem('cm_machinery', JSON.stringify(mergedMach)); } catch(e) {}
+
+  // Apply everything else (settings, profile, BOQ, etc.) from cloud as before
+  var dMerged = JSON.parse(JSON.stringify(d));
+  dMerged.db = mergedDb;
+  dMerged.machinery = mergedMach;
+  _applyFullBackup(dMerged);
+  applyProfile();
+  try { renderDashboard(); } catch(e) {}
+  // FIX: re-render the currently visible tab so changes appear instantly without tab-switch
+  try {
+    var curTab = document.querySelector('.tab-btn.active');
+    if (curTab) {
+      var tabName = curTab.getAttribute('data-tab');
+      if (tabName && typeof switchTab === 'function') switchTab(tabName);
+    }
+  } catch(e) {}
+  var el = document.getElementById('cloud-sync-time');
+  var now = new Date().toLocaleTimeString('en-IN', {timeZone:'Asia/Kolkata'});
+  if (el) el.textContent = 'Pulled: ' + now;
+  if (!silent) {
+    toast('🔄 Cloud data updated from another device!', 'ok');
+  } else {
+    // Flash sync dot amber → green to show silent pull happened
+    var dot = document.getElementById('cloud-sync-dot');
+    if (dot) { dot.style.background = '#a78bfa'; setTimeout(function(){ dot.style.background = '#22c55e'; }, 1500); }
+  }
+}
+
+function _adminCloudPull(silent) {
+  if (!_sb || !_adminSBUser) return;
+  var siteId = getSiteId();
+  if (!siteId) return;
+  _sb.from('cloud_backups')
+    .select('data,updated_at')
+    .eq('admin_id', _adminSBUser.id)
+    .eq('backup_key', siteId)
+    .single()
+    .then(function(r) {
+      if (r.error || !r.data || !r.data.data) return;
+      var remoteTs = r.data.data.lastSync || 0;
+      // Apply cloud data if it's strictly newer than what we last applied.
+      // On first open _lastCloudTimestamp is 0 so this always pulls on startup.
+      if (remoteTs > _lastCloudTimestamp) {
+        _applyCloudData(r.data.data, !!silent);
+      }
+    }).catch(function(e) {});
+}
+
+function _startAdminRealtime() {
+  if (!_sb || !_adminSBUser) return;
+  if (_adminRealtimeChannel) {
+    try { _sb.removeChannel(_adminRealtimeChannel); } catch(e) {}
+    _adminRealtimeChannel = null;
+  }
+  try {
+    _adminRealtimeChannel = _sb
+      .channel('admin-sync-' + _adminSBUser.id)
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'cloud_backups',
+        filter: 'admin_id=eq.' + _adminSBUser.id
+      }, function(payload) {
+        try {
+          if (payload && payload.new && payload.new.data) {
+            _applyCloudData(payload.new.data, true);
+            var el = document.getElementById('cloud-sync-dot');
+            if (el) { el.style.background = '#a78bfa'; setTimeout(function(){ el.style.background='#22c55e'; }, 1500); }
+          }
+        } catch(e) {}
+      })
+      .subscribe(function(status) {
+        var dot = document.getElementById('cloud-sync-dot');
+        if (dot) dot.style.background = (status === 'SUBSCRIBED') ? '#22c55e' : '#fbbf24';
+      });
+  } catch(e) {
+    console.warn('Admin realtime subscription failed (ok in offline):', e);
+  }
+}
+
 function startAutoSync() {
   if (_cloudSyncTimer) clearInterval(_cloudSyncTimer);
+  // PULL only every 10s — pushing is now done on every data save (debounced)
+  var SYNC_MS = 10000;
   _cloudSyncTimer = setInterval(function() {
-    if (_getAdminDb() && isCloudActivated()) cloudBackupNow();
-  }, 120000);
+    if (!_getAdminDb() || !isCloudActivated()) return;
+    _adminCloudPull(true); // pull-only: check if another device pushed newer data
+  }, SYNC_MS);
+  // Start Realtime for instant push notifications from other devices
+  _startAdminRealtime();
+  // Pull immediately on start to get latest cloud data before user edits
+  setTimeout(function() { _adminCloudPull(true); }, 1500);
+}
+
+// ── Debounced push: fires 3s after the last save, prevents rapid overwrites ──
+var _cloudPushTimer = null;
+function _scheduleCloudPush() {
+  if (!isCloudActivated || typeof isCloudActivated !== 'function') return;
+  if (!isCloudActivated()) return;
+  if (_cloudPushTimer) clearTimeout(_cloudPushTimer);
+  _cloudPushTimer = setTimeout(function() {
+    _cloudPushTimer = null;
+    cloudBackupNow(true); // silent push after user finishes editing
+  }, 3000); // 3s debounce — waits until user stops making changes
 }
 
 // -- Supabase credential viewer --
@@ -10446,6 +10802,7 @@ function _viewerLogout() {
     _viewerRealtimeChannel = null;
   }
   // Stop safety-net poll
+  try { if (window._viewerPollTimer) { clearInterval(window._viewerPollTimer); window._viewerPollTimer = null; } } catch(e) {}
   try { if (typeof _viewerPollTimer !== 'undefined' && _viewerPollTimer) { clearInterval(_viewerPollTimer); } } catch(e) {}
   safeLS.removeItem('sj_viewer_perms');
   safeLS.removeItem('sj_viewer_print');
@@ -10475,21 +10832,12 @@ function _viewerLoadData(adminId, projId) {
   if (!adminId) { toast('⚠️ Admin ID missing — open the viewer link again', 'err'); return; }
 
   function applyViewerData(d, silent) {
-    var hasData = d && (d.db || d.mats || d.machinery || d.budget || d.milestones || d.punchlist);
+    var hasData = d && (d.db || d.mats || d.machinery || d.budget || d.milestones || d.punchlist || d.cm_all);
     if (!hasData) {
       if (!silent) toast('No backup data found. Ask admin to run Backup Now.', 'err');
       return;
     }
-    if (d.db)         { sd(d.db); AD = ld(); }
-    if (d.meta)       sm(d.meta);
-    if (d.mats)       smat(d.mats);
-    if (d.dept)       sdept(d.dept);
-    if (d.prof)       sprof(d.prof);
-    if (d.machinery)  smach(d.machinery);
-    if (d.drawings)   sdrw(d.drawings);
-    if (d.budget)     sbgt(d.budget);
-    if (d.milestones) sms(d.milestones);
-    if (d.punchlist)  spl(d.punchlist);
+    _applyFullBackup(d);
     applyProfile();
     var rawPerms = safeLS.getItem('sj_viewer_perms');
     var perms = []; var canPrint = safeLS.getItem('sj_viewer_print') === '1';
@@ -10519,6 +10867,10 @@ function _viewerLoadData(adminId, projId) {
   }
 
   // ── Pull latest backup once ────────────────────────────────
+  if (typeof window._viewerPollTimer !== 'undefined' && window._viewerPollTimer) {
+    clearInterval(window._viewerPollTimer);
+    window._viewerPollTimer = null;
+  }
   var _viewerPollTimer = null;
 
   function fetchLatest(silent) {
@@ -10554,10 +10906,10 @@ function _viewerLoadData(adminId, projId) {
   // Initial load
   fetchLatest(false);
 
-  // Safety-net polling every 45s in case WebSocket realtime doesn't work
-  // (iOS Safari PWA background mode, restrictive networks, etc.)
+  // Safety-net polling every 25s (true cloud sync — ≤30s as required)
   if (_viewerPollTimer) clearInterval(_viewerPollTimer);
-  _viewerPollTimer = setInterval(function() { fetchLatest(true); }, 45000);
+  _viewerPollTimer = setInterval(function() { fetchLatest(true); }, 25000);
+  window._viewerPollTimer = _viewerPollTimer; // expose for logout cleanup
 
   // ── Realtime subscription — auto-refresh when admin saves ─────
   // Only create one channel; tear down old one if re-called
@@ -13647,45 +13999,25 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 
 // ══════════════════════════════════════════════════════════════
-// 5. CLOUD SYNC — 10s FOR SUBSCRIBERS
+// 5. CLOUD SYNC — BIDIRECTIONAL PUSH + PULL ≤30s
 // ══════════════════════════════════════════════════════════════
 (function(){
-  // After login, check subscription; patch startAutoSync interval
-  var _origStartSync = window.startAutoSync;
-  window.startAutoSync = function() {
-    var freq = window._sbHasPro ? 10000 : 120000;
-    if (window._cloudSyncTimer) clearInterval(window._cloudSyncTimer);
-    window._cloudSyncTimer = setInterval(function() {
-      if (typeof _getAdminDb==='function' && _getAdminDb() && typeof isCloudActivated==='function' && isCloudActivated()) {
-        if (typeof cloudBackupNow==='function') cloudBackupNow();
-      }
-    }, freq);
-    // Show subscriber badge — hidden from UI, element kept for JS compat
-    var badge = document.getElementById('sett-sync-badge');
-    if (badge) {
-      // badge text intentionally not shown in UI
-    }
-  };
-  // Detect subscription from Supabase user metadata after auth check
+  // startAutoSync is already defined above with 25s bidirectional sync.
+  // This block just ensures subscription state is detected and sync starts.
   document.addEventListener('DOMContentLoaded', function(){
-    var _origCheck = window._checkSubscription || null;
-    // Sync badge element kept hidden in DOM for JS compat — not shown in UI
     var badge = document.createElement('div');
     badge.id = 'sett-sync-badge';
     badge.style.cssText = 'display:none';
     document.body.appendChild(badge);
   });
-  // Hook into post-login to detect pro
+  // Hook into post-login to auto-start sync when admin is verified
   var _origRefreshState = window.refreshCloudModalState;
   window.refreshCloudModalState = function() {
     if (_origRefreshState) _origRefreshState.apply(this, arguments);
     try {
-      var meta = window._adminSBUser && window._adminSBUser.user_metadata;
-      var isPro = meta && (meta.pro === true || meta.subscription === 'pro' || meta.plan === 'pro');
-      // Also check payment ID as proxy for subscription
-      var hasPaid = localStorage.getItem('cm_rzp_payment_id') || '';
-      if (isPro || hasPaid) {
-        window._sbHasPro = true;
+      var isAdmin = safeLS.getItem(ADMIN_ROLE_KEY) === 'admin';
+      var subActive = window._sbSubActive;
+      if (isAdmin && subActive) {
         if (typeof window.startAutoSync === 'function') window.startAutoSync();
       }
     } catch(e){}
@@ -13896,6 +14228,12 @@ document.addEventListener('DOMContentLoaded', function(){
   document.addEventListener('sanjineer-tab-changed', function(e) {
     if (_tourOpen) setTimeout(_renderTour, 150);
   });
+
+  // BOQ Auto Daily Reset — check immediately on load then every minute
+  setTimeout(function() {
+    boqCheckAndRunDailyReset();
+    setInterval(boqCheckAndRunDailyReset, 60000); // every 60 seconds
+  }, 3000); // small delay to let app fully initialise
 });
 
 // ══════════════════════════════════════════════════════════════
