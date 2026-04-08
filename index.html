@@ -1443,9 +1443,29 @@ function dismissWelcome(){
 
   var W=window.innerWidth, H=window.innerHeight;
 
-  // Collect real tab button positions so shards fly TO them
+  // ── STEP 1: Spin chips 360° one-by-one before everything else ──────────────
+  var chips=Array.prototype.slice.call(overlay.querySelectorAll('.w-chip'));
+  chips.forEach(function(chip,i){
+    chip.style.transition='transform 0.35s cubic-bezier(.34,1.56,.64,1), opacity 0.35s ease';
+    chip.style.transformOrigin='center center';
+    chip.style.display='inline-flex';
+    setTimeout(function(){
+      chip.style.transform='rotate(360deg) scale(1.18)';
+      chip.style.opacity='0.6';
+      setTimeout(function(){
+        chip.style.transform='rotate(720deg) scale(0)';
+        chip.style.opacity='0';
+      },200);
+    }, i*55);
+  });
+  var chipDelay = chips.length*55 + 250;
+
+  // ── After chips done, run wall-break animation ──────────────────────────────
+  setTimeout(function(){
+
+  // Collect tab button positions for brick flight targets
   var tabBtns=Array.prototype.slice.call(document.querySelectorAll('nav .tab-btn'));
-  var tabTargets=tabBtns.slice(0,8).map(function(b,i){
+  var tabTargets=tabBtns.slice(0,9).map(function(b){
     var r=b.getBoundingClientRect();
     return {x:r.left+r.width/2, y:r.top+r.height/2};
   });
@@ -1458,210 +1478,178 @@ function dismissWelcome(){
   document.body.appendChild(cvs);
   var ctx=cvs.getContext('2d');
 
-  // Build grid of quads as individual shards
-  var COLS=9, ROWS=12;
-  var shards=[];
-  for(var r=0;r<ROWS;r++){
-    for(var c=0;c<COLS;c++){
-      var x0=c/COLS*W, y0=r/ROWS*H;
-      var x1=(c+1)/COLS*W, y1=(r+1)/ROWS*H;
-      // jitter corners for organic look
-      var jx=(Math.random()-.5)*(W/COLS)*0.35;
-      var jy=(Math.random()-.5)*(H/ROWS)*0.35;
-      var mx=(x0+x1)/2+jx, my=(y0+y1)/2+jy;
-      // 4 triangles per cell
-      var tris=[
-        [[x0,y0],[x1,y0],[mx,my]],
-        [[x1,y0],[x1,y1],[mx,my]],
-        [[x1,y1],[x0,y1],[mx,my]],
-        [[x0,y1],[x0,y0],[mx,my]]
-      ];
-      tris.forEach(function(pts){
-        var cx=(pts[0][0]+pts[1][0]+pts[2][0])/3;
-        var cy=(pts[0][1]+pts[1][1]+pts[2][1])/3;
-        // pick a tab target for this shard based on horizontal position
-        var ti=Math.round((cx/W)*(tabTargets.length-1));
-        var tgt=tabTargets[Math.min(ti,tabTargets.length-1)];
-        var hue=230+Math.random()*90;
-        var lit=22+Math.random()*30;
-        shards.push({
-          pts:pts, cx:cx, cy:cy,
-          tx:tgt.x, ty:tgt.y,       // fly-to target (tab position)
-          vr:(Math.random()-.5)*12,   // spin speed
-          fill:'hsla('+hue+',72%,'+lit+'%,1)',
-          delay:Math.random()*0.15    // stagger launch
-        });
+  // ── BUILD BRICK GRID ────────────────────────────────────────────────────────
+  // Standard brick: wide rectangle. Each row offset by half-brick (running bond)
+  var BW=Math.floor(W/7);   // brick width
+  var BH=Math.floor(H/14);  // brick height (taller rows = chunky wall feel)
+  var bricks=[];
+  var row=0, y=0;
+  while(y < H+BH){
+    var offset=(row%2===0)?0:BW/2;
+    var x=-offset;
+    while(x < W+BW){
+      var bx=x, by=y, bw=BW-3, bh=BH-3; // -3 for mortar gap
+      var cx2=bx+bw/2, cy2=by+bh/2;
+      // Assign tab target based on column
+      var ti=Math.round((cx2/W)*(tabTargets.length-1));
+      ti=Math.min(Math.max(ti,0),tabTargets.length-1);
+      var tgt=tabTargets[ti];
+      // Brick colour: reddish/crimson radial palette
+      var rnd=Math.random();
+      var fill= rnd<0.15 ? 'hsl(0,'+(65+Math.random()*20)+'%,'+(28+Math.random()*10)+'%)' :  // deep crimson
+                rnd<0.40 ? 'hsl(355,'+(60+Math.random()*18)+'%,'+(38+Math.random()*10)+'%)' :  // rose red
+                rnd<0.65 ? 'hsl(8,'+(58+Math.random()*15)+'%,'+(45+Math.random()*10)+'%)' :    // brick red
+                           'hsl(348,'+(55+Math.random()*18)+'%,'+(42+Math.random()*8)+'%)';    // dark rose
+      // Physics: bricks closer to bottom fall faster, gravity-ish
+      var fallSpeed=2.5+Math.random()*2+(by/H)*3;
+      var spinDir=(Math.random()<0.5)?1:-1;
+      bricks.push({
+        x:bx,y:by,w:bw,h:bh,cx:cx2,cy:cy2,
+        tx:tgt.x,ty:tgt.y,
+        fill:fill,
+        // Gravity fall params
+        vy:fallSpeed,          // fall velocity (grows with gravity)
+        vx:(Math.random()-.5)*1.8, // slight sideways drift
+        vr:spinDir*(1.5+Math.random()*3), // spin deg/frame
+        rot:0,
+        // Arc-to-tab params (phase 2)
+        launched:false,
+        delay:0.05+Math.random()*0.30
       });
+      x+=BW;
     }
+    y+=BH; row++;
   }
 
-  // Hide welcome content immediately
+  // Hide welcome content
   overlay.style.visibility='hidden';
+  setTimeout(function(){ overlay.style.display='none'; overlay.style.visibility=''; },2400);
 
-  // Show dashboard behind before animation finishes
-  setTimeout(function(){
-    overlay.style.display='none';
-    overlay.style.visibility='';
-  }, 2200);
-
-  var t0=performance.now();
-  // Timeline (ms):
-  //  0–500   : cracks appear / slight vibration
-  //  500–1200: shards explode outward then arc to their tab target
-  //  1200–1700: shards arrive at tab, compress into tab pill shape
-  //  1700–2000: dashboard cards fly in from bottom in 3D perspective
-  // We handle phases 1-3 in canvas; phase 4 via CSS on dashboard elements
-
-  // Phase 4 prep: inject 3D build-in CSS for dashboard cards
+  // ── 3D dashboard card build-in ──────────────────────────────────────────────
   var styleTag=document.createElement('style');
   styleTag.id='_dash3d_style';
-  styleTag.textContent=[
-    '@keyframes _dashCardIn{',
-    '  from{opacity:0;transform:perspective(600px) rotateX(-35deg) translateY(60px) scale(.88);}',
-    '  to  {opacity:1;transform:perspective(600px) rotateX(0deg)   translateY(0)    scale(1);}',
-    '}',
-    '#tab-dashboard .bg-white.rounded-2xl,',
-    '#tab-dashboard .rounded-2xl{',
-    '  animation:_dashCardIn .55s cubic-bezier(.34,1.1,.64,1) both;',
-    '}'
-  ].join('');
+  styleTag.textContent='@keyframes _dci{from{opacity:0;transform:perspective(600px) rotateX(-40deg) translateY(55px) scale(.86);}to{opacity:1;transform:perspective(600px) rotateX(0deg) translateY(0) scale(1);}}#tab-dashboard .rounded-2xl{animation:_dci .5s cubic-bezier(.34,1.1,.64,1) both;}';
   document.head.appendChild(styleTag);
-
-  // Stagger each card
   var cards=document.querySelectorAll('#tab-dashboard .rounded-2xl');
-  cards.forEach(function(el,i){
-    el.style.animationDelay=(i*0.06+1.75)+'s';
-    el.style.animationFillMode='both';
-  });
+  cards.forEach(function(el,i){ el.style.animationDelay=(i*0.055+1.9)+'s'; el.style.animationFillMode='both'; });
   setTimeout(function(){
     if(document.getElementById('_dash3d_style')) document.getElementById('_dash3d_style').remove();
     cards.forEach(function(el){ el.style.animation=''; el.style.animationDelay=''; });
-  },3200);
+  },3400);
 
-  function easeIn(t){return t*t*t;}
-  function easeOut(t){var u=1-t;return 1-u*u*u;}
-  function easeInOut(t){return t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;}
+  // ── ANIMATION LOOP ──────────────────────────────────────────────────────────
+  var TOTAL=2400;
+  var t0=performance.now();
+  var GRAV=0.18; // gravity acceleration per frame
+
+  function easeOut3(t){var u=1-t;return 1-u*u*u;}
+  function easeInOut3(t){return t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;}
 
   function frame(now){
     var elapsed=now-t0;
-    var p=Math.min(elapsed/2000,1);
+    var p=Math.min(elapsed/TOTAL,1);
     ctx.clearRect(0,0,W,H);
 
-    // Dark overlay fades in then out
-    if(p<0.3){
-      ctx.fillStyle='rgba(10,8,24,'+(p/0.3*0.7)+')';
+    // Dust/dark overlay
+    if(p<0.25){
+      ctx.fillStyle='rgba(8,5,18,'+(p/0.25*0.55)+')';
       ctx.fillRect(0,0,W,H);
     } else if(p<0.75){
-      ctx.fillStyle='rgba(10,8,24,0.7)';
+      ctx.fillStyle='rgba(8,5,18,0.55)';
       ctx.fillRect(0,0,W,H);
     } else {
-      ctx.fillStyle='rgba(10,8,24,'+(1-(p-0.75)/0.25)*0.7+')';
+      ctx.fillStyle='rgba(8,5,18,'+(1-(p-0.75)/0.25)*0.55+')';
       ctx.fillRect(0,0,W,H);
     }
 
-    for(var i=0;i<shards.length;i++){
-      var s=shards[i];
-      var localP=Math.max(0,Math.min((p-s.delay)/(1-s.delay),1));
+    // Draw mortar background (light grey wall base)
+    if(p<0.35){
+      ctx.fillStyle='rgba(180,160,140,'+(p/0.35*0.3)+')';
+      ctx.fillRect(0,0,W,H);
+    }
 
-      var tx,ty,rot,alpha,scaleX,scaleY;
+    for(var i=0;i<bricks.length;i++){
+      var b=bricks[i];
+      var localP=Math.max(0,Math.min((p-b.delay)/(1-b.delay),1));
+      if(localP<=0) continue;
 
-      if(localP<0.02){
-        // Crack stage: tiny random jitter in place
-        tx=(Math.random()-.5)*3; ty=(Math.random()-.5)*3;
-        rot=0; alpha=1; scaleX=1; scaleY=1;
+      var tx,ty,rot,alpha;
 
-      } else if(localP<0.55){
-        // Launch phase: shards explode outward from center
-        var ep=easeIn((localP-0.02)/0.53);
-        var midX=s.cx+(s.cx-W/2)*ep*0.6;
-        var midY=s.cy+(s.cy-H/2)*ep*0.6;
-        tx=midX-s.cx; ty=midY-s.cy;
-        rot=s.vr*ep*720;
-        alpha=1;
-        // slight perspective distortion: farther from center = smaller
-        var dist=Math.sqrt((s.cx-W/2)*(s.cx-W/2)+(s.cy-H/2)*(s.cy-H/2));
-        scaleX=1+ep*0.3*(dist/(W/2));
-        scaleY=scaleX;
-
-      } else if(localP<0.85){
-        // Arc to tab: shard curves toward its tab target
-        var ap=easeInOut((localP-0.55)/0.30);
-        var fromX=s.cx+(s.cx-W/2)*0.6;
-        var fromY=s.cy+(s.cy-H/2)*0.6;
-        // Arc via a mid-point (curve outward then inward)
-        var ctrlX=(fromX+s.tx)/2-(s.ty-fromY)*0.3;
-        var ctrlY=(fromY+s.ty)/2+(s.tx-fromX)*0.3;
-        var bx=(1-ap)*(1-ap)*fromX+2*(1-ap)*ap*ctrlX+ap*ap*s.tx;
-        var by=(1-ap)*(1-ap)*fromY+2*(1-ap)*ap*ctrlY+ap*ap*s.ty;
-        tx=bx-s.cx; ty=by-s.cy;
-        rot=s.vr*(0.6*(1-ap)+ap)*720;
-        alpha=1-ap*0.5;
-        scaleX=1+0.18*(1-ap);
-        scaleY=scaleX;
+      if(localP<0.65){
+        // Phase 1: FALL — bricks drop with gravity & spin, like wall crumbling
+        var fp=localP/0.65;
+        var ge=fp*fp; // accelerate (gravity)
+        // Bricks fall downward + slight sideways
+        ty = b.vy * ge * H * 0.75;
+        tx = b.vx * fp * W * 0.14;
+        // Add shake/vibration at start
+        tx += (Math.random()-.5)*(1-fp)*4;
+        b.rot += b.vr*(1+ge*2);
+        rot=b.rot;
+        alpha=fp<0.55?1:Math.max(0,1-(fp-0.55)/0.45);
 
       } else {
-        // Compress into tab pill
-        var cp=easeOut((localP-0.85)/0.15);
-        tx=s.tx-s.cx; ty=s.ty-s.cy;
-        rot=s.vr*720;
-        alpha=(1-0.5)*Math.max(0,1-cp);
-        scaleX=Math.max(0.05,1.18*(1-cp*0.9));
-        scaleY=Math.max(0.02,1.18*(1-cp));
+        // Phase 2: FADE OUT — bricks vanish, do not fly to tab names
+        var fp2=(localP-0.65)/0.35;
+        ty = b.vy * H * 0.75 + fp2*H*0.2;
+        tx = b.vx * W * 0.14;
+        b.rot += b.vr*0.5;
+        rot=b.rot;
+        alpha=Math.max(0,1-fp2);
       }
 
       ctx.save();
       ctx.globalAlpha=Math.max(0,alpha);
-      ctx.translate(s.cx+tx, s.cy+ty);
+      ctx.translate(b.cx+tx, b.cy+ty);
       ctx.rotate(rot*Math.PI/180);
-      ctx.scale(scaleX,scaleY);
-      ctx.translate(-s.cx,-s.cy);
+      ctx.translate(-b.cx,-b.cy);
 
+      // Brick rectangle
       ctx.beginPath();
-      ctx.moveTo(s.pts[0][0],s.pts[0][1]);
-      ctx.lineTo(s.pts[1][0],s.pts[1][1]);
-      ctx.lineTo(s.pts[2][0],s.pts[2][1]);
-      ctx.closePath();
-      ctx.fillStyle=s.fill;
+      ctx.roundRect ? ctx.roundRect(b.x,b.y,b.w,b.h,3) : ctx.rect(b.x,b.y,b.w,b.h);
+      ctx.fillStyle=b.fill;
       ctx.fill();
 
-      // Glass edge highlight
-      ctx.strokeStyle='rgba(255,255,255,0.22)';
-      ctx.lineWidth=0.9;
-      ctx.stroke();
-
-      // Bright inner edge for depth
+      // Mortar/highlight top edge
+      ctx.strokeStyle='rgba(255,245,235,0.28)';
+      ctx.lineWidth=1;
       ctx.beginPath();
-      ctx.moveTo(s.pts[0][0],s.pts[0][1]);
-      ctx.lineTo(s.pts[1][0],s.pts[1][1]);
-      ctx.strokeStyle='rgba(255,255,255,0.08)';
+      ctx.moveTo(b.x+3,b.y+1); ctx.lineTo(b.x+b.w-3,b.y+1);
+      ctx.stroke();
+      // Shadow bottom edge
+      ctx.strokeStyle='rgba(0,0,0,0.4)';
       ctx.lineWidth=1.5;
+      ctx.beginPath();
+      ctx.moveTo(b.x+2,b.y+b.h-1); ctx.lineTo(b.x+b.w-2,b.y+b.h-1);
       ctx.stroke();
 
       ctx.restore();
     }
 
-    // Spark particles at tab positions during arrival phase
-    if(p>0.55 && p<0.95){
-      var sp=(p-0.55)/0.40;
-      tabTargets.forEach(function(tgt){
-        for(var k=0;k<3;k++){
-          var angle=Math.random()*Math.PI*2;
-          var dist2=Math.random()*28*sp;
-          var px=tgt.x+Math.cos(angle)*dist2;
-          var py=tgt.y+Math.sin(angle)*dist2;
-          ctx.beginPath();
-          ctx.arc(px,py,Math.random()*2.5,0,Math.PI*2);
-          ctx.fillStyle='hsla('+(260+Math.random()*80)+',100%,75%,'+(1-sp)*0.9+')';
-          ctx.fill();
-        }
-      });
+    // Dust particles during crumble phase
+    if(p>0.05 && p<0.55){
+      var dp=(p-0.05)/0.50;
+      var numDust=Math.floor(dp*18);
+      for(var k=0;k<numDust;k++){
+        var px=Math.random()*W;
+        var py=Math.random()*H*0.8+H*0.1;
+        var pr=Math.random()*3+0.5;
+        ctx.beginPath();
+        ctx.arc(px,py,pr,0,Math.PI*2);
+        ctx.fillStyle='rgba(200,180,150,'+(Math.random()*0.4+0.1)+')';
+        ctx.fill();
+      }
     }
+
+    // No sparks at tab targets — bricks fall and disappear cleanly
 
     if(p<1){ requestAnimationFrame(frame); }
     else { cvs.remove(); }
   }
 
   requestAnimationFrame(frame);
+
+  }, chipDelay); // end setTimeout for chip stagger
 }
 function checkShowWelcome(){
   if(typeof _IS_VIEWER!=='undefined'&&_IS_VIEWER)return;
@@ -7667,13 +7655,65 @@ return '<div class="hdr" style="border-bottom:3px solid '+solidColor+'"><div sty
 +'<div><div class="rt">'+title+'</div><div class="rd">'+sub+'</div><div class="rp">'+now.toLocaleString('en-IN',{timeZone:'Asia/Kolkata'})+'</div></div></div>';
 }
 function pftr(){
-return '<div class="footer">'
-+'<div class="sig"><div class="sl"></div><div class="slb">Site Supervisor</div></div>'
-+'<div class="sig" style="text-align:center"><div class="sl" style="margin:0 auto"></div><div class="slb">Prepared By</div></div>'
-+'<div class="sig" style="text-align:right"><div class="sl" style="margin-left:auto"></div><div class="slb">Authorized</div></div>'
-+'</div>'
-/* Normal flow — appears once at end of document only, never repeats */
-+'<div style="text-align:center;margin-top:8px;font-size:8px;color:#d1d5db">app.sanjineer.in</div>';
+// Load saved signatures and render them in the correct PDF positions
+var sigs = [];
+try { sigs = JSON.parse(localStorage.getItem('sanj_signatures')||'[]'); } catch(e){ sigs=[]; }
+
+// Role priority order for positioning
+var roleOrder = ['Prepared By','Site Engineer','Site Incharge','Checked By','Approved By','Project Manager','Contractor / Owner','Client'];
+
+// Filter saved sigs that match our authority roles, preserve order
+var placed = [];
+roleOrder.forEach(function(role){
+  sigs.forEach(function(s){ if(s.role===role) placed.push(s); });
+});
+// Any remaining sigs not in roleOrder
+sigs.forEach(function(s){
+  if(roleOrder.indexOf(s.role)===-1) placed.push(s);
+});
+
+if(!placed.length){
+  // Default static footer if no signatures saved
+  return '<div class="footer">'
+    +'<div class="sig"><div class="sl"></div><div class="slb">Prepared By</div></div>'
+    +'<div class="sig" style="text-align:center"><div class="sl" style="margin:0 auto"></div><div class="slb">Site Engineer</div></div>'
+    +'<div class="sig" style="text-align:right"><div class="sl" style="margin-left:auto"></div><div class="slb">Approved By</div></div>'
+    +'</div>'
+    +'<div style="text-align:center;margin-top:8px;font-size:8px;color:#d1d5db">app.sanjineer.in</div>';
+}
+
+// Render placed signatures in up to 4 per row
+var rows = [];
+var perRow = placed.length <= 3 ? placed.length : placed.length <= 6 ? Math.ceil(placed.length/2) : 4;
+for(var i=0;i<placed.length;i+=perRow){
+  rows.push(placed.slice(i,i+perRow));
+}
+
+var footerHtml = '<div style="margin-top:24px;padding-top:12px;border-top:2px solid #e5e7eb">';
+rows.forEach(function(row){
+  footerHtml += '<div style="display:flex;justify-content:'+(row.length===1?'flex-start':'space-between')+';gap:10px;margin-bottom:18px">';
+  row.forEach(function(s, idx){
+    var align = row.length===1 ? 'left' : idx===0 ? 'left' : idx===row.length-1 ? 'right' : 'center';
+    var marginStyle = align==='right'?'margin-left:auto':align==='center'?'margin:0 auto':'';
+    footerHtml += '<div style="text-align:'+align+';flex:1">';
+    if(s.img && s.img.length > 50){
+      footerHtml += '<div style="min-height:44px;display:flex;align-items:flex-end;justify-content:'+(align==='right'?'flex-end':align==='center'?'center':'flex-start')+'">'
+        +'<img src="'+s.img+'" style="max-width:120px;height:40px;object-fit:contain;display:block;'+(align==='right'?'margin-left:auto':align==='center'?'margin:0 auto':'')+'" />'
+        +'</div>';
+    } else {
+      footerHtml += '<div style="min-height:44px;border-bottom:1.5px solid #374151;'+(marginStyle?marginStyle+';':'')+';max-width:140px;width:100%"></div>';
+    }
+    footerHtml += '<div style="border-top:1.5px solid #374151;padding-top:4px;margin-top:'+(s.img&&s.img.length>50?'4px':'0')+';max-width:140px;'+(align==='right'?'margin-left:auto':align==='center'?'margin:0 auto':'')+'">'
+      +'<div style="font-size:9px;color:#6b7280;font-weight:600">'+s.role+'</div>'
+      +'<div style="font-size:10px;font-weight:800;color:#374151;margin-top:2px">'+s.name+'</div>'
+      +'</div>'
+      +'</div>';
+  });
+  footerHtml += '</div>';
+});
+footerHtml += '</div>'
+  +'<div style="text-align:center;margin-top:8px;font-size:8px;color:#d1d5db">app.sanjineer.in</div>';
+return footerHtml;
 }
 function opw(html){
   function _patchClose(h,fn){
@@ -8154,11 +8194,11 @@ try {
         {src:iconDataUrl, sizes:'512x512', type:'image/png', purpose:'any maskable'}
       ];
     } else {
-      // Fallback SVG with royal green + crane emoji
+      // Fallback SVG with correct gradient
       var svgFallback = 'data:image/svg+xml,' + encodeURIComponent(
         '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">' +
         '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">' +
-        '<stop offset="0%" stop-color="#1a5c38"/><stop offset="100%" stop-color="#1e7a47"/>' +
+        '<stop offset="0%" stop-color="#1e293b"/><stop offset="100%" stop-color="#4f46e5"/>' +
         '</linearGradient></defs>' +
         '<rect width="192" height="192" rx="38" fill="url(#g)"/>' +
         '<text x="96" y="130" font-size="100" text-anchor="middle">&#127959;</text>' +
@@ -8169,7 +8209,7 @@ try {
     var m = {
       name:'Sanjineer', short_name:'Sanjineer',
       start_url:'.', display:'standalone',
-      background_color:'#1a5c38', theme_color:'#1a5c38',
+      background_color:'#1e293b', theme_color:'#4f46e5',
       icons: icons
     };
     var el = document.getElementById('pwa-manifest');
@@ -8186,10 +8226,10 @@ try {
       var cvs = document.createElement('canvas');
       cvs.width = SZ; cvs.height = SZ;
       var ctx = cvs.getContext('2d');
-      // Royal green gradient background
-      var grad = ctx.createLinearGradient(0,0,SZ,SZ);
-      grad.addColorStop(0, '#1a5c38');
-      grad.addColorStop(1, '#1e7a47');
+      // linear-gradient(135deg,#1e293b,#4f46e5)
+      var grad = ctx.createLinearGradient(0,0,SZ,SZ); // 135deg ≈ TL→BR
+      grad.addColorStop(0, '#1e293b');
+      grad.addColorStop(1, '#4f46e5');
       // Rounded rect background
       var r = 96;
       ctx.beginPath();
@@ -8204,8 +8244,8 @@ try {
       ctx.closePath();
       ctx.fillStyle = grad;
       ctx.fill();
-      // Draw logo centred with padding
-      var pad = 80;
+      // Draw logo 1.6x bigger — less padding so logo fills nicely
+      var pad = 46;
       ctx.drawImage(logoImg, pad, pad, SZ-pad*2, SZ-pad*2);
       var dataUrl = cvs.toDataURL('image/png');
       _buildManifestWithIcon(dataUrl);
@@ -14277,7 +14317,7 @@ function placeSig(targetId, sigIdx) {
 document.addEventListener('DOMContentLoaded', function(){
   var modal = document.createElement('div');
   modal.id = 'sig-modal';
-  var _roleOpts = '<option value="">— Select authority role —</option><option value="Site Supervisor">Site Supervisor</option><option value="Prepared By">Prepared By</option><option value="Authorized">Authorized</option><option value="Authorised By">Authorised By</option><option value="Client Acceptance">Client Acceptance</option><option value="Supplier Acknowledgement">Supplier Acknowledgement</option><option value="Site Engineer">Site Engineer</option><option value="Project Manager">Project Manager</option><option value="Site Incharge">Site Incharge</option><option value="Checked By">Checked By</option><option value="Approved By">Approved By</option><option value="Contractor">Contractor</option><option value="Consultant">Consultant</option><option value="Director / Owner">Director / Owner</option><option value="Witness">Witness</option>';
+  var _roleOpts = '<option value="">— Select authority role —</option><option value="Site Engineer">Site Engineer</option><option value="Site Incharge">Site Incharge</option><option value="Prepared By">Prepared By</option><option value="Approved By">Approved By</option><option value="Project Manager">Project Manager</option><option value="Checked By">Checked By</option><option value="Contractor / Owner">Contractor / Owner</option><option value="Client">Client</option>';
   modal.innerHTML = '<div style="background:linear-gradient(160deg,#1a1740,#312e81);border-radius:20px;padding:18px;width:92%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,.6)">'
     +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
     +'<p style="font-size:14px;font-weight:900;color:#fff;margin:0">✍️ Add Signature</p>'
