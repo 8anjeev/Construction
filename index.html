@@ -850,8 +850,8 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
     main .space-y-2 > * + * { margin-top: 5px !important; }
     main .space-y-4 > * + * { margin-top: 9px !important; }
 
-    /* ── 7. Nav tab bar ── */
-    nav .tab-btn { font-size: 11px !important; font-weight: 600 !important; padding: 4px 8px !important; }
+    /* ── 7. Nav tab bar — height/padding locked by #nav-ratio-lock above ── */
+    nav .tab-btn { font-size: 11px !important; font-weight: 600 !important; }
 
     /* ── 8. Bill tab selector — compact single-row nav ── */
     #tab-bill > div:first-child button {
@@ -1010,7 +1010,7 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
     .stat-card{box-shadow:0 10px 30px rgba(0,0,0,0.32),0 3px 10px rgba(0,0,0,0.18)!important;}
     .tab-btn{transition:all .15s;background:transparent;color:rgba(255,255,255,0.45);border:none;cursor:pointer;outline:none;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;touch-action:manipulation;}
     button{-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
-    .tab-btn.active{background:rgba(255,255,255,0.18);color:#ffffff;box-shadow:0 2px 10px rgba(0,0,0,.2);font-weight:700;}
+    .tab-btn.active{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#ffffff;box-shadow:0 2px 10px rgba(99,102,241,.35);font-weight:700;}
     .expand-content{max-height:0;overflow:hidden;transition:max-height .35s ease;}
     .expand-content.open{max-height:4000px;}
     .calendar-day{transition:.1s;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,0.12);border-radius:6px;}
@@ -1244,6 +1244,29 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
     /* ══ 10. PRINT AREA BUTTONS — hide in print ══ */
     @media print {
       main button { display: none !important; }
+      /* Android WebView: when _pf_overlay is full-screen during print, hide everything else */
+      body > *:not(#_pf_overlay) { }
+      #_pf_topbar { display: none !important; }
+    }
+    /* ══════════════════════════════════════════
+       TABLET LAYOUT  (640px – 1023px) — fill full screen
+       ══════════════════════════════════════════ */
+    @media (min-width: 640px) and (max-width: 1023px) {
+      #main-app {
+        max-width: 100% !important;
+        width: 100% !important;
+        margin: 0 !important;
+      }
+      #main-app > header {
+        padding: 0 20px !important;
+      }
+      #main-app > nav {
+        padding-left: 4px !important;
+        padding-right: 4px !important;
+      }
+      #main-app > main {
+        padding: 12px 20px 28px 20px !important;
+      }
     }
     /* ══════════════════════════════════════════
        DESKTOP / LAPTOP LAYOUT  (>= 1024px)
@@ -1355,11 +1378,11 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
         color: rgba(255,255,255,0.9) !important;
       }
       #main-app > nav .tab-btn.active {
-        background: rgba(99,102,241,0.28) !important;
+        background: linear-gradient(135deg,#4f46e5,#7c3aed) !important;
         color: #fff !important;
         font-weight: 700 !important;
-        box-shadow: 0 2px 8px rgba(99,102,241,0.25) !important;
-        border-left: 3px solid #818cf8 !important;
+        box-shadow: 0 2px 10px rgba(99,102,241,0.35) !important;
+        border-left: 3px solid rgba(255,255,255,0.6) !important;
       }
 
       /* Main content area */
@@ -1393,6 +1416,126 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
     }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+
+<!-- ═══ NAV + HEADER RATIO LOCK ═══
+     Pins the nav to an exact pixel height so that header:nav ratio
+     stays constant at every zoom level and screen size.
+     Header inner div = 44px + 3px top + 4px bottom = 51px total.
+     Nav = 30px total (incl. border-b 1px). Ratio ≈ 1.7 : 1  (locked).
+     Chips fill full nav height with zero wasted background on all 3 sides.
+-->
+<style id="nav-ratio-lock">
+/* ── Header: explicitly lock inner height ── */
+#main-app > header {
+  padding-top: 3px !important;
+  padding-bottom: 4px !important;
+  flex-shrink: 0 !important;
+}
+#main-app > header > div {
+  height: 44px !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
+}
+
+/* ── Nav: tighter height, horizontal-scroll only ── */
+#main-app > nav {
+  height: 30px !important;
+  min-height: 30px !important;
+  max-height: 30px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  flex-shrink: 0 !important;
+}
+
+/* ── Inner scroll row: horizontal only, no vertical movement ── */
+#main-app > nav > div {
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 2px 6px !important;
+  margin: 0 !important;
+  align-items: center !important;
+  gap: 2px !important;
+  box-sizing: border-box !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  touch-action: pan-x !important;
+  overscroll-behavior-x: contain !important;
+  overscroll-behavior-y: none !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+/* ── Tab chips ── */
+#main-app > nav .tab-btn {
+  height: 25px !important;
+  min-height: 25px !important;
+  padding: 0 7px !important;
+  border-radius: 6px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+  touch-action: manipulation !important;
+}
+#main-app > nav .tab-btn.active {
+  background: linear-gradient(135deg,#4f46e5,#7c3aed) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  box-shadow: 0 1px 8px rgba(99,102,241,0.40) !important;
+}
+
+/* ── iOS landscape: fill full width (phones ~667–926px wide in landscape) ── */
+@media (orientation: landscape) and (min-width: 500px) and (max-width: 1023px) {
+  #main-app {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+  }
+  #main-app > header {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+  #main-app > nav {
+    padding: 0 !important;
+  }
+  #main-app > main {
+    padding: 10px 20px 24px 20px !important;
+  }
+}
+
+/* ── Desktop sidebar nav: override ratio-lock for vertical layout ── */
+@media (min-width: 1024px) {
+  #main-app > nav {
+    height: 100vh !important;
+    min-height: 100vh !important;
+    max-height: 100vh !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    touch-action: pan-y !important;
+  }
+  #main-app > nav > div {
+    height: auto !important;
+    min-height: unset !important;
+    align-items: flex-start !important;
+    flex-direction: column !important;
+    padding: 0 8px !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+    touch-action: pan-y !important;
+  }
+  #main-app > nav .tab-btn {
+    height: auto !important;
+    min-height: auto !important;
+    padding: 8px 12px !important;
+    border-radius: 10px !important;
+    width: 100% !important;
+  }
+}
+</style>
 </head>
 <body>
 
@@ -1460,196 +1603,26 @@ function dismissWelcome(){
   });
   var chipDelay = chips.length*55 + 250;
 
-  // ── After chips done, run wall-break animation ──────────────────────────────
   setTimeout(function(){
-
-  // Collect tab button positions for brick flight targets
-  var tabBtns=Array.prototype.slice.call(document.querySelectorAll('nav .tab-btn'));
-  var tabTargets=tabBtns.slice(0,9).map(function(b){
-    var r=b.getBoundingClientRect();
-    return {x:r.left+r.width/2, y:r.top+r.height/2};
-  });
-  if(!tabTargets.length) tabTargets=[{x:W/2,y:H-30}];
-
-  // Canvas overlay
-  var cvs=document.createElement('canvas');
-  cvs.width=W; cvs.height=H;
-  cvs.style.cssText='position:fixed;inset:0;z-index:999999;pointer-events:none;';
-  document.body.appendChild(cvs);
-  var ctx=cvs.getContext('2d');
-
-  // ── BUILD BRICK GRID ────────────────────────────────────────────────────────
-  // Standard brick: wide rectangle. Each row offset by half-brick (running bond)
-  var BW=Math.floor(W/7);   // brick width
-  var BH=Math.floor(H/14);  // brick height (taller rows = chunky wall feel)
-  var bricks=[];
-  var row=0, y=0;
-  while(y < H+BH){
-    var offset=(row%2===0)?0:BW/2;
-    var x=-offset;
-    while(x < W+BW){
-      var bx=x, by=y, bw=BW-3, bh=BH-3; // -3 for mortar gap
-      var cx2=bx+bw/2, cy2=by+bh/2;
-      // Assign tab target based on column
-      var ti=Math.round((cx2/W)*(tabTargets.length-1));
-      ti=Math.min(Math.max(ti,0),tabTargets.length-1);
-      var tgt=tabTargets[ti];
-      // Brick colour: reddish/crimson radial palette
-      var rnd=Math.random();
-      var fill= rnd<0.15 ? 'hsl(0,'+(65+Math.random()*20)+'%,'+(28+Math.random()*10)+'%)' :  // deep crimson
-                rnd<0.40 ? 'hsl(355,'+(60+Math.random()*18)+'%,'+(38+Math.random()*10)+'%)' :  // rose red
-                rnd<0.65 ? 'hsl(8,'+(58+Math.random()*15)+'%,'+(45+Math.random()*10)+'%)' :    // brick red
-                           'hsl(348,'+(55+Math.random()*18)+'%,'+(42+Math.random()*8)+'%)';    // dark rose
-      // Physics: bricks closer to bottom fall faster, gravity-ish
-      var fallSpeed=2.5+Math.random()*2+(by/H)*3;
-      var spinDir=(Math.random()<0.5)?1:-1;
-      bricks.push({
-        x:bx,y:by,w:bw,h:bh,cx:cx2,cy:cy2,
-        tx:tgt.x,ty:tgt.y,
-        fill:fill,
-        // Gravity fall params
-        vy:fallSpeed,          // fall velocity (grows with gravity)
-        vx:(Math.random()-.5)*1.8, // slight sideways drift
-        vr:spinDir*(1.5+Math.random()*3), // spin deg/frame
-        rot:0,
-        // Arc-to-tab params (phase 2)
-        launched:false,
-        delay:0.05+Math.random()*0.30
-      });
-      x+=BW;
-    }
-    y+=BH; row++;
-  }
-
-  // Hide welcome content
-  overlay.style.visibility='hidden';
-  setTimeout(function(){ overlay.style.display='none'; overlay.style.visibility=''; },2400);
-
-  // ── 3D dashboard card build-in ──────────────────────────────────────────────
-  var styleTag=document.createElement('style');
-  styleTag.id='_dash3d_style';
-  styleTag.textContent='@keyframes _dci{from{opacity:0;transform:perspective(600px) rotateX(-40deg) translateY(55px) scale(.86);}to{opacity:1;transform:perspective(600px) rotateX(0deg) translateY(0) scale(1);}}#tab-dashboard .rounded-2xl{animation:_dci .5s cubic-bezier(.34,1.1,.64,1) both;}';
-  document.head.appendChild(styleTag);
-  var cards=document.querySelectorAll('#tab-dashboard .rounded-2xl');
-  cards.forEach(function(el,i){ el.style.animationDelay=(i*0.055+1.9)+'s'; el.style.animationFillMode='both'; });
-  setTimeout(function(){
-    if(document.getElementById('_dash3d_style')) document.getElementById('_dash3d_style').remove();
-    cards.forEach(function(el){ el.style.animation=''; el.style.animationDelay=''; });
-  },3400);
-
-  // ── ANIMATION LOOP ──────────────────────────────────────────────────────────
-  var TOTAL=2400;
-  var t0=performance.now();
-  var GRAV=0.18; // gravity acceleration per frame
-
-  function easeOut3(t){var u=1-t;return 1-u*u*u;}
-  function easeInOut3(t){return t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;}
-
-  function frame(now){
-    var elapsed=now-t0;
-    var p=Math.min(elapsed/TOTAL,1);
-    ctx.clearRect(0,0,W,H);
-
-    // Dust/dark overlay
-    if(p<0.25){
-      ctx.fillStyle='rgba(8,5,18,'+(p/0.25*0.55)+')';
-      ctx.fillRect(0,0,W,H);
-    } else if(p<0.75){
-      ctx.fillStyle='rgba(8,5,18,0.55)';
-      ctx.fillRect(0,0,W,H);
-    } else {
-      ctx.fillStyle='rgba(8,5,18,'+(1-(p-0.75)/0.25)*0.55+')';
-      ctx.fillRect(0,0,W,H);
-    }
-
-    // Draw mortar background (light grey wall base)
-    if(p<0.35){
-      ctx.fillStyle='rgba(180,160,140,'+(p/0.35*0.3)+')';
-      ctx.fillRect(0,0,W,H);
-    }
-
-    for(var i=0;i<bricks.length;i++){
-      var b=bricks[i];
-      var localP=Math.max(0,Math.min((p-b.delay)/(1-b.delay),1));
-      if(localP<=0) continue;
-
-      var tx,ty,rot,alpha;
-
-      if(localP<0.65){
-        // Phase 1: FALL — bricks drop with gravity & spin, like wall crumbling
-        var fp=localP/0.65;
-        var ge=fp*fp; // accelerate (gravity)
-        // Bricks fall downward + slight sideways
-        ty = b.vy * ge * H * 0.75;
-        tx = b.vx * fp * W * 0.14;
-        // Add shake/vibration at start
-        tx += (Math.random()-.5)*(1-fp)*4;
-        b.rot += b.vr*(1+ge*2);
-        rot=b.rot;
-        alpha=fp<0.55?1:Math.max(0,1-(fp-0.55)/0.45);
-
-      } else {
-        // Phase 2: FADE OUT — bricks vanish, do not fly to tab names
-        var fp2=(localP-0.65)/0.35;
-        ty = b.vy * H * 0.75 + fp2*H*0.2;
-        tx = b.vx * W * 0.14;
-        b.rot += b.vr*0.5;
-        rot=b.rot;
-        alpha=Math.max(0,1-fp2);
-      }
-
-      ctx.save();
-      ctx.globalAlpha=Math.max(0,alpha);
-      ctx.translate(b.cx+tx, b.cy+ty);
-      ctx.rotate(rot*Math.PI/180);
-      ctx.translate(-b.cx,-b.cy);
-
-      // Brick rectangle
-      ctx.beginPath();
-      ctx.roundRect ? ctx.roundRect(b.x,b.y,b.w,b.h,3) : ctx.rect(b.x,b.y,b.w,b.h);
-      ctx.fillStyle=b.fill;
-      ctx.fill();
-
-      // Mortar/highlight top edge
-      ctx.strokeStyle='rgba(255,245,235,0.28)';
-      ctx.lineWidth=1;
-      ctx.beginPath();
-      ctx.moveTo(b.x+3,b.y+1); ctx.lineTo(b.x+b.w-3,b.y+1);
-      ctx.stroke();
-      // Shadow bottom edge
-      ctx.strokeStyle='rgba(0,0,0,0.4)';
-      ctx.lineWidth=1.5;
-      ctx.beginPath();
-      ctx.moveTo(b.x+2,b.y+b.h-1); ctx.lineTo(b.x+b.w-2,b.y+b.h-1);
-      ctx.stroke();
-
-      ctx.restore();
-    }
-
-    // Dust particles during crumble phase
-    if(p>0.05 && p<0.55){
-      var dp=(p-0.05)/0.50;
-      var numDust=Math.floor(dp*18);
-      for(var k=0;k<numDust;k++){
-        var px=Math.random()*W;
-        var py=Math.random()*H*0.8+H*0.1;
-        var pr=Math.random()*3+0.5;
-        ctx.beginPath();
-        ctx.arc(px,py,pr,0,Math.PI*2);
-        ctx.fillStyle='rgba(200,180,150,'+(Math.random()*0.4+0.1)+')';
-        ctx.fill();
-      }
-    }
-
-    // No sparks at tab targets — bricks fall and disappear cleanly
-
-    if(p<1){ requestAnimationFrame(frame); }
-    else { cvs.remove(); }
-  }
-
-  requestAnimationFrame(frame);
-
-  }, chipDelay); // end setTimeout for chip stagger
+    overlay.style.transition='opacity 0.4s ease';
+    overlay.style.opacity='0';
+    setTimeout(function(){
+      overlay.style.display='none';
+      overlay.style.opacity='';
+      // ── Login is mandatory — always auth first ──
+      try{
+        var sess=localStorage.getItem('sanj_auth_session');
+        if(sess){
+          // Already logged in — go to plans page
+          var po=document.getElementById('plans-overlay');
+          if(po) po.style.display='flex';
+          return;
+        }
+      }catch(e){}
+      var ao=document.getElementById('auth-overlay');
+      if(ao) ao.style.display='flex';
+    }, 420);
+  }, chipDelay);
 }
 function checkShowWelcome(){
   if(typeof _IS_VIEWER!=='undefined'&&_IS_VIEWER)return;
@@ -1663,7 +1636,21 @@ function checkShowWelcome(){
   var el=document.getElementById('welcome-overlay');
   if(el)el.style.display='flex';
 }
-document.addEventListener('DOMContentLoaded',checkShowWelcome);
+document.addEventListener('DOMContentLoaded',checkShowWelcomeAndAuth);
+
+// ── Launch app (3D card animation then show main) ──────────────────────────
+function _launchApp(){
+  var styleTag=document.createElement('style');
+  styleTag.id='_dash3d_style';
+  styleTag.textContent='@keyframes _dci{from{opacity:0;transform:perspective(600px) rotateX(-40deg) translateY(55px) scale(.86);}to{opacity:1;transform:perspective(600px) rotateX(0deg) translateY(0) scale(1);}}#tab-dashboard .rounded-2xl{animation:_dci .5s cubic-bezier(.34,1.1,.64,1) both;}';
+  document.head.appendChild(styleTag);
+  var cards=document.querySelectorAll('#tab-dashboard .rounded-2xl');
+  cards.forEach(function(el,i){el.style.animationDelay=(i*0.055+0.3)+'s';el.style.animationFillMode='both';});
+  setTimeout(function(){
+    if(document.getElementById('_dash3d_style'))document.getElementById('_dash3d_style').remove();
+    cards.forEach(function(el){el.style.animation='';el.style.animationDelay='';});
+  },2000);
+}
 
 // ── App logo loader — tries multiple CDNs, falls back to emoji ──
 (function(){
@@ -1705,9 +1692,967 @@ document.addEventListener('DOMContentLoaded',checkShowWelcome);
 
 </script>
 
+<!-- ═══════════════════════════════════════════════════════════
+     PLANS OVERLAY — shown AFTER login, FREE vs PRO comparison
+     ═══════════════════════════════════════════════════════════ -->
+<div id="plans-overlay" style="display:none;position:fixed;inset:0;z-index:99998;background:#07060f;flex-direction:column;align-items:center;justify-content:flex-start;padding:0;overflow-y:auto;">
+  <!-- Ambient blobs -->
+  <div style="position:fixed;top:-80px;left:-60px;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,#4f46e5,#7c3aed);filter:blur(90px);opacity:0.38;pointer-events:none;"></div>
+  <div style="position:fixed;bottom:-60px;right:-40px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,#f59e0b,#f97316);filter:blur(80px);opacity:0.25;pointer-events:none;"></div>
+  <div style="position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,0.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.015) 1px,transparent 1px);background-size:38px 38px;pointer-events:none;"></div>
+  <style>
+    @keyframes plFadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+    @keyframes plPulse{0%,100%{opacity:1}50%{opacity:.7}}
+    @keyframes plSlide{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    .pl2-card{border-radius:20px;padding:20px 16px 16px;position:relative;overflow:hidden;}
+    .pl2-feat{display:flex;align-items:flex-start;gap:9px;margin-bottom:9px;}
+    .pl2-feat-icon{font-size:16px;flex-shrink:0;margin-top:1px;width:22px;text-align:center;}
+    .pl2-feat-text strong{display:block;font-size:11.5px;font-weight:700;color:#fff;margin:0 0 1px;}
+    .pl2-feat-text span{font-size:10px;color:rgba(255,255,255,0.45);line-height:1.4;}
+    .pl2-btn{width:100%;padding:14px;border:none;border-radius:13px;font-weight:800;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s,box-shadow .15s;margin-top:14px;}
+    .pl2-btn:active{transform:scale(.97)!important;}
+    .pl2-divider{height:1px;background:rgba(255,255,255,0.08);margin:14px 0;}
+    .pl2-strike{text-decoration:line-through;color:rgba(255,255,255,0.3);font-size:12px;}
+  </style>
+
+  <div style="position:relative;z-index:2;width:100%;max-width:460px;padding:20px 14px 36px;animation:plFadeUp .55s ease both;">
+
+    <!-- Header -->
+    <div style="text-align:center;margin-bottom:18px;">
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;">
+        <div style="width:36px;height:36px;background:linear-gradient(145deg,#f97316,#fb923c);border-radius:10px;overflow:hidden;box-shadow:0 0 16px rgba(249,115,22,0.4);flex-shrink:0;">
+          <img src="https://cdn.jsdelivr.net/gh/8anjeev/Sanjineer@main/assets/logo.png" style="width:36px;height:36px;object-fit:cover;" onerror="this.style.display='none'">
+        </div>
+        <p style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:#fff;margin:0;">Sanj<span style="background:linear-gradient(90deg,#818cf8,#c084fc,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">ineer</span></p>
+      </div>
+      <!-- Welcome back pill -->
+      <div id="plans-welcome-pill" style="display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.3);border-radius:99px;padding:4px 14px;margin-bottom:10px;">
+        <span style="width:7px;height:7px;border-radius:50%;background:#34d399;flex-shrink:0;animation:plPulse 2s ease-in-out infinite;"></span>
+        <span style="font-size:10.5px;font-weight:600;color:#6ee7b7;" id="plans-welcome-email">Logged in ✓</span>
+      </div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:#fff;margin:0 0 4px;line-height:1.15;">Choose Your Plan</h2>
+      <p style="font-size:11px;color:rgba(255,255,255,0.38);margin:0;">Pick what works for you. Upgrade anytime.</p>
+    </div>
+
+    <!-- Plans grid -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0;">
+
+      <!-- ── FREE card ── -->
+      <div class="pl2-card" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);">
+        <div style="margin-bottom:14px;">
+          <div style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.1);border-radius:99px;padding:3px 10px;margin-bottom:10px;">
+            <span style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.65);letter-spacing:.04em;">FREE</span>
+          </div>
+          <p style="font-size:1.9rem;font-weight:900;color:#fff;margin:0;line-height:1;font-family:'Syne',sans-serif;">₹0</p>
+          <p style="font-size:9.5px;color:rgba(255,255,255,0.32);margin:4px 0 0;">forever · this device</p>
+        </div>
+        <div class="pl2-divider"></div>
+        <div class="pl2-feat"><span class="pl2-feat-icon">📱</span><div class="pl2-feat-text"><strong>Device Only</strong><span>Data on this phone</span></div></div>
+        <div class="pl2-feat"><span class="pl2-feat-icon">✅</span><div class="pl2-feat-text"><strong>All 18 Tabs</strong><span>Full feature access</span></div></div>
+        <div class="pl2-feat"><span class="pl2-feat-icon">🔢</span><div class="pl2-feat-text"><strong>1 Project</strong><span>Single active site</span></div></div>
+        <div class="pl2-feat" style="opacity:.32;"><span class="pl2-feat-icon">✗</span><div class="pl2-feat-text"><strong style="color:rgba(255,255,255,0.4)!important;">No Cloud</strong></div></div>
+        <div class="pl2-feat" style="opacity:.32;"><span class="pl2-feat-icon">✗</span><div class="pl2-feat-text"><strong style="color:rgba(255,255,255,0.4)!important;">No Sharing</strong></div></div>
+        <button class="pl2-btn" onclick="plChooseFree()" style="background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2);">
+          Continue Free →
+        </button>
+      </div>
+
+      <!-- ── PRO card ── -->
+      <div class="pl2-card" style="background:linear-gradient(155deg,#1a1060,#2a1575,#150b4a);border:1.5px solid rgba(139,92,246,0.55);box-shadow:0 0 36px rgba(99,102,241,0.2),inset 0 1px 0 rgba(255,255,255,0.1);">
+        <!-- animated top bar -->
+        <div style="position:absolute;top:0;left:0;right:0;height:2.5px;background:linear-gradient(90deg,#6366f1,#a855f7,#f59e0b,#ec4899,#6366f1);background-size:300% 100%;animation:plSlide 3s linear infinite;border-radius:20px 20px 0 0;"></div>
+        <!-- Popular badge -->
+        <div style="position:absolute;top:10px;right:10px;background:linear-gradient(135deg,#f59e0b,#f97316);border-radius:99px;padding:2px 8px;font-size:8.5px;font-weight:800;color:#fff;letter-spacing:.04em;">⭐ BEST</div>
+        <div style="margin-bottom:14px;margin-top:4px;">
+          <div style="display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,rgba(99,102,241,0.4),rgba(168,85,247,0.4));border:1px solid rgba(139,92,246,0.4);border-radius:99px;padding:3px 10px;margin-bottom:10px;">
+            <span style="font-size:10px;font-weight:700;color:#c4b5fd;letter-spacing:.04em;">PRO ☁️</span>
+          </div>
+          <!-- Pricing with strikethrough -->
+          <div style="display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;">
+            <p style="font-size:1.9rem;font-weight:900;color:#fff;margin:0;line-height:1;font-family:'Syne',sans-serif;">₹30</p>
+            <span class="pl2-strike">₹99</span>
+          </div>
+          <p style="font-size:9.5px;color:rgba(255,255,255,0.42);margin:4px 0 0;">per month · limited offer</p>
+        </div>
+        <div class="pl2-divider" style="background:rgba(139,92,246,0.2)!important;"></div>
+        <div class="pl2-feat"><span class="pl2-feat-icon">☁️</span><div class="pl2-feat-text"><strong>Cloud Sync</strong><span>Auto backup always</span></div></div>
+        <div class="pl2-feat"><span class="pl2-feat-icon">📲</span><div class="pl2-feat-text"><strong>Any Device</strong><span>Phone, laptop, screen</span></div></div>
+        <div class="pl2-feat"><span class="pl2-feat-icon">📂</span><div class="pl2-feat-text"><strong>Multi-Project</strong><span>Unlimited sites</span></div></div>
+        <div class="pl2-feat"><span class="pl2-feat-icon">🔗</span><div class="pl2-feat-text"><strong>Share Links</strong><span>Any tab, anywhere</span></div></div>
+        <div class="pl2-feat"><span class="pl2-feat-icon">🌍</span><div class="pl2-feat-text"><strong>World Access</strong><span>Never lose data</span></div></div>
+        <button class="pl2-btn" onclick="plBuyPro()" style="background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;box-shadow:0 6px 22px rgba(99,102,241,0.5);">
+          Buy Pro — ₹30/mo ✦
+        </button>
+      </div>
+    </div>
+
+    <!-- Guarantee strip -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-top:14px;flex-wrap:wrap;">
+      <span style="font-size:10px;color:rgba(255,255,255,0.28);display:flex;align-items:center;gap:4px;">🔒 Secure payment</span>
+      <span style="font-size:10px;color:rgba(255,255,255,0.28);display:flex;align-items:center;gap:4px;">⚡ Instant activation</span>
+      <span style="font-size:10px;color:rgba(255,255,255,0.28);display:flex;align-items:center;gap:4px;">↩️ Cancel anytime</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     AUTH OVERLAY — mandatory email OTP login (no skip)
+     ═══════════════════════════════════════════════════════════ -->
+<div id="auth-overlay" style="display:none;position:fixed;inset:0;z-index:99999;background:#07060f;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;overflow-y:auto;">
+  <div style="position:absolute;top:-80px;right:-60px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,#4f46e5,#7c3aed);filter:blur(70px);opacity:0.45;pointer-events:none;"></div>
+  <div style="position:absolute;bottom:-60px;left:-40px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,#059669,#0d9488);filter:blur(70px);opacity:0.35;pointer-events:none;"></div>
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.018) 1px,transparent 1px);background-size:36px 36px;pointer-events:none;"></div>
+  <style>
+    @keyframes authFUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+    @keyframes authSpin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+    @keyframes otpPop{0%{transform:scale(0.8);opacity:0}100%{transform:scale(1);opacity:1}}
+    .auth-inp{width:100%;padding:11px 14px;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.14);border-radius:12px;color:#fff;font-size:13px;outline:none;box-sizing:border-box;transition:border-color .2s;}
+    .auth-inp:focus{border-color:rgba(99,102,241,0.7);background:rgba(99,102,241,0.08);}
+    .auth-inp::placeholder{color:rgba(255,255,255,0.3);}
+    .otp-box{width:46px;height:54px;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.18);border-radius:12px;color:#fff;font-size:1.4rem;font-weight:700;text-align:center;outline:none;caret-color:#6366f1;transition:border-color .2s,background .2s;}
+    .otp-box:focus{border-color:#6366f1;background:rgba(99,102,241,0.15);}
+    .auth-submit{width:100%;padding:14px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;border-radius:13px;font-weight:800;font-size:.92rem;cursor:pointer;box-shadow:0 6px 20px rgba(79,70,229,0.4);display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s,box-shadow .15s;}
+    .auth-submit:active{transform:scale(.97);}
+    .auth-submit:disabled{opacity:0.6;cursor:not-allowed;}
+    .auth-back{background:none;border:none;color:rgba(255,255,255,0.35);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;display:block;width:100%;text-align:center;padding:5px 0;}
+    .auth-back:hover{color:rgba(255,255,255,0.6);}
+  </style>
+
+  <div id="auth-inner" style="position:relative;z-index:2;width:100%;max-width:340px;display:flex;flex-direction:column;align-items:center;animation:authFUp .55s ease both;">
+
+    <!-- Logo -->
+    <div style="display:flex;align-items:center;gap:9px;margin-bottom:1.8rem;">
+      <div style="width:42px;height:42px;background:linear-gradient(145deg,#f97316,#fb923c);border-radius:12px;overflow:hidden;box-shadow:0 0 22px rgba(249,115,22,0.45);flex-shrink:0;">
+        <img src="https://cdn.jsdelivr.net/gh/8anjeev/Sanjineer@main/assets/logo.png" style="width:42px;height:42px;object-fit:cover;" onerror="this.style.display='none'">
+      </div>
+      <div>
+        <p style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:#fff;margin:0;line-height:1;">Sanj<span style="background:linear-gradient(90deg,#818cf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">ineer</span></p>
+        <p style="font-size:9.5px;color:rgba(255,255,255,0.38);margin:2px 0 0;">Secure Login — No Password Needed</p>
+      </div>
+    </div>
+
+    <!-- ── STEP 1: Email entry ── -->
+    <div id="auth-step-email" style="width:100%;">
+      <div style="text-align:center;margin-bottom:18px;">
+        <div style="width:52px;height:52px;background:linear-gradient(135deg,#4f46e5,#7c3aed);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 10px;box-shadow:0 6px 20px rgba(79,70,229,0.35);">✉️</div>
+        <h3 style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;color:#fff;margin:0 0 5px;">Enter Your Email</h3>
+        <p style="font-size:11px;color:rgba(255,255,255,0.4);margin:0;line-height:1.5;">We'll send a 6-digit OTP code to verify you.<br><strong style="color:rgba(255,255,255,0.6);">No password — ever.</strong></p>
+      </div>
+      <input id="auth-email-inp" class="auth-inp" type="email" placeholder="your@email.com" style="margin-bottom:10px;" oninput="document.getElementById('auth-email-err').style.display='none'">
+      <p id="auth-email-err" style="font-size:11px;color:#fca5a5;margin:0 0 10px;display:none;text-align:center;"></p>
+      <button class="auth-submit" id="auth-otp-send-btn" onclick="authSendOTP()">
+        <span id="auth-otp-send-label">Send Login Code →</span>
+      </button>
+      <p style="text-align:center;font-size:10px;color:rgba(255,255,255,0.22);margin-top:14px;line-height:1.5;">By continuing, you agree to Sanjineer's terms.<br>Your account is free. No spam ever.</p>
+    </div>
+
+    <!-- ── STEP 2: OTP verification ── -->
+    <div id="auth-step-otp" style="width:100%;display:none;">
+      <div style="text-align:center;margin-bottom:20px;">
+        <div style="width:52px;height:52px;background:linear-gradient(135deg,#059669,#10b981);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 10px;box-shadow:0 6px 20px rgba(5,150,105,0.35);">🔐</div>
+        <h3 style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;color:#fff;margin:0 0 5px;">Check Your Email</h3>
+        <p style="font-size:11px;color:rgba(255,255,255,0.4);margin:0;line-height:1.5;">Enter the 6-digit code we sent to<br><strong id="auth-otp-email-label" style="color:rgba(255,255,255,0.7);"></strong></p>
+      </div>
+      <!-- 6-box OTP input -->
+      <div id="auth-otp-boxes" style="display:flex;gap:7px;justify-content:center;margin-bottom:16px;animation:otpPop .4s ease;">
+        <input class="otp-box" maxlength="1" type="tel" oninput="otpMove(this,0)" onkeydown="otpBack(event,this,0)">
+        <input class="otp-box" maxlength="1" type="tel" oninput="otpMove(this,1)" onkeydown="otpBack(event,this,1)">
+        <input class="otp-box" maxlength="1" type="tel" oninput="otpMove(this,2)" onkeydown="otpBack(event,this,2)">
+        <input class="otp-box" maxlength="1" type="tel" oninput="otpMove(this,3)" onkeydown="otpBack(event,this,3)">
+        <input class="otp-box" maxlength="1" type="tel" oninput="otpMove(this,4)" onkeydown="otpBack(event,this,4)">
+        <input class="otp-box" maxlength="1" type="tel" oninput="otpMove(this,5)" onkeydown="otpBack(event,this,5)">
+      </div>
+      <p id="auth-otp-err" style="font-size:11px;color:#fca5a5;margin:0 0 10px;display:none;text-align:center;"></p>
+      <button class="auth-submit" id="auth-verify-btn" onclick="authVerifyOTP()" style="background:linear-gradient(135deg,#059669,#10b981);box-shadow:0 6px 20px rgba(5,150,105,0.4);">
+        <span id="auth-verify-label">Verify &amp; Enter App ✓</span>
+      </button>
+      <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-top:12px;">
+        <button id="auth-resend-btn" onclick="authResendOTP()" style="background:none;border:none;color:rgba(99,102,241,0.7);font-size:10.5px;cursor:pointer;font-weight:600;">Resend Code</button>
+        <span style="color:rgba(255,255,255,0.2);font-size:10px;">·</span>
+        <button onclick="authBackToEmail()" class="auth-back" style="width:auto;margin:0;">← Change Email</button>
+      </div>
+      <div id="auth-resend-timer" style="text-align:center;font-size:10px;color:rgba(255,255,255,0.3);margin-top:6px;"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     RAZORPAY PRO PURCHASE LANDING — full-screen payment page
+     ═══════════════════════════════════════════════════════════ -->
+<div id="razorpay-landing" style="display:none;position:fixed;inset:0;z-index:100001;background:#06050e;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;overflow-y:auto;">
+  <div style="position:absolute;top:-60px;right:-40px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,#f59e0b,#f97316);filter:blur(80px);opacity:0.3;pointer-events:none;"></div>
+  <div style="position:absolute;bottom:-40px;left:-30px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,#6366f1,#a855f7);filter:blur(80px);opacity:0.3;pointer-events:none;"></div>
+  <style>
+    @keyframes rzpFade{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+    .rzp-feat-row{display:flex;align-items:center;gap:10px;padding:9px 12px;background:rgba(255,255,255,0.04);border-radius:10px;margin-bottom:7px;}
+    .rzp-feat-row .rzp-fi{font-size:18px;flex-shrink:0;width:26px;text-align:center;}
+    .rzp-feat-row p{margin:0;font-size:11.5px;font-weight:700;color:#fff;}
+    .rzp-feat-row span{font-size:10px;color:rgba(255,255,255,0.4);}
+  </style>
+  <div style="position:relative;z-index:2;width:100%;max-width:380px;animation:rzpFade .5s ease both;">
+    <button onclick="closeRazorpayLanding()" style="position:absolute;top:-8px;right:0;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:50%;width:30px;height:30px;color:rgba(255,255,255,0.55);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
+      <div style="width:44px;height:44px;background:linear-gradient(135deg,#f59e0b,#f97316);border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 18px rgba(245,158,11,0.4);">⭐</div>
+      <div>
+        <p style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;color:#fff;margin:0;line-height:1;">Upgrade to Pro</p>
+        <p style="font-size:10px;color:rgba(255,255,255,0.38);margin:3px 0 0;">Unlock everything ☁️</p>
+      </div>
+    </div>
+    <div style="background:linear-gradient(135deg,rgba(99,102,241,0.2),rgba(168,85,247,0.15));border:1px solid rgba(99,102,241,0.35);border-radius:16px;padding:16px 18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:8px;">
+          <p style="font-size:2.2rem;font-weight:900;color:#fff;margin:0;font-family:'Syne',sans-serif;line-height:1;">₹30</p>
+          <p style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.35);margin:0;text-decoration:line-through;">₹99</p>
+        </div>
+        <p style="font-size:10px;color:rgba(255,255,255,0.4);margin:4px 0 0;">per month · billed monthly</p>
+      </div>
+      <div style="text-align:center;background:linear-gradient(135deg,#f59e0b,#f97316);border-radius:10px;padding:7px 12px;">
+        <p style="font-size:11px;font-weight:800;color:#fff;margin:0;line-height:1.2;">70% OFF</p>
+        <p style="font-size:9px;color:rgba(255,255,255,0.8);margin:2px 0 0;">limited offer</p>
+      </div>
+    </div>
+    <div style="margin-bottom:16px;">
+      <div class="rzp-feat-row"><span class="rzp-fi">☁️</span><div><p>Cloud Sync — Real-time Backup</p><span>Never lose a single entry, ever</span></div></div>
+      <div class="rzp-feat-row"><span class="rzp-fi">📲</span><div><p>Any Device, Anywhere in World</p><span>Phone · Laptop · Shared Monitor</span></div></div>
+      <div class="rzp-feat-row"><span class="rzp-fi">📂</span><div><p>Unlimited Projects</p><span>Switch between sites with one tap</span></div></div>
+      <div class="rzp-feat-row"><span class="rzp-fi">🔗</span><div><p>Share Any Tab as View Link</p><span>Daily report, drawings, attendance…</span></div></div>
+      <div class="rzp-feat-row"><span class="rzp-fi">🌍</span><div><p>Monitor on Mobile While on Laptop</p><span>Real-time sync across all your screens</span></div></div>
+    </div>
+    <button onclick="rzpDoPurchase()" id="rzp-pay-btn" style="width:100%;padding:16px;background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;border:none;border-radius:14px;font-weight:800;font-size:1rem;cursor:pointer;box-shadow:0 6px 26px rgba(245,158,11,0.45);display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .15s,box-shadow .15s;margin-bottom:10px;" ontouchstart="this.style.transform='scale(.97)'" ontouchend="this.style.transform='scale(1)'">
+      <span>⭐</span><span id="rzp-pay-label">Pay ₹30 — Activate Pro Now</span><span>→</span>
+    </button>
+    <p style="text-align:center;font-size:9.5px;color:rgba(255,255,255,0.22);margin:0 0 14px;">Secure payment via Razorpay · Instant activation · Cancel anytime</p>
+    <div style="border-top:1px solid rgba(255,255,255,0.08);padding-top:12px;text-align:center;">
+      <p style="font-size:10px;color:rgba(255,255,255,0.3);margin:0 0 7px;">Already a Pro member on another device?</p>
+      <button onclick="restoreProPurchase()" style="padding:7px 18px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:9px;color:rgba(255,255,255,0.5);font-size:10.5px;font-weight:700;cursor:pointer;">🔄 Restore Purchase</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  PLANS + AUTH LOGIC  (v3 — auth first, plans after)
+// ═══════════════════════════════════════════════════════════
+var _authEmail = '';
+var _otpResendTimer = null;
+
+function plShowWelcomePill(){
+  try{
+    var sess=JSON.parse(localStorage.getItem('sanj_auth_session')||'{}');
+    var el=document.getElementById('plans-welcome-email');
+    if(el&&sess.email) el.textContent='✓ '+sess.email;
+  }catch(e){}
+}
+
+/* ── Plans buttons ── */
+function plChooseFree(){
+  try{localStorage.setItem('sanj_cloud_choice','local');}catch(e){}
+  var po=document.getElementById('plans-overlay');
+  if(po){po.style.transition='opacity .35s ease';po.style.opacity='0';setTimeout(function(){po.style.display='none';po.style.opacity='';_launchApp();},350);}
+}
+
+function plBuyPro(){
+  var po=document.getElementById('plans-overlay');
+  var rl=document.getElementById('razorpay-landing');
+  if(po){po.style.transition='opacity .3s ease';po.style.opacity='0';setTimeout(function(){po.style.display='none';po.style.opacity='';},300);}
+  setTimeout(function(){if(rl)rl.style.display='flex';},320);
+}
+
+function closeRazorpayLanding(){
+  var rl=document.getElementById('razorpay-landing');
+  if(rl){rl.style.transition='opacity .3s ease';rl.style.opacity='0';setTimeout(function(){rl.style.display='none';rl.style.opacity='';},300);}
+  setTimeout(function(){
+    var po=document.getElementById('plans-overlay');
+    if(po){po.style.opacity='0';po.style.display='flex';setTimeout(function(){po.style.transition='opacity .3s';po.style.opacity='1';},10);}
+  },320);
+}
+
+function rzpDoPurchase(){
+  var email='';
+  try{var s=JSON.parse(localStorage.getItem('sanj_auth_session')||'{}');email=s.email||'';}catch(e){}
+  if(typeof Razorpay==='undefined'||window._rpLoadErr){
+    alert('Payment gateway loading. Please check your internet connection and try again.');
+    return;
+  }
+  var label=document.getElementById('rzp-pay-label');
+  var btn=document.getElementById('rzp-pay-btn');
+  if(label)label.textContent='Opening payment…';
+  if(btn)btn.disabled=true;
+  var options={
+    key:'rzp_live_REPLACE_WITH_YOUR_KEY',
+    amount:3000,
+    currency:'INR',
+    name:'Sanjineer',
+    description:'Pro Plan — Monthly Cloud Access',
+    image:'https://cdn.jsdelivr.net/gh/8anjeev/Sanjineer@main/assets/logo.png',
+    prefill:{email:email},
+    theme:{color:'#6366f1'},
+    modal:{ondismiss:function(){
+      if(label)label.textContent='Pay ₹30 — Activate Pro Now';
+      if(btn)btn.disabled=false;
+    }},
+    handler:function(response){
+      if(label)label.textContent='Pay ₹30 — Activate Pro Now';
+      if(btn)btn.disabled=false;
+      try{
+        var s=JSON.parse(localStorage.getItem('sanj_auth_session')||'{}');
+        s.plan='pro';s.pro_payment_id=response.razorpay_payment_id;
+        s.pro_expires=Date.now()+(30*24*60*60*1000);
+        localStorage.setItem('sanj_auth_session',JSON.stringify(s));
+        localStorage.setItem('sanj_cloud_choice','cloud');
+        localStorage.setItem('sanj_pro','1');
+      }catch(ex){}
+      var rl=document.getElementById('razorpay-landing');
+      if(rl){rl.style.transition='opacity .3s ease';rl.style.opacity='0';setTimeout(function(){rl.style.display='none';rl.style.opacity='';},300);}
+      setTimeout(function(){
+        _launchApp();
+        setTimeout(function(){if(typeof toast==='function')toast('🎉 Pro activated! Cloud sync enabled.','ok');},800);
+      },350);
+    }
+  };
+  try{var rzp=new Razorpay(options);rzp.open();}
+  catch(ex){
+    if(label)label.textContent='Pay ₹30 — Activate Pro Now';
+    if(btn)btn.disabled=false;
+    alert('Could not open payment. Please try again.');
+  }
+}
+
+function restoreProPurchase(){
+  var email='';
+  try{var s=JSON.parse(localStorage.getItem('sanj_auth_session')||'{}');email=s.email||'';}catch(e){}
+  if(!email){alert('Please log in first.');return;}
+  if(typeof toast==='function')toast('Checking purchase for '+email+'…','');
+  setTimeout(function(){if(typeof toast==='function')toast('ℹ️ No active Pro subscription found. Please purchase.','');},1500);
+}
+
+/* ── Pro modal alias ── */
+function openProModal(){plBuyPro();}
+function closeProModal(){closeRazorpayLanding();}
+
+/* ── Startup routing ── */
+function checkShowWelcomeAndAuth(){
+  if(typeof _IS_VIEWER!=='undefined'&&_IS_VIEWER)return;
+  try{
+    var sess=localStorage.getItem('sanj_auth_session');
+    if(sess){
+      plShowWelcomePill();
+      if(!localStorage.getItem(WELCOME_VER)){
+        var el2=document.getElementById('welcome-overlay');
+        if(el2)el2.style.display='flex';
+        return;
+      }
+      var po=document.getElementById('plans-overlay');
+      if(po)po.style.display='flex';
+      return;
+    }
+  }catch(e){}
+  try{
+    if(localStorage.getItem(WELCOME_VER)){
+      var ao=document.getElementById('auth-overlay');
+      if(ao)ao.style.display='flex';
+      return;
+    }
+  }catch(e){}
+  var el=document.getElementById('welcome-overlay');
+  if(el)el.style.display='flex';
+}
+
+/* ── Stubs ── */
+function obChooseLocal(){try{localStorage.setItem('sanj_cloud_choice','local');}catch(e){}  _launchApp();}
+function obToggleCloud(){}
+function obSwitchAuthTab(){}
+
+/* ── Auth OTP ── */
+function authSendOTP(){
+  var inp=document.getElementById('auth-email-inp');
+  var err=document.getElementById('auth-email-err');
+  var email=(inp||{}).value||'';
+  email=email.trim().toLowerCase();
+  var emailRx=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if(!emailRx.test(email)){err.textContent='⚠️ Please enter a valid email address';err.style.display='block';inp.style.borderColor='rgba(248,113,113,0.7)';return;}
+  _authEmail=email;
+  var label=document.getElementById('auth-otp-send-label');
+  var btn=document.getElementById('auth-otp-send-btn');
+  if(label)label.textContent='Sending…';
+  if(btn)btn.disabled=true;
+  _authSendSupabaseOTP(email,function(err2){
+    if(label)label.textContent='Send Login Code →';
+    if(btn)btn.disabled=false;
+    if(err2){err.textContent='⚠️ '+err2;err.style.display='block';return;}
+    document.getElementById('auth-step-email').style.display='none';
+    document.getElementById('auth-step-otp').style.display='block';
+    var lbl=document.getElementById('auth-otp-email-label');
+    if(lbl)lbl.textContent=email;
+    var boxes=document.querySelectorAll('.otp-box');
+    if(boxes[0])boxes[0].focus();
+    _startResendTimer();
+  });
+}
+
+function _authSendSupabaseOTP(email,cb){
+  try{
+    if(typeof window._supa!=='undefined'&&window._supa){
+      window._supa.auth.signInWithOtp({email:email,options:{shouldCreateUser:true}})
+        .then(function(res){if(res&&res.error){cb(res.error.message||'Failed to send code');}else{cb(null);}})
+        .catch(function(e){cb(e&&e.message||'Network error');});
+      return;
+    }
+  }catch(ex){}
+  try{
+    var demoOtp=String(Math.floor(100000+Math.random()*900000));
+    localStorage.setItem('_demo_otp_'+email,demoOtp);
+    localStorage.setItem('_demo_otp_ts',Date.now());
+    console.log('[Sanjineer Demo OTP for '+email+']: '+demoOtp);
+    setTimeout(function(){
+      var t=document.createElement('div');
+      t.textContent='Demo OTP: '+demoOtp;
+      t.style.cssText='position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:999999;background:#1e1b4b;border:1px solid #6366f1;color:#a5b4fc;padding:8px 18px;border-radius:99px;font-size:12px;font-weight:700;white-space:nowrap;box-shadow:0 4px 20px rgba(99,102,241,0.4);';
+      document.body.appendChild(t);
+      setTimeout(function(){t.remove();},8000);
+    },400);
+  }catch(ex){}
+  cb(null);
+}
+
+function _startResendTimer(){
+  var timerEl=document.getElementById('auth-resend-timer');
+  var resendBtn=document.getElementById('auth-resend-btn');
+  var secs=60;
+  if(resendBtn){resendBtn.style.opacity='0.4';resendBtn.style.pointerEvents='none';}
+  clearInterval(_otpResendTimer);
+  _otpResendTimer=setInterval(function(){
+    secs--;
+    if(timerEl)timerEl.textContent='Resend available in '+secs+'s';
+    if(secs<=0){clearInterval(_otpResendTimer);if(timerEl)timerEl.textContent='';if(resendBtn){resendBtn.style.opacity='1';resendBtn.style.pointerEvents='auto';}}
+  },1000);
+}
+
+function authResendOTP(){authBackToEmail();setTimeout(function(){authSendOTP();},200);}
+
+function authBackToEmail(){
+  document.getElementById('auth-step-email').style.display='block';
+  document.getElementById('auth-step-otp').style.display='none';
+  document.querySelectorAll('.otp-box').forEach(function(b){b.value='';});
+  var err=document.getElementById('auth-otp-err');
+  if(err)err.style.display='none';
+}
+
+function otpMove(el,idx){
+  var boxes=document.querySelectorAll('.otp-box');
+  var val=el.value.replace(/\D/g,'');
+  if(val.length>1){
+    for(var i=0;i<val.length&&(idx+i)<boxes.length;i++)boxes[idx+i].value=val[i];
+    var next=idx+val.length;
+    if(next<boxes.length)boxes[next].focus();else boxes[boxes.length-1].focus();
+    el.value=val[0]||'';return;
+  }
+  el.value=val;
+  if(val&&idx<boxes.length-1)boxes[idx+1].focus();
+  var full=true;
+  boxes.forEach(function(b){if(!b.value)full=false;});
+  if(full)authVerifyOTP();
+}
+function otpBack(e,el,idx){
+  if(e.key==='Backspace'&&!el.value){
+    var boxes=document.querySelectorAll('.otp-box');
+    if(idx>0){boxes[idx-1].focus();boxes[idx-1].value='';}
+  }
+}
+
+function authVerifyOTP(){
+  var boxes=document.querySelectorAll('.otp-box');
+  var code='';
+  boxes.forEach(function(b){code+=b.value||'';});
+  if(code.length<6){var e=document.getElementById('auth-otp-err');e.textContent='⚠️ Enter all 6 digits';e.style.display='block';return;}
+  var label=document.getElementById('auth-verify-label');
+  var btn=document.getElementById('auth-verify-btn');
+  if(label)label.textContent='Verifying…';
+  if(btn)btn.disabled=true;
+  _authVerifySupabaseOTP(_authEmail,code,function(err,user){
+    if(label)label.textContent='Verify & Continue ✓';
+    if(btn)btn.disabled=false;
+    if(err){var e=document.getElementById('auth-otp-err');e.textContent='⚠️ '+err;e.style.display='block';return;}
+    try{localStorage.setItem('sanj_auth_session',JSON.stringify({email:_authEmail,plan:'free',ts:Date.now(),user:user||null}));}catch(ex){}
+    var ao=document.getElementById('auth-overlay');
+    if(ao){ao.style.transition='opacity .35s ease';ao.style.opacity='0';setTimeout(function(){ao.style.display='none';ao.style.opacity='';},360);}
+    setTimeout(function(){plShowWelcomePill();var po=document.getElementById('plans-overlay');if(po)po.style.display='flex';},380);
+  });
+}
+
+function _authVerifySupabaseOTP(email,code,cb){
+  try{
+    if(typeof window._supa!=='undefined'&&window._supa){
+      window._supa.auth.verifyOtp({email:email,token:code,type:'email'})
+        .then(function(res){if(res&&res.error){cb(res.error.message||'Invalid code');}else{cb(null,res&&res.data&&res.data.user?res.data.user:null);}})
+        .catch(function(e){cb(e&&e.message||'Network error');});
+      return;
+    }
+  }catch(ex){}
+  try{
+    var stored=localStorage.getItem('_demo_otp_'+email);
+    var ts=parseInt(localStorage.getItem('_demo_otp_ts')||'0');
+    if(stored&&stored===code&&(Date.now()-ts)<600000){localStorage.removeItem('_demo_otp_'+email);cb(null,{email:email,id:'demo-'+email});}
+    else cb('Incorrect code. Please try again.');
+  }catch(ex){cb('Verification failed');}
+}
+
+function obDoLogin(){
+  var email=(document.getElementById('ob-login-email')||{}).value||'';
+  var pass=(document.getElementById('ob-login-pass')||{}).value||'';
+  var errEl=document.getElementById('ob-login-err');
+  if(!email||!pass){if(errEl){errEl.textContent='⚠️ Enter email and password';errEl.style.display='block';}return;}
+  if(errEl)errEl.style.display='none';
+  var re=document.getElementById('auth-login-email');
+  var rp=document.getElementById('auth-login-pass');
+  if(re)re.value=email;
+  if(rp)rp.value=pass;
+  var _plSelectPlan_dummy = function(plan){ /* noop */ };
+  // Update auth badge
+  var icon = document.getElementById('auth-plan-icon');
+  var text = document.getElementById('auth-plan-text');
+  var sub  = document.getElementById('auth-plan-sub');
+  if(plan==='pro'){
+    if(icon) icon.textContent='☁️';
+    if(text) text.textContent='Pro Plan Selected';
+    if(sub)  sub.textContent='Cloud sync · unlimited projects';
+  } else {
+    if(icon) icon.textContent='📱';
+    if(text) text.textContent='Free Plan Selected';
+    if(sub)  sub.textContent='Device storage · 1 project';
+  }
+  // Animate plan card selection
+  var fBtn=document.getElementById('pl-free-btn');
+  var pBtn=document.getElementById('pl-pro-btn');
+  if(plan==='pro'){
+    if(fBtn){fBtn.style.background='rgba(255,255,255,0.08)';fBtn.textContent='Start Free';}
+    if(pBtn){pBtn.style.boxShadow='0 0 0 3px rgba(99,102,241,0.6),0 6px 20px rgba(99,102,241,0.5)';}
+  } else {
+    if(pBtn){pBtn.style.boxShadow='0 6px 20px rgba(99,102,241,0.45)';}
+    if(fBtn){fBtn.style.background='rgba(99,102,241,0.25)';fBtn.textContent='✓ Free Selected';}
+  }
+  // Slide to auth
+  var po=document.getElementById('plans-overlay');
+  var ao=document.getElementById('auth-overlay');
+  if(!po||!ao)return;
+  po.style.transition='opacity .35s ease';
+  po.style.opacity='0';
+  setTimeout(function(){
+    po.style.display='none'; po.style.opacity='';
+    ao.style.display='flex';
+    // If pro chosen, immediately show pro modal after email login
+  },350);
+}
+
+function _plBack(){
+  var ao=document.getElementById('auth-overlay');
+  var po=document.getElementById('plans-overlay');
+  if(ao) ao.style.display='none';
+  if(po){ po.style.opacity='0'; po.style.display='flex'; setTimeout(function(){po.style.transition='opacity .3s';po.style.opacity='1';},10); }
+}
+
+/* ── Auth: Send OTP ── */
+function authSendOTP(){
+  var inp = document.getElementById('auth-email-inp');
+  var err = document.getElementById('auth-email-err');
+  var email = (inp||{}).value||'';
+  email = email.trim().toLowerCase();
+  var emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if(!emailRx.test(email)){
+    err.textContent='⚠️ Please enter a valid email address';
+    err.style.display='block';
+    inp.style.borderColor='rgba(248,113,113,0.7)';
+    return;
+  }
+  _authEmail = email;
+  var label = document.getElementById('auth-otp-send-label');
+  var btn   = document.getElementById('auth-otp-send-btn');
+  if(label) label.textContent='Sending…';
+  if(btn)   btn.disabled=true;
+
+  // Use Supabase magic-link OTP
+  _authSendSupabaseOTP(email, function(err2){
+    if(label) label.textContent='Send Login Code →';
+    if(btn)   btn.disabled=false;
+    if(err2){
+      err.textContent='⚠️ '+err2;
+      err.style.display='block';
+      return;
+    }
+    // Show OTP step
+    document.getElementById('auth-step-email').style.display='none';
+    var otpStep=document.getElementById('auth-step-otp');
+    otpStep.style.display='block';
+    var lbl=document.getElementById('auth-otp-email-label');
+    if(lbl)lbl.textContent=email;
+    // Focus first box
+    var boxes=document.querySelectorAll('.otp-box');
+    if(boxes[0])boxes[0].focus();
+    // Start resend timer
+    _startResendTimer();
+  });
+}
+
+function _authSendSupabaseOTP(email, cb){
+  // Try Supabase OTP
+  try{
+    if(typeof window._supa!=='undefined'&&window._supa){
+      window._supa.auth.signInWithOtp({
+        email:email,
+        options:{shouldCreateUser:true}
+      }).then(function(res){
+        if(res&&res.error){ cb(res.error.message||'Failed to send code'); }
+        else { cb(null); }
+      }).catch(function(e){ cb(e&&e.message||'Network error'); });
+      return;
+    }
+  }catch(ex){}
+  // Fallback: simulate OTP (demo mode — store in localStorage)
+  try{
+    var demoOtp = String(Math.floor(100000+Math.random()*900000));
+    localStorage.setItem('_demo_otp_'+email, demoOtp);
+    localStorage.setItem('_demo_otp_ts', Date.now());
+    console.log('[Sanjineer Demo OTP for '+email+']: '+demoOtp+' (only shown in demo mode)');
+    // In demo mode, auto-show it in a toast-like way
+    setTimeout(function(){
+      var t=document.createElement('div');
+      t.textContent='Demo OTP: '+demoOtp+' (check console)';
+      t.style.cssText='position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:999999;background:#1e1b4b;border:1px solid #6366f1;color:#a5b4fc;padding:8px 18px;border-radius:99px;font-size:12px;font-weight:700;';
+      document.body.appendChild(t);
+      setTimeout(function(){t.remove();},6000);
+    },400);
+  }catch(ex){}
+  cb(null);
+}
+
+function _startResendTimer(){
+  var timerEl=document.getElementById('auth-resend-timer');
+  var resendBtn=document.getElementById('auth-resend-btn');
+  var secs=60;
+  if(resendBtn)resendBtn.style.opacity='0.4';
+  if(resendBtn)resendBtn.style.pointerEvents='none';
+  clearInterval(_otpResendTimer);
+  _otpResendTimer=setInterval(function(){
+    secs--;
+    if(timerEl)timerEl.textContent='Resend in '+secs+'s';
+    if(secs<=0){
+      clearInterval(_otpResendTimer);
+      if(timerEl)timerEl.textContent='';
+      if(resendBtn){resendBtn.style.opacity='1';resendBtn.style.pointerEvents='auto';}
+    }
+  },1000);
+}
+
+function authResendOTP(){
+  authBackToEmail();
+  setTimeout(function(){ authSendOTP(); },200);
+}
+
+function authBackToEmail(){
+  document.getElementById('auth-step-email').style.display='block';
+  document.getElementById('auth-step-otp').style.display='none';
+  var boxes=document.querySelectorAll('.otp-box');
+  boxes.forEach(function(b){b.value='';});
+  var err=document.getElementById('auth-otp-err');
+  if(err)err.style.display='none';
+}
+
+/* OTP box navigation */
+function otpMove(el, idx){
+  var boxes=document.querySelectorAll('.otp-box');
+  var val=el.value.replace(/\D/g,'');
+  if(val.length>1){
+    // Paste support — distribute digits
+    for(var i=0;i<val.length&&(idx+i)<boxes.length;i++){
+      boxes[idx+i].value=val[i];
+    }
+    var next=idx+val.length;
+    if(next<boxes.length)boxes[next].focus();
+    else boxes[boxes.length-1].focus();
+    el.value=val[0]||'';
+    return;
+  }
+  el.value=val;
+  if(val&&idx<boxes.length-1)boxes[idx+1].focus();
+  // Auto-verify when all 6 filled
+  var full=true;
+  boxes.forEach(function(b){if(!b.value)full=false;});
+  if(full)authVerifyOTP();
+}
+function otpBack(e,el,idx){
+  if(e.key==='Backspace'&&!el.value){
+    var boxes=document.querySelectorAll('.otp-box');
+    if(idx>0){boxes[idx-1].focus();boxes[idx-1].value='';}
+  }
+}
+
+/* ── Auth: Verify OTP ── */
+function authVerifyOTP(){
+  var boxes=document.querySelectorAll('.otp-box');
+  var code='';
+  boxes.forEach(function(b){code+=b.value||'';});
+  if(code.length<6){
+    var e=document.getElementById('auth-otp-err');
+    e.textContent='⚠️ Enter all 6 digits';
+    e.style.display='block';
+    return;
+  }
+  var label=document.getElementById('auth-verify-label');
+  var btn=document.getElementById('auth-verify-btn');
+  if(label)label.textContent='Verifying…';
+  if(btn)btn.disabled=true;
+
+  _authVerifySupabaseOTP(_authEmail, code, function(err, user){
+    if(label)label.textContent='Verify & Enter App ✓';
+    if(btn)btn.disabled=false;
+    if(err){
+      var e=document.getElementById('auth-otp-err');
+      e.textContent='⚠️ '+err;
+      e.style.display='block';
+      return;
+    }
+    // Save session (plan chosen later on plans page)
+    try{
+      localStorage.setItem('sanj_auth_session', JSON.stringify({email:_authEmail,plan:'free',ts:Date.now(),user:user||null}));
+    }catch(ex){}
+    // Dismiss auth overlay → show plans
+    var ao=document.getElementById('auth-overlay');
+    if(ao){ao.style.transition='opacity .35s ease';ao.style.opacity='0';setTimeout(function(){ao.style.display='none';ao.style.opacity='';},360);}
+    setTimeout(function(){
+      var po=document.getElementById('plans-overlay');
+      if(po) po.style.display='flex';
+    },380);
+  });
+}
+
+function _authVerifySupabaseOTP(email,code,cb){
+  // Try Supabase OTP verify
+  try{
+    if(typeof window._supa!=='undefined'&&window._supa){
+      window._supa.auth.verifyOtp({
+        email:email,
+        token:code,
+        type:'email'
+      }).then(function(res){
+        if(res&&res.error){ cb(res.error.message||'Invalid code'); }
+        else { cb(null, res&&res.data&&res.data.user?res.data.user:null); }
+      }).catch(function(e){ cb(e&&e.message||'Network error'); });
+      return;
+    }
+  }catch(ex){}
+  // Demo fallback
+  try{
+    var stored=localStorage.getItem('_demo_otp_'+email);
+    var ts=parseInt(localStorage.getItem('_demo_otp_ts')||'0');
+    if(stored&&stored===code&&(Date.now()-ts)<600000){
+      localStorage.removeItem('_demo_otp_'+email);
+      cb(null,{email:email,id:'demo-'+email});
+    } else {
+      cb('Incorrect code. Please try again.');
+    }
+  }catch(ex){cb('Verification failed');}
+}
+
+/* ── checkShowWelcomeAndAuth: startup routing ── */
+function checkShowWelcomeAndAuth(){
+  if(typeof _IS_VIEWER!=='undefined'&&_IS_VIEWER)return;
+  // Already logged in?
+  try{
+    var sess=localStorage.getItem('sanj_auth_session');
+    if(sess){
+      // Seen welcome before — go straight to plans
+      if(localStorage.getItem(WELCOME_VER)){
+        var po=document.getElementById('plans-overlay');
+        if(po) po.style.display='flex';
+        return;
+      }
+      // Show welcome again for new version, then plans
+      var el=document.getElementById('welcome-overlay');
+      if(el) el.style.display='flex';
+      return;
+    }
+  }catch(e){}
+  // Not logged in
+  try{
+    if(localStorage.getItem(WELCOME_VER)){
+      // Seen welcome — go straight to auth
+      var ao=document.getElementById('auth-overlay');
+      if(ao) ao.style.display='flex';
+      return;
+    }
+  }catch(e){}
+  // First ever visit — show welcome splash
+  var el=document.getElementById('welcome-overlay');
+  if(el) el.style.display='flex';
+}
+
+/* ── Pro modal controls ── */
+function openProModal(){
+  var m=document.getElementById('pro-upgrade-modal');
+  if(m)m.style.display='flex';
+}
+function closeProModal(){
+  var m=document.getElementById('pro-upgrade-modal');
+  if(m)m.style.display='none';
+}
+
+function buyProNow(){
+  // Check Razorpay available
+  if(typeof Razorpay==='undefined'||window._rpLoadErr){
+    alert('Payment gateway loading. Please check your connection and try again.');
+    return;
+  }
+  var email='';
+  try{var s=JSON.parse(localStorage.getItem('sanj_auth_session')||'{}');email=s.email||'';}catch(e){}
+  var options={
+    key:'rzp_live_REPLACE_WITH_YOUR_KEY', // ← Replace with your Razorpay Live Key
+    amount:49900, // ₹499 in paise
+    currency:'INR',
+    name:'Sanjineer',
+    description:'Pro Plan — 1 Year Cloud Access',
+    image:'https://cdn.jsdelivr.net/gh/8anjeev/Sanjineer@main/assets/logo.png',
+    prefill:{email:email},
+    theme:{color:'#6366f1'},
+    handler:function(response){
+      // Payment success
+      try{
+        var s=JSON.parse(localStorage.getItem('sanj_auth_session')||'{}');
+        s.plan='pro';
+        s.pro_payment_id=response.razorpay_payment_id;
+        s.pro_expires=Date.now()+(365*24*60*60*1000);
+        localStorage.setItem('sanj_auth_session',JSON.stringify(s));
+        localStorage.setItem('sanj_cloud_choice','cloud');
+        localStorage.setItem('sanj_pro','1');
+      }catch(ex){}
+      closeProModal();
+      if(typeof toast==='function')toast('🎉 Pro activated! Cloud sync enabled.','ok');
+      // Trigger cloud connect if function exists
+      if(typeof openCloudModal==='function')openCloudModal();
+    }
+  };
+  try{
+    var rzp=new Razorpay(options);
+    rzp.open();
+  }catch(ex){alert('Could not open payment. Please try again.');}
+}
+
+function restoreProPurchase(){
+  var email='';
+  try{var s=JSON.parse(localStorage.getItem('sanj_auth_session')||'{}');email=s.email||'';}catch(e){}
+  if(!email){alert('Please log in first.');return;}
+  // In production: call your backend to check if this email has a paid subscription
+  if(typeof toast==='function')toast('Checking purchase for '+email+'…','ok');
+  // Demo: if no real backend, inform user
+  setTimeout(function(){
+    if(typeof toast==='function')toast('ℹ️ No Pro subscription found for this account. Please purchase.','');
+  },1500);
+}
+
+// ── compatibility stubs (existing code may call these) ──
+function obChooseLocal(){
+  try{ localStorage.setItem('sanj_cloud_choice','local'); }catch(e){}
+  var ao=document.getElementById('auth-onboard');
+  if(ao){ao.style.transition='opacity .35s ease';ao.style.opacity='0';setTimeout(function(){ao.style.display='none';ao.style.opacity='';_launchApp();},360);}
+}
+function obToggleCloud(){}
+function obSwitchAuthTab(){}
+
+function obDoLogin(){
+  var email = (document.getElementById('ob-login-email')||{}).value||'';
+  var pass  = (document.getElementById('ob-login-pass')||{}).value||'';
+  var errEl = document.getElementById('ob-login-err');
+  if(!email||!pass){ if(errEl){errEl.textContent='⚠️ Enter email and password'; errEl.style.display='block';} return; }
+  if(errEl)errEl.style.display='none';
+  var re = document.getElementById('auth-login-email');
+  var rp = document.getElementById('auth-login-pass');
+  if(re) re.value = email;
+  if(rp) rp.value = pass;
+  // Show loading on button
+  var btn = document.getElementById('ob-login-btn');
+  btn.textContent='⏳ Logging in…'; btn.disabled=true;
+  // Override the error display to point to our onboard error
+  var _orig_showErr = window._obLoginErrHook;
+  // Wrap doSmartLogin result via auth state change
+  var _unsub;
+  function _onAuth(evt, session){
+    if(evt==='SIGNED_IN'){
+      if(_unsub) _unsub.data.subscription.unsubscribe();
+      try{localStorage.setItem('sanj_cloud_choice','cloud');}catch(e){}
+      btn.textContent='🔑 Login'; btn.disabled=false;
+      _obDismiss();
+    }
+  }
+  if(typeof _sb !== 'undefined' && _sb && _sb.auth){
+    _unsub = _sb.auth.onAuthStateChange(_onAuth);
+  }
+  // Fallback: watch for error in err element
+  var origErrEl = document.getElementById('auth-login-err');
+  var _watchErr = setInterval(function(){
+    if(!btn.disabled){ clearInterval(_watchErr); return; }
+    if(origErrEl && origErrEl.style.display!=='none' && origErrEl.textContent){
+      clearInterval(_watchErr);
+      errEl.textContent = origErrEl.textContent;
+      errEl.style.display = 'block';
+      btn.textContent='🔑 Login'; btn.disabled=false;
+      if(_unsub) try{_unsub.data.subscription.unsubscribe();}catch(e){}
+    }
+  },300);
+  // If user had a subscription open the pay landing — still dismiss onboard
+  var origOpen = window.openPayLanding;
+  window.openPayLanding = function(fl){
+    clearInterval(_watchErr);
+    try{localStorage.setItem('sanj_cloud_choice','cloud');}catch(e){}
+    btn.textContent='🔑 Login'; btn.disabled=false;
+    _obDismiss();
+    setTimeout(function(){ window.openPayLanding=origOpen; if(origOpen) origOpen(fl); },400);
+  };
+  doSmartLogin();
+}
+
+function obDoSignup(){
+  var name  = (document.getElementById('ob-signup-name')||{}).value||'';
+  var email = (document.getElementById('ob-signup-email')||{}).value||'';
+  var pass  = (document.getElementById('ob-signup-pass')||{}).value||'';
+  var errEl = document.getElementById('ob-signup-err');
+  if(!name||!email||!pass){ errEl.textContent='⚠️ Fill all fields'; errEl.style.display='block'; return; }
+  if(pass.length<6){ errEl.textContent='⚠️ Password must be at least 6 characters'; errEl.style.display='block'; return; }
+  errEl.style.display='none';
+  var btn = document.getElementById('ob-signup-btn');
+  btn.textContent='⏳ Creating…'; btn.disabled=true;
+  // Sync to real signup inputs
+  var rn = document.getElementById('auth-signup-name');
+  var re = document.getElementById('auth-signup-email');
+  var rp = document.getElementById('auth-signup-pass');
+  if(rn) rn.value=name; if(re) re.value=email; if(rp) rp.value=pass;
+  // Watch pay landing open as signal of success
+  var origOpen = window.openPayLanding;
+  window.openPayLanding = function(fl){
+    try{localStorage.setItem('sanj_cloud_choice','cloud');}catch(e){}
+    btn.textContent='✨ Create Cloud ID'; btn.disabled=false;
+    _obDismiss();
+    setTimeout(function(){ window.openPayLanding=origOpen; if(origOpen) origOpen(fl); },400);
+  };
+  // Watch for error
+  var origErrEl = document.getElementById('auth-signup-err');
+  var _watchErr = setInterval(function(){
+    if(!btn.disabled){ clearInterval(_watchErr); return; }
+    if(origErrEl && origErrEl.style.display!=='none' && origErrEl.textContent){
+      clearInterval(_watchErr);
+      errEl.textContent = origErrEl.textContent;
+      errEl.style.display='block';
+      btn.textContent='✨ Create Cloud ID'; btn.disabled=false;
+      window.openPayLanding = origOpen;
+    }
+  },300);
+  doAdminSignup();
+}
+</script>
+
 <!-- ========== MAIN APP ========== -->
 
-<div id="main-app" class="flex flex-col min-h-screen" style="max-width:480px;margin:0 auto;">
+<div id="main-app" class="flex flex-col min-h-screen" style="width:100%;max-width:480px;margin:0 auto;">
 
 <!-- HEADER -->
 
@@ -1744,10 +2689,16 @@ document.addEventListener('DOMContentLoaded',checkShowWelcome);
         <p id="hdr-engineer" class="text-amber-300 truncate" style="font-size:10px!important;line-height:1;margin:0;transition:opacity .3s">Set your name</p>
       </div>
     </div>
-    <!-- RIGHT: Total Spends -->
+    <!-- RIGHT: Calculator + Total Spends -->
     <div class="text-right flex-shrink-0" style="display:flex;flex-direction:column;gap:2px;align-items:flex-end">
       <p class="text-purple-200 uppercase" style="font-size:8px!important;letter-spacing:.05em;line-height:1;font-weight:500;margin:0">Total Spends</p>
-      <p id="header-spends" class="text-white" style="font-size:15px!important;line-height:1;font-weight:400;margin:0;transition:all .4s cubic-bezier(.34,1.56,.64,1)">₹0</p>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <!-- Compact calculator trigger — left of spend amount -->
+        <button onclick="openCalcModal()" style="display:flex;align-items:center;justify-content:center;background:transparent;border:none;border-radius:8px;padding:4px 7px;cursor:pointer;-webkit-tap-highlight-color:transparent;outline:none;transition:background .15s;" ontouchstart="this.style.background='rgba(255,255,255,0.18)'" ontouchend="this.style.background='transparent'">
+          <span style="font-size:15px;line-height:1">🖩</span>
+        </button>
+        <p id="header-spends" class="text-white" style="font-size:15px!important;line-height:1;font-weight:400;margin:0;transition:all .4s cubic-bezier(.34,1.56,.64,1)">₹0</p>
+      </div>
     </div>
   </div>
 </header>
@@ -1867,15 +2818,6 @@ document.addEventListener('DOMContentLoaded',checkShowWelcome);
       <button onclick="closeAllAndSettings()" style="width:24px;height:24px;border-radius:50%;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.07);color:#fff;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,transform .15s;" ontouchstart="this.style.transform='scale(.88)'" ontouchend="this.style.transform='scale(1)'">✕</button>
     </div>
 
-    <!-- Login / Cloud -->
-    <button class="sett-btn sett-row" onclick="_settRipple(event,this);closeSettingsPanel();openCloudModal()" id="sett-login-btn">
-      <span style="font-size:15px;flex-shrink:0" id="sett-login-icon">🔒</span>
-      <div style="display:flex;flex-direction:column;gap:1px">
-        <span id="sett-login-title">Login / Cloud</span>
-        <span style="font-size:9px;font-weight:500;color:rgba(255,255,255,0.45)" id="sett-login-sub">Sign in for backup &amp; sync</span>
-      </div>
-    </button>
-
     <!-- Profile Settings -->
     <button class="sett-btn sett-row" onclick="_settRipple(event,this);closeSettingsPanel();openEditProfile()">
       <span style="font-size:15px;flex-shrink:0">👤</span>
@@ -1952,6 +2894,7 @@ document.addEventListener('DOMContentLoaded',checkShowWelcome);
       <div id="sig-list-wrap" style="max-height:120px;overflow-y:auto"><p style="font-size:9px;color:rgba(255,255,255,0.3);text-align:center;margin:4px 0">No signatures yet</p></div>
     </div>
 
+    <!-- Calculator -->
     <!-- Storage badge — hidden from UI; element kept for JS compat -->
     <div style="display:none;">
       <span id="sett-storage-badge"></span>
@@ -2921,30 +3864,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- NAV -->
 
-<nav class="bg-white/10 backdrop-blur-lg border-b border-white/10 sticky top-0 z-30 px-2">
-  <div class="flex overflow-x-auto gap-0.5 py-1" style="scrollbar-width:none;-webkit-overflow-scrolling:touch;">
-    <button class="tab-btn flex-shrink-0 px-2.5 py-1 text-xs font-semibold text-white/70 rounded-lg" data-tab="dashboard" onclick="switchTab('dashboard')">📊 Dashboard</button>
-    <button class="tab-btn flex-shrink-0 px-2.5 py-1 text-xs font-semibold text-white/70 rounded-lg" data-tab="daily" onclick="switchTab('daily')">📋 Report</button>
-    <button class="tab-btn flex-shrink-0 px-2.5 py-1 text-xs font-semibold text-white/70 rounded-lg" data-tab="attendance" onclick="switchTab('attendance')">📅 Attendance</button>
-    <button class="tab-btn flex-shrink-0 px-2.5 py-1 text-xs font-semibold text-white/70 rounded-lg" data-tab="boq" onclick="switchTab('boq')">📋 BOQ DPR</button>
-    <button class="tab-btn flex-shrink-0 px-2.5 py-1 text-xs font-semibold text-white/70 rounded-lg" data-tab="machinery" onclick="switchTab('machinery')">⚙️ Machinery</button>
-    <button class="tab-btn flex-shrink-0 px-2.5 py-1 text-xs font-semibold text-white/70 rounded-lg" data-tab="expenses" onclick="switchTab('expenses')">💰 Expenses</button>
-    <button class="tab-btn flex-shrink-0 px-2.5 py-1 text-xs font-semibold text-white/70 rounded-lg" data-tab="materials" onclick="switchTab('materials')">🧱 Materials</button>
-    <button class="tab-btn flex-shrink-0 px-2.5 py-1 text-xs font-semibold text-white/70 rounded-lg" data-tab="tools" onclick="switchTab('tools')">🔧 Tools</button>
-    <button class="tab-btn flex-shrink-0 px-2.5 py-1 text-xs font-semibold text-white/70 rounded-lg" data-tab="drawings" onclick="switchTab('drawings')">📐 Drawings</button>
-    <button class="tab-btn flex-shrink-0 px-2.5 py-1 text-xs font-semibold text-white/70 rounded-lg" data-tab="rentals" onclick="switchTab('rentals')">📦 Rentals</button>
-    <button class="tab-btn flex-shrink-0 px-2.5 py-1 text-xs font-semibold text-white/70 rounded-lg" data-tab="departmental" onclick="switchTab('departmental')">🏗️ Dept Work</button>
-    <button class="tab-btn flex-shrink-0 px-2.5 py-1 text-xs font-semibold text-white/70 rounded-lg" data-tab="contractors" onclick="switchTab('contractors')">👥 Teams</button>
-    <button class="tab-btn flex-shrink-0 px-2.5 py-1 text-xs font-semibold text-white/70 rounded-lg" data-tab="budget" onclick="switchTab('budget')">📊 Budget</button>
-    <button class="tab-btn flex-shrink-0 px-2.5 py-1 text-xs font-semibold text-white/70 rounded-lg" data-tab="schedule" onclick="switchTab('schedule')">📅 Schedule</button>
-    <button class="tab-btn flex-shrink-0 px-2.5 py-1 text-xs font-semibold text-white/70 rounded-lg" data-tab="punchlist" onclick="switchTab('punchlist')">📋 Punch List</button>
-    <button class="tab-btn flex-shrink-0 px-2.5 py-1 text-xs font-semibold text-white/70 rounded-lg" data-tab="bill" onclick="switchTab('bill')">🧾 Bill</button>
-    <button class="tab-btn flex-shrink-0 px-2.5 py-1 text-xs font-semibold text-white/70 rounded-lg" data-tab="quotation" onclick="switchTab('quotation')">💼 Quotation</button>
-    <button class="tab-btn flex-shrink-0 px-2.5 py-1 text-xs font-semibold text-white/70 rounded-lg" data-tab="visits" onclick="switchTab('visits')">🏛️ Site Visits</button>
+<nav class="bg-white/10 backdrop-blur-lg border-b border-white/10 sticky top-0 z-30">
+  <div class="flex overflow-x-auto" style="scrollbar-width:none;overflow-y:hidden;touch-action:pan-x;overscroll-behavior-x:contain;overscroll-behavior-y:none;-webkit-overflow-scrolling:touch;">
+    <button class="tab-btn text-white/70" data-tab="dashboard" onclick="switchTab('dashboard')">📊 Dashboard</button>
+    <button class="tab-btn text-white/70" data-tab="daily" onclick="switchTab('daily')">📋 Report</button>
+    <button class="tab-btn text-white/70" data-tab="attendance" onclick="switchTab('attendance')">📅 Attendance</button>
+    <button class="tab-btn text-white/70" data-tab="boq" onclick="switchTab('boq')">📋 BOQ DPR</button>
+    <button class="tab-btn text-white/70" data-tab="machinery" onclick="switchTab('machinery')">⚙️ Machinery</button>
+    <button class="tab-btn text-white/70" data-tab="expenses" onclick="switchTab('expenses')">💰 Expenses</button>
+    <button class="tab-btn text-white/70" data-tab="materials" onclick="switchTab('materials')">🧱 Materials</button>
+    <button class="tab-btn text-white/70" data-tab="tools" onclick="switchTab('tools')">🔧 Tools</button>
+    <button class="tab-btn text-white/70" data-tab="drawings" onclick="switchTab('drawings')">📐 Drawings</button>
+    <button class="tab-btn text-white/70" data-tab="rentals" onclick="switchTab('rentals')">📦 Rentals</button>
+    <button class="tab-btn text-white/70" data-tab="departmental" onclick="switchTab('departmental')">🏗️ Dept Work</button>
+    <button class="tab-btn text-white/70" data-tab="contractors" onclick="switchTab('contractors')">👥 Teams</button>
+    <button class="tab-btn text-white/70" data-tab="budget" onclick="switchTab('budget')">📊 Budget</button>
+    <button class="tab-btn text-white/70" data-tab="schedule" onclick="switchTab('schedule')">📅 Schedule</button>
+    <button class="tab-btn text-white/70" data-tab="punchlist" onclick="switchTab('punchlist')">📋 Punch List</button>
+    <button class="tab-btn text-white/70" data-tab="bill" onclick="switchTab('bill')">🧾 Bill</button>
+    <button class="tab-btn text-white/70" data-tab="quotation" onclick="switchTab('quotation')">💼 Quotation</button>
+    <button class="tab-btn text-white/70" data-tab="visits" onclick="switchTab('visits')">🏛️ Site Visits</button>
   </div>
 </nav>
 
-<main class="flex-1 overflow-y-auto p-3 pb-6">
+<main class="flex-1 overflow-y-auto pb-6" style="padding:6px 6px 24px 6px;">
 
 <!-- ===== DASHBOARD ===== -->
 
@@ -4355,6 +5298,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- ===== QUOTATION / ESTIMATE ===== -->
 <div id="tab-quotation" class="tab-content" style="display:none">
+  <!-- Sub-tab buttons -->
+  <div class="flex gap-2 mb-3">
+    <button id="qtab-btn-quote" onclick="switchQtSubTab('quote')" class="flex-1 py-2 rounded-xl text-sm font-bold text-white active:scale-95" style="background:linear-gradient(135deg,#4f46e5,#7c3aed)">💼 Quotation</button>
+    <button id="qtab-btn-meas" onclick="switchQtSubTab('meas')" class="flex-1 py-2 rounded-xl text-sm font-bold active:scale-95 border-2 border-indigo-300 text-indigo-700 bg-white">📐 Measurement</button>
+  </div>
+
+  <!-- ── Quotation sub-section ── -->
+  <div id="qtab-sec-quote">
   <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
     <div class="flex items-center justify-between mb-2">
       <p class="text-sm font-bold text-gray-700">💼 New Quotation / Estimate</p>
@@ -4400,6 +5351,59 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
     <div id="qt-records-list"><p class="text-gray-400 text-center py-3 text-xs">No quotations saved yet</p></div>
   </div>
+  </div><!-- end qtab-sec-quote -->
+
+  <!-- ── Measurement sub-section ── -->
+  <div id="qtab-sec-meas" style="display:none">
+  <!-- New Measurement Sheet -->
+  <div class="bg-white rounded-2xl p-3 mb-3 shadow-xl">
+    <div class="flex items-center justify-between mb-2">
+      <p class="text-sm font-bold text-gray-700">📐 New Measurement Sheet</p>
+      <button onclick="printMeasurementSheet()" class="g-tobr-indigo500-violet500 text-white rounded-lg text-xs font-bold active:scale-95" style="padding:0 12px">🖨️ Print PDF</button>
+    </div>
+    <div class="grid grid-cols-2 gap-2 mb-2">
+      <div><label class="text-[10px] font-bold text-gray-500 block mb-1">Sheet No.</label><input type="text" id="ms-no" placeholder="MS-001" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400"></div>
+      <div><label class="text-[10px] font-bold text-gray-500 block mb-1">Date</label><input type="date" id="ms-date" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400"></div>
+      <div><label class="text-[10px] font-bold text-gray-500 block mb-1">Work Item / Description</label><input type="text" id="ms-title" placeholder="e.g. Brick Masonry — First Floor" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400"></div>
+      <div><label class="text-[10px] font-bold text-gray-500 block mb-1">Location / Notes</label><input type="text" id="ms-location" placeholder="Location / Remarks" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400"></div>
+    </div>
+    <!-- Measurement rows table -->
+    <div class="flex items-center justify-between mb-2">
+      <p class="text-xs font-bold text-gray-600">Measurement Items</p>
+      <button onclick="addMsRow()" class="g-tobr-amber500-orange500 text-white rounded-lg text-xs font-bold active:scale-95" style="padding:2px 10px">+ Add Row</button>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-xs mb-1" style="min-width:560px">
+        <thead>
+          <tr class="bg-indigo-50">
+            <th class="px-1 py-1.5 text-center text-gray-600 font-bold" style="width:28px">S.No</th>
+            <th class="px-1 py-1.5 text-left text-gray-600 font-bold" style="min-width:110px">Description</th>
+            <th class="px-1 py-1.5 text-center text-gray-600 font-bold" style="width:72px">Unit</th>
+            <th class="px-1 py-1.5 text-center text-gray-600 font-bold" style="width:40px">Nos</th>
+            <th class="px-1 py-1.5 text-center text-gray-600 font-bold" style="width:52px">Length</th>
+            <th class="px-1 py-1.5 text-center text-gray-600 font-bold" style="width:52px">Width</th>
+            <th class="px-1 py-1.5 text-center text-gray-600 font-bold" style="width:52px">Height</th>
+            <th class="px-1 py-1.5 text-right text-gray-600 font-bold" style="width:70px">Qty (unit)</th>
+            <th class="px-1 py-1.5" style="width:20px"></th>
+          </tr>
+        </thead>
+        <tbody id="ms-rows-body"></tbody>
+      </table>
+    </div>
+    <div class="flex justify-between items-center border-t pt-2 mt-1">
+      <p class="text-xs text-gray-500">Total quantity is sum of all rows in their respective units.</p>
+    </div>
+    <button onclick="saveMeasurementSheet()" class="g-tobr-indigo500-violet500 w-full text-white py-2 rounded-xl font-semibold text-sm active:scale-95 mt-2">💾 Save Sheet</button>
+  </div>
+  <!-- Saved Measurement Sheets -->
+  <div class="bg-white rounded-2xl p-3 shadow-xl">
+    <div class="flex items-center justify-between mb-2">
+      <p class="text-sm font-bold text-gray-700">📁 Saved Measurement Sheets</p>
+      <button onclick="renderMsRecords()" class="bg-gray-100 text-gray-600 rounded-lg text-xs font-semibold px-3 py-1">🔄 Refresh</button>
+    </div>
+    <div id="ms-records-list"><p class="text-gray-400 text-center py-3 text-xs">No sheets saved yet</p></div>
+  </div>
+  </div><!-- end qtab-sec-meas -->
 </div>
 
 <!-- ===== SITE VISITS / INSPECTION LOG ===== -->
@@ -5230,6 +6234,12 @@ function istNow() {
 function fc(n) {
   return '\u20b9' + (parseFloat(n)||0).toLocaleString('en-IN', {maximumFractionDigits:2});
 }
+// Format decimal hours as "XH YM"
+function fhm(h){
+  var total = Math.round((parseFloat(h)||0)*60);
+  var hrs = Math.floor(total/60), mins = total%60;
+  return hrs+'H '+(mins<10?'0':'')+mins+'M';
+}
 function fd(d) {
   if (!d) return '--';
   var p = d.split('-');
@@ -5385,8 +6395,6 @@ var _HEADER_COLORS = [
   // 10 solid
   {v:'#4f46e5',label:'Indigo'},
   {v:'#2563eb',label:'Blue'},
-  {v:'#0d9488',label:'Teal'},
-  {v:'#16a34a',label:'Green'},
   {v:'#7c3aed',label:'Violet'},
   {v:'#dc2626',label:'Red'},
   {v:'#e11d48',label:'Rose'},
@@ -5483,6 +6491,30 @@ function applyHeaderColor() {
     hdr.style.backgroundColor = hColor;
     hdr.className = hdr.className.replace(/g-to[br]+-[a-z0-9-]+/g,'').trim();
   }
+  // ── Sync active tab chip to the same profile colour ──
+  var bg = hColor.indexOf('gradient') !== -1 ? hColor : hColor;
+  var isGrad = hColor.indexOf('gradient') !== -1;
+  // Derive a glow colour from the value for box-shadow
+  var glowMatch = hColor.match(/#([0-9a-fA-F]{6})/);
+  var glowHex = glowMatch ? glowMatch[1] : '4f46e5';
+  var r=parseInt(glowHex.slice(0,2),16), g=parseInt(glowHex.slice(2,4),16), b=parseInt(glowHex.slice(4,6),16);
+  var glowRgba = 'rgba('+r+','+g+','+b+',0.45)';
+  var styleId = 'tab-active-color';
+  var el = document.getElementById(styleId);
+  if (!el) { el = document.createElement('style'); el.id = styleId; document.head.appendChild(el); }
+  el.textContent =
+    '#main-app > nav .tab-btn.active {'
+    +'  background: '+bg+' !important;'
+    +'  color: #fff !important;'
+    +'  font-weight: 700 !important;'
+    +'  box-shadow: 0 1px 8px '+glowRgba+' !important;'
+    +'}'
+    +'.tab-btn.active {'
+    +'  background: '+bg+' !important;'
+    +'  color: #fff !important;'
+    +'  font-weight: 700 !important;'
+    +'  box-shadow: 0 2px 10px '+glowRgba+' !important;'
+    +'}';
 }
 function loadProfileLogo(evt) {
   var file = evt.target.files[0]; if (!file) return;
@@ -7564,39 +8596,8 @@ function _pdfHeader(appName, company, reportTitle, rightHtml, showEngineer){
     +(showEngineer && prof.engineer ? '<p style="font-size:10px;color:rgba(255,255,255,0.85);margin-top:2px">'+prof.engineer+'</p>' : '')
     +'</div><div style="text-align:right;flex-shrink:0">'+(rightHtml||defaultRight)+'</div></div>';
 }
-function _pdfFooter(){
-  // Encode saved signatures as JSON for print window use
-  var sigs = [];
-  try { sigs = JSON.parse(localStorage.getItem('sanj_signatures')||'[]'); } catch(e) {}
-  var sigsJson = JSON.stringify(sigs).replace(/'/g,"\\'").replace(/"/g,'&quot;');
-  var sigDropHtml = sigs.length > 0
-    ? '<div id="pdf-sig-drop" style="display:none;position:absolute;bottom:40px;right:20px;background:#fff;border:1.5px solid #e5e7eb;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.15);padding:6px 0;z-index:999;min-width:200px">'
-      + sigs.map(function(s,i){
-        return '<div onclick="placePdfSig('+i+')" style="display:flex;align-items:center;gap:8px;padding:7px 12px;cursor:pointer;border-bottom:1px solid #f3f4f6" onmouseover="this.style.background=\'#eef2ff\'" onmouseout="this.style.background=\'\'">'
-          + '<img src="'+s.img+'" style="height:22px;max-width:70px;object-fit:contain;flex-shrink:0">'
-          + '<div><p style="font-size:11px;font-weight:700;color:#374151;margin:0">'+s.name+'</p>'+(s.role?'<p style="font-size:9px;color:#6b7280;margin:1px 0 0">'+s.role+'</p>':'')+'</div>'
-          + '</div>';
-      }).join('')
-      + '</div>'
-    : '';
-  var sigJs = sigs.length > 0
-    ? '<script>var _pdfSigs='+JSON.stringify(sigs).replace(/<\/script>/g,'')+';'
-      + 'function toggleSigDrop(){var d=document.getElementById("pdf-sig-drop");if(d)d.style.display=d.style.display==="none"?"block":"none";}'
-      + 'function placePdfSig(i){var sig=_pdfSigs[i];if(!sig)return;var zone=document.getElementById("pdf-sig-zone");if(!zone)return;'
-      + 'zone.innerHTML="<div style=\'text-align:center\'><img src=\'"+(sig.img)+"\' style=\'max-width:130px;max-height:44px;object-fit:contain\'><div style=\'font-size:9px;color:#374151;font-weight:700;margin-top:2px\'>"+(sig.name)+"<\/div><\/div>";'
-      + 'var drop=document.getElementById("pdf-sig-drop");if(drop)drop.style.display="none";}'
-      + 'document.addEventListener("dblclick",function(e){if(e.target.closest("#pdf-sig-zone,#pdf-sig-drop"))return;toggleSigDrop();});'
-      + '<\/script>'
-    : '';
-  return '<div style="position:relative;margin-top:20px;padding-top:10px;border-top:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:flex-end;font-size:10px;color:#9ca3af">'
-    + '<span>app.sanjineer.in · '+(lprof()||{company:''}).company+'</span>'
-    + '<div id="pdf-sig-zone" ondblclick="toggleSigDrop()" title="Double-tap to add signature" style="min-width:140px;height:44px;border:1.5px dashed #d1d5db;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#9ca3af;font-size:9px;font-weight:600;position:relative">'
-    + (sigs.length > 0 ? '✍️ Double-tap to sign' : 'Signature: _______________________')
-    + '</div>'
-    + sigDropHtml
-    + '</div>'
-    + sigJs;
-}
+function _pdfFooter(){ return pftr(); }
+
 function pcs(){
 var _p=lprof()||{};
 var _hc=(_p.headerColor&&_p.headerColor.indexOf('gradient')===-1)?_p.headerColor:'#4f46e5';
@@ -7634,7 +8635,7 @@ return ':root{--hc:'+_hc+'}'
 +'.footer{margin-top:24px;padding-top:12px;border-top:2px solid #e5e7eb;display:flex;justify-content:space-between}'
 +'.sig .sl{width:140px;border-top:1.5px solid #374151;margin-top:28px}'
 +'.sig .slb{font-size:9px;color:#6b7280;margin-top:3px}'
-+'@media print{.bar{display:none!important}.content{margin-top:0;zoom:0.62}html,body{margin:0!important;padding:0!important;max-width:none!important}@page{margin:12mm 10mm 18mm 10mm;size:A4}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}'
++'@media print{.bar{display:none!important}.no-print{display:none!important}.sig-zone{border:none!important;padding:0!important;min-height:0!important}.content{margin-top:0;zoom:0.62}html,body{margin:0!important;padding:0!important;max-width:none!important}@page{margin:12mm 10mm 18mm 10mm;size:A4}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}'
 /* Page number bottom-right on every page */
 +'@page{@bottom-right{content:"Page " counter(page) " of " counter(pages);font-size:8px;color:#9ca3af;font-family:Arial,sans-serif}}'
 +'}';
@@ -7654,66 +8655,117 @@ return '<div class="hdr" style="border-bottom:3px solid '+solidColor+'"><div sty
 +'<div style="flex:1;padding:0 12px;text-align:center"><div class="hcname">'+(p.company||'')+'</div>'+(p.address?'<div style="font-size:10px;color:#6b7280;margin-top:3px;font-weight:400">'+p.address+'</div>':'')+'</div>'
 +'<div><div class="rt">'+title+'</div><div class="rd">'+sub+'</div><div class="rp">'+now.toLocaleString('en-IN',{timeZone:'Asia/Kolkata'})+'</div></div></div>';
 }
-function pftr(){
-// Load saved signatures and render them in the correct PDF positions
-var sigs = [];
-try { sigs = JSON.parse(localStorage.getItem('sanj_signatures')||'[]'); } catch(e){ sigs=[]; }
-
-// Role priority order for positioning
-var roleOrder = ['Prepared By','Site Engineer','Site Incharge','Checked By','Approved By','Project Manager','Contractor / Owner','Client'];
-
-// Filter saved sigs that match our authority roles, preserve order
-var placed = [];
-roleOrder.forEach(function(role){
-  sigs.forEach(function(s){ if(s.role===role) placed.push(s); });
-});
-// Any remaining sigs not in roleOrder
-sigs.forEach(function(s){
-  if(roleOrder.indexOf(s.role)===-1) placed.push(s);
-});
-
-if(!placed.length){
-  // Default static footer if no signatures saved
-  return '<div class="footer">'
-    +'<div class="sig"><div class="sl"></div><div class="slb">Prepared By</div></div>'
-    +'<div class="sig" style="text-align:center"><div class="sl" style="margin:0 auto"></div><div class="slb">Site Engineer</div></div>'
-    +'<div class="sig" style="text-align:right"><div class="sl" style="margin-left:auto"></div><div class="slb">Approved By</div></div>'
-    +'</div>'
-    +'<div style="text-align:center;margin-top:8px;font-size:8px;color:#d1d5db">app.sanjineer.in</div>';
+// ── Print Authority Slots ─────────────────────────────────────
+// Stores {middle:'Approved By', right:'Project Manager'} in localStorage
+var _PRINT_AUTH_KEY = 'sanj_print_auth_slots';
+function _getPrintAuthSlots(){
+  try { return JSON.parse(localStorage.getItem(_PRINT_AUTH_KEY)||'{}'); } catch(e){ return {}; }
 }
-
-// Render placed signatures in up to 4 per row
-var rows = [];
-var perRow = placed.length <= 3 ? placed.length : placed.length <= 6 ? Math.ceil(placed.length/2) : 4;
-for(var i=0;i<placed.length;i+=perRow){
-  rows.push(placed.slice(i,i+perRow));
+function _setPrintAuthSlots(obj){
+  try { localStorage.setItem(_PRINT_AUTH_KEY, JSON.stringify(obj)); } catch(e){}
 }
+// All available roles (same 8 the user can save sigs for)
+var _AUTH_ROLES = ['Site Engineer','Site Incharge','Prepared By','Approved By','Project Manager','Checked By','Contractor / Owner','Client'];
 
-var footerHtml = '<div style="margin-top:24px;padding-top:12px;border-top:2px solid #e5e7eb">';
-rows.forEach(function(row){
-  footerHtml += '<div style="display:flex;justify-content:'+(row.length===1?'flex-start':'space-between')+';gap:10px;margin-bottom:18px">';
-  row.forEach(function(s, idx){
-    var align = row.length===1 ? 'left' : idx===0 ? 'left' : idx===row.length-1 ? 'right' : 'center';
-    var marginStyle = align==='right'?'margin-left:auto':align==='center'?'margin:0 auto':'';
-    footerHtml += '<div style="text-align:'+align+';flex:1">';
-    if(s.img && s.img.length > 50){
-      footerHtml += '<div style="min-height:44px;display:flex;align-items:flex-end;justify-content:'+(align==='right'?'flex-end':align==='center'?'center':'flex-start')+'">'
-        +'<img src="'+s.img+'" style="max-width:120px;height:40px;object-fit:contain;display:block;'+(align==='right'?'margin-left:auto':align==='center'?'margin:0 auto':'')+'" />'
-        +'</div>';
-    } else {
-      footerHtml += '<div style="min-height:44px;border-bottom:1.5px solid #374151;'+(marginStyle?marginStyle+';':'')+';max-width:140px;width:100%"></div>';
-    }
-    footerHtml += '<div style="border-top:1.5px solid #374151;padding-top:4px;margin-top:'+(s.img&&s.img.length>50?'4px':'0')+';max-width:140px;'+(align==='right'?'margin-left:auto':align==='center'?'margin:0 auto':'')+'">'
-      +'<div style="font-size:9px;color:#6b7280;font-weight:600">'+s.role+'</div>'
-      +'<div style="font-size:10px;font-weight:800;color:#374151;margin-top:2px">'+s.name+'</div>'
-      +'</div>'
+// Build one signature cell — no box, no border, no padding. Just sig + role text, click role to change.
+function _buildSigCell(role, align, sigs, isInteractive, slotKey){
+  var sig = null;
+  if(role) sigs.forEach(function(s){ if(s.role===role && !sig) sig = s; });
+  var hasSig = sig && sig.img && sig.img.length > 50;
+  // All content aligns to same axis: left col = left, center col = center, right col = right
+  var ta   = align==='center'?'center':align==='right'?'right':'left';
+  var imgM = align==='right'?'margin-left:auto':align==='center'?'margin:0 auto':'margin-right:auto';
+
+  if(!role){
+    if(!isInteractive) return '<div style="flex:1"></div>';
+    return '<div style="flex:1;text-align:'+ta+'">'
+      +'<div style="height:44px"></div>'
+      +'<span onclick="_openRoleList(\''+slotKey+'\')" class="no-print" style="font-size:9px;color:#c4b5fd;font-weight:600;cursor:pointer;text-decoration:underline dotted">+ set role</span>'
       +'</div>';
-  });
-  footerHtml += '</div>';
-});
-footerHtml += '</div>'
-  +'<div style="text-align:center;margin-top:8px;font-size:8px;color:#d1d5db">app.sanjineer.in</div>';
-return footerHtml;
+  }
+
+  // Role set — sig image (or blank space) then role text below, all same horizontal alignment
+  var sigBlock = hasSig
+    ? '<img src="'+sig.img+'" style="display:block;max-width:120px;height:40px;object-fit:contain;'+imgM+'">'
+    : '<div style="height:44px"></div>';
+
+  var roleBlock = isInteractive
+    ? '<span onclick="_openRoleList(\''+slotKey+'\')" style="font-size:9px;color:#6b7280;font-weight:700;letter-spacing:.02em;cursor:pointer">'+role+'</span>'
+    : '<span style="font-size:9px;color:#6b7280;font-weight:700;letter-spacing:.02em">'+role+'</span>';
+
+  return '<div style="flex:1;text-align:'+ta+'">'
+    +sigBlock
+    +roleBlock
+    +'</div>';
+}
+
+function pftr(){
+  var sigs = [];
+  try { sigs = JSON.parse(localStorage.getItem('sanj_signatures')||'[]'); } catch(e){ sigs=[]; }
+  var slots = _getPrintAuthSlots();
+  if(!slots.left) slots.left = 'Site Engineer';
+
+  var sigsJson  = JSON.stringify(sigs).replace(/</g,'\\u003c').replace(/>/g,'\\u003e');
+  var slotsJson = JSON.stringify(slots).replace(/</g,'\\u003c').replace(/>/g,'\\u003e');
+  var rolesJson = JSON.stringify(_AUTH_ROLES);
+
+  var leftHtml  = _buildSigCell(slots.left   || '', 'left',   sigs, true, 'left');
+  var midHtml   = _buildSigCell(slots.middle || '', 'center', sigs, true, 'middle');
+  var rightHtml = _buildSigCell(slots.right  || '', 'right',  sigs, true, 'right');
+
+  // Role picker modal
+  var roleMenu = '<div id="_role_menu" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.45);align-items:center;justify-content:center" class="no-print">'
+    +'<div style="background:#fff;border-radius:14px;padding:16px;min-width:210px;box-shadow:0 20px 60px rgba(0,0,0,0.3)">'
+    +'<p style="font-size:12px;font-weight:800;color:#1f2937;margin-bottom:10px;text-align:center">Select Authority Role</p>'
+    +_AUTH_ROLES.map(function(r){
+      return '<div onclick="_pickRole(\''+r+'\')" style="padding:9px 12px;border-radius:8px;font-size:11px;font-weight:600;color:#374151;cursor:pointer;border:1px solid #e5e7eb;margin-bottom:5px" onmouseover="this.style.background=\'#eef2ff\'" onmouseout="this.style.background=\'\'">'+r+'</div>';
+    }).join('')
+    +'<div onclick="_pickRole(\'\')" style="padding:7px 12px;border-radius:8px;font-size:10px;font-weight:600;color:#9ca3af;cursor:pointer;text-align:center;margin-top:4px;border:1px dashed #e5e7eb" onmouseover="this.style.background=\'#fef2f2\'" onmouseout="this.style.background=\'\'">✕ Clear / None</div>'
+    +'</div></div>';
+
+  // Inline JS for live re-render inside PDF popup
+  var inlineJs = '<sc'+'ript>'
+    +'var _pSigs='+sigsJson+';'
+    +'var _pSlots='+slotsJson+';'
+    +'var _pRoles='+rolesJson+';'
+    +'var _activeSlot=null;'
+    +'function _openRoleList(slot){'
+    +'  _activeSlot=slot;'
+    +'  var m=document.getElementById("_role_menu");if(m)m.style.display="flex";'
+    +'}'
+    +'function _closeRoleList(){var m=document.getElementById("_role_menu");if(m)m.style.display="none";_activeSlot=null;}'
+    +'document.addEventListener("click",function(e){if(e.target===document.getElementById("_role_menu"))_closeRoleList();});'
+    +'function _pickRole(role){'
+    +'  if(_activeSlot===null)return;'
+    +'  _pSlots[_activeSlot]=role;'
+    +'  try{window.parent&&window.parent.localStorage&&window.parent.localStorage.setItem("sanj_print_auth_slots",JSON.stringify(_pSlots));}catch(ex){}'
+    +'  try{window.opener&&window.opener.localStorage&&window.opener.localStorage.setItem("sanj_print_auth_slots",JSON.stringify(_pSlots));}catch(ex){}'
+    +'  _renderCol(_activeSlot,role);'
+    +'  _closeRoleList();'
+    +'}'
+    +'function _renderCol(slot,role){'
+    +'  var col=document.getElementById("_sig_col_"+slot);if(!col)return;'
+    +'  var sig=null;'
+    +'  if(role)_pSigs.forEach(function(s){if(s.role===role&&!sig)sig=s;});'
+    +'  var hasSig=sig&&sig.img&&sig.img.length>50;'
+    +'  var ta={left:"left",middle:"center",right:"right"}[slot]||"left";'
+    +'  var imgM={left:"margin-right:auto",middle:"margin:0 auto",right:"margin-left:auto"}[slot]||"";'
+    +'  col.style.textAlign=ta;'
+    +'  var sigB=hasSig?"<img src=\'"+sig.img+"\' style=\'display:block;max-width:120px;height:40px;object-fit:contain;"+imgM+"\' />":"<div style=\'height:44px\'></div>";'
+    +'  var roleB=role?"<span onclick=\'_openRoleList(\\""+slot+"\\")\'style=\'font-size:9px;color:#6b7280;font-weight:700;letter-spacing:.02em;cursor:pointer\'>"+role+"</span>":"<span onclick=\'_openRoleList(\\""+slot+"\\")\'class=\'no-print\'style=\'font-size:9px;color:#c4b5fd;font-weight:600;cursor:pointer;text-decoration:underline dotted\'>+ set role</span>";'
+    +'  col.innerHTML=sigB+roleB;'
+    +'}'
+    +'<\/sc'+'ript>';
+
+  return '<div style="margin-top:24px;padding-top:12px;border-top:2px solid #e5e7eb">'
+    +'<div style="display:flex;justify-content:space-between;gap:16px">'
+    +'<div id="_sig_col_left"   style="flex:1;text-align:left">'+  leftHtml.replace(/^<div[^>]*>/,'').replace(/<\/div>$/,'')  +'</div>'
+    +'<div id="_sig_col_middle" style="flex:1;text-align:center">'+midHtml.replace(/^<div[^>]*>/,'').replace(/<\/div>$/,'')  +'</div>'
+    +'<div id="_sig_col_right"  style="flex:1;text-align:right">'+  rightHtml.replace(/^<div[^>]*>/,'').replace(/<\/div>$/,'')+'</div>'
+    +'</div></div>'
+    +inlineJs
+    +roleMenu
+    +'<div style="text-align:center;margin-top:8px;font-size:8px;color:#d1d5db">app.sanjineer.in</div>';
 }
 function opw(html){
   function _patchClose(h,fn){
@@ -7759,7 +8811,28 @@ function opw(html){
   function _closeOv(){var o=document.getElementById('_pf_overlay');if(o)o.remove();}
   document.getElementById('_pf_back').onclick=_closeOv;
   document.getElementById('_pf_x').onclick=_closeOv;
-  document.getElementById('_pf_print').onclick=function(){try{ifr.contentWindow.print();}catch(e){window.print();}};
+  topbar.id='_pf_topbar';
+  document.getElementById('_pf_print').onclick=function(){
+    var ua=navigator.userAgent||'';
+    var isAndroid=/Android/i.test(ua);
+    // Strategy 1: iframe print (works in desktop Chrome/Firefox/Safari)
+    var s1ok=false;
+    try{ifr.contentWindow.focus();ifr.contentWindow.print();s1ok=true;}catch(e1){s1ok=false;}
+    // Strategy 2: full-screen iframe + window.print() — Android WebView or if Strategy 1 silently failed
+    if(!s1ok||isAndroid){
+      var origStyle=ifr.style.cssText;
+      var tb=document.getElementById('_pf_topbar');
+      if(tb)tb.style.display='none';
+      ifr.style.cssText='position:fixed;inset:0;top:0;left:0;width:100vw;height:100vh;border:none;z-index:999997;background:#fff;display:block;';
+      setTimeout(function(){
+        try{window.print();}catch(e2){}
+        setTimeout(function(){
+          ifr.style.cssText=origStyle;
+          if(tb)tb.style.display='';
+        },600);
+      },250);
+    }
+  };
 }
 
 // ============================================================
@@ -8244,8 +9317,8 @@ try {
       ctx.closePath();
       ctx.fillStyle = grad;
       ctx.fill();
-      // Draw logo 1.6x bigger — less padding so logo fills nicely
-      var pad = 46;
+      // Draw logo 2x bigger — 1.25x increase from previous 1.6x — fills icon more
+      var pad = 20;
       ctx.drawImage(logoImg, pad, pad, SZ-pad*2, SZ-pad*2);
       var dataUrl = cvs.toDataURL('image/png');
       _buildManifestWithIcon(dataUrl);
@@ -8436,21 +9509,21 @@ try{
     var mC=list.reduce(function(a,s){return a+(parseFloat(s.cost)||0);},0);
     var rows=list.map(function(s){
       return '<tr>'
-        +'<td style="padding:7px 10px;font-weight:700;color:#1f2937">'+s.name+'</td>'
-        +'<td style="padding:7px 10px;color:#4f46e5;font-weight:600">'+(s.operator||'—')+'</td>'
-        +'<td style="padding:7px 10px;text-align:center">'+(s.start||'—')+(s.end?' – '+s.end:'')+'</td>'
-        +'<td style="padding:7px 10px;text-align:center;font-weight:700;color:#059669">'+(parseFloat(s.hours)||0).toFixed(1)+'h</td>'
-        +'<td style="padding:7px 10px;text-align:right;font-weight:700;color:#059669">'+fc(parseFloat(s.cost)||0)+'</td>'
-        +'<td style="padding:7px 10px;color:#6b7280;font-size:11px">'+(s.notes||'—')+'</td>'
+        +'<td style="padding:4px 8px;font-weight:700;color:#1f2937">'+s.name+'</td>'
+        +'<td style="padding:4px 8px;color:#4f46e5;font-weight:600">'+(s.operator||'—')+'</td>'
+        +'<td style="padding:4px 8px;text-align:center">'+(s.start||'—')+(s.end?' – '+s.end:'')+'</td>'
+        +'<td style="padding:4px 8px;text-align:center;font-weight:700;color:#059669">'+fhm(parseFloat(s.hours)||0)+'</td>'
+        +'<td style="padding:4px 8px;text-align:right;font-weight:700;color:#059669">'+fc(parseFloat(s.cost)||0)+'</td>'
+        +'<td style="padding:4px 8px;color:#6b7280;font-size:11px">'+(s.notes||'—')+'</td>'
         +'</tr>';
     }).join('');
-    return '<div style="margin-bottom:18px;border:1.5px solid #e0e7ff;border-radius:10px;overflow:hidden">'
-      +'<div style="background:'+(p.headerColor||'linear-gradient(135deg,#1e1b4b,#4f46e5)')+';padding:8px 14px;display:flex;justify-content:space-between;align-items:center;-webkit-print-color-adjust:exact;print-color-adjust:exact">'
-      +'<p style="font-size:13px;font-weight:900;color:white">&#9881;&#65039; '+mName+'</p>'
-      +'<p style="font-size:11px;color:#a5b4fc;font-weight:700">'+mH.toFixed(1)+'h &nbsp;·&nbsp; '+fc(mC)+'</p>'
+    return '<div style="margin-bottom:14px;border:1.5px solid #e0e7ff;border-radius:10px;overflow:hidden">'
+      +'<div style="background:'+(p.headerColor||'linear-gradient(135deg,#1e1b4b,#4f46e5)')+';padding:4px 10px;display:flex;justify-content:space-between;align-items:center;-webkit-print-color-adjust:exact;print-color-adjust:exact">'
+      +'<p style="font-size:12px;font-weight:900;color:white;margin:0">&#9881;&#65039; '+mName+'</p>'
+      +'<p style="font-size:11px;color:white;font-weight:800;margin:0">'+fhm(mH)+' &nbsp;·&nbsp; '+fc(mC)+'</p>'
       +'</div>'
       +'<table style="width:100%;border-collapse:collapse">'
-      +'<thead><tr style="background:#f0f4ff"><th style="padding:6px 10px;text-align:left;font-size:10px;color:#4f46e5;font-weight:700">Machine</th><th style="padding:6px 10px;text-align:left;font-size:10px;color:#4f46e5;font-weight:700">Operator</th><th style="padding:6px 10px;text-align:center;font-size:10px;color:#4f46e5;font-weight:700">Time</th><th style="padding:6px 10px;text-align:center;font-size:10px;color:#4f46e5;font-weight:700">Hours</th><th style="padding:6px 10px;text-align:right;font-size:10px;color:#4f46e5;font-weight:700">Cost</th><th style="padding:6px 10px;text-align:left;font-size:10px;color:#4f46e5;font-weight:700">Notes</th></tr></thead>'
+      +'<thead><tr style="background:#f0f4ff"><th style="padding:4px 8px;text-align:left;font-size:10px;color:#4f46e5;font-weight:700">Machine</th><th style="padding:4px 8px;text-align:left;font-size:10px;color:#4f46e5;font-weight:700">Operator</th><th style="padding:4px 8px;text-align:center;font-size:10px;color:#4f46e5;font-weight:700">Time</th><th style="padding:4px 8px;text-align:center;font-size:10px;color:#4f46e5;font-weight:700">Total Time</th><th style="padding:4px 8px;text-align:right;font-size:10px;color:#4f46e5;font-weight:700">Amount</th><th style="padding:4px 8px;text-align:left;font-size:10px;color:#4f46e5;font-weight:700">Notes</th></tr></thead>'
       +'<tbody>'+rows+'</tbody>'
       +'</table></div>';
   }).join('');
@@ -8465,10 +9538,6 @@ try{
     +'<div class="bar"><button class="bb" onclick="window.close()">&#8592; Back</button><span style="flex:1;font-weight:700">Machinery Log &#8212; '+fdl(d)+'</span><button class="bp" onclick="window.print()">&#128438; Print</button><button class="bx" onclick="window.close()">&#x2715;</button></div>'
     +'<div class="content">'
     +_pdfHeader('app.sanjineer.in',p.company||'','',rightHtml)
-    +'<div style="display:flex;gap:12px;margin-bottom:16px">'
-    +'<div style="flex:1;background:#f0f4ff;border-radius:10px;padding:10px 14px;text-align:center"><p style="font-size:9px;color:#4f46e5;font-weight:700;text-transform:uppercase">Total Hours</p><p style="font-size:20px;font-weight:900;color:#1e1b4b">'+totalH.toFixed(1)+'h</p></div>'
-    +'<div style="flex:1;background:#f0fdf4;border-radius:10px;padding:10px 14px;text-align:center"><p style="font-size:9px;color:#059669;font-weight:700;text-transform:uppercase">Total Cost</p><p style="font-size:20px;font-weight:900;color:#059669">'+fc(totalC)+'</p></div>'
-    +'</div>'
     +machCards
     +_pdfFooter()+'</div></body></html>';
   opw(html);
@@ -8504,29 +9573,29 @@ try{
     var mC=mc.rows.reduce(function(a,r){return a+(parseFloat(r.cost)||0);},0);
     var rows=mc.rows.map(function(r){
       return '<tr>'
-        +'<td style="padding:6px 10px;font-weight:600;color:#374151">'+fd(r.date)+'</td>'
-        +'<td style="padding:6px 10px;font-weight:700;color:#1f2937">'+mName+'</td>'
-        +'<td style="padding:6px 10px;color:#4f46e5;font-weight:600">'+r.operator+'</td>'
-        +'<td style="padding:6px 10px;text-align:center">'+(r.start+(r.end?' – '+r.end:''))+'</td>'
-        +'<td style="padding:6px 10px;text-align:center;font-weight:700;color:#059669">'+r.hours.toFixed(1)+'h</td>'
-        +'<td style="padding:6px 10px;text-align:right;font-weight:700;color:#059669">'+fc(r.cost)+'</td>'
-        +'<td style="padding:6px 10px;color:#6b7280;font-size:11px">'+r.notes+'</td>'
+        +'<td style="padding:4px 8px;font-weight:600;color:#374151">'+fd(r.date)+'</td>'
+        +'<td style="padding:4px 8px;font-weight:700;color:#1f2937">'+mName+'</td>'
+        +'<td style="padding:4px 8px;color:#4f46e5;font-weight:600">'+r.operator+'</td>'
+        +'<td style="padding:4px 8px;text-align:center">'+(r.start+(r.end?' – '+r.end:''))+'</td>'
+        +'<td style="padding:4px 8px;text-align:center;font-weight:700;color:#059669">'+fhm(r.hours)+'</td>'
+        +'<td style="padding:4px 8px;text-align:right;font-weight:700;color:#059669">'+fc(r.cost)+'</td>'
+        +'<td style="padding:4px 8px;color:#6b7280;font-size:11px">'+r.notes+'</td>'
         +'</tr>';
     }).join('');
-    return '<div style="margin-bottom:18px;border:1.5px solid #e0e7ff;border-radius:10px;overflow:hidden">'
-      +'<div style="background:'+(p.headerColor||'linear-gradient(135deg,#1e1b4b,#4f46e5)')+';padding:8px 14px;display:flex;justify-content:space-between;align-items:center;-webkit-print-color-adjust:exact;print-color-adjust:exact">'
-      +'<p style="font-size:13px;font-weight:900;color:white">&#9881;&#65039; '+mName+'</p>'
-      +'<p style="font-size:11px;color:#a5b4fc;font-weight:700">'+mc.rows.length+' sessions &nbsp;&#183;&nbsp; '+mH.toFixed(1)+'h &nbsp;&#183;&nbsp; '+fc(mC)+'</p>'
+    return '<div style="margin-bottom:14px;border:1.5px solid #e0e7ff;border-radius:10px;overflow:hidden">'
+      +'<div style="background:'+(p.headerColor||'linear-gradient(135deg,#1e1b4b,#4f46e5)')+';padding:4px 10px;display:flex;justify-content:space-between;align-items:center;-webkit-print-color-adjust:exact;print-color-adjust:exact">'
+      +'<p style="font-size:12px;font-weight:900;color:white;margin:0">&#9881;&#65039; '+mName+'</p>'
+      +'<p style="font-size:11px;color:white;font-weight:800;margin:0">'+mc.rows.length+' sessions &nbsp;&#183;&nbsp; '+fhm(mH)+' &nbsp;&#183;&nbsp; '+fc(mC)+'</p>'
       +'</div>'
       +'<table style="width:100%;border-collapse:collapse">'
       +'<thead><tr style="background:#f0f4ff">'
-      +'<th style="padding:6px 10px;text-align:left;font-size:10px;color:#4f46e5;font-weight:700">Date</th>'
-      +'<th style="padding:6px 10px;text-align:left;font-size:10px;color:#4f46e5;font-weight:700">Machine</th>'
-      +'<th style="padding:6px 10px;text-align:left;font-size:10px;color:#4f46e5;font-weight:700">Operator</th>'
-      +'<th style="padding:6px 10px;text-align:center;font-size:10px;color:#4f46e5;font-weight:700">Time</th>'
-      +'<th style="padding:6px 10px;text-align:center;font-size:10px;color:#4f46e5;font-weight:700">Hours</th>'
-      +'<th style="padding:6px 10px;text-align:right;font-size:10px;color:#4f46e5;font-weight:700">Cost</th>'
-      +'<th style="padding:6px 10px;text-align:left;font-size:10px;color:#4f46e5;font-weight:700">Notes</th>'
+      +'<th style="padding:4px 8px;text-align:left;font-size:10px;color:#4f46e5;font-weight:700">Date</th>'
+      +'<th style="padding:4px 8px;text-align:left;font-size:10px;color:#4f46e5;font-weight:700">Machine</th>'
+      +'<th style="padding:4px 8px;text-align:left;font-size:10px;color:#4f46e5;font-weight:700">Operator</th>'
+      +'<th style="padding:4px 8px;text-align:center;font-size:10px;color:#4f46e5;font-weight:700">Time</th>'
+      +'<th style="padding:4px 8px;text-align:center;font-size:10px;color:#4f46e5;font-weight:700">Total Time</th>'
+      +'<th style="padding:4px 8px;text-align:right;font-size:10px;color:#4f46e5;font-weight:700">Amount</th>'
+      +'<th style="padding:4px 8px;text-align:left;font-size:10px;color:#4f46e5;font-weight:700">Notes</th>'
       +'</tr></thead>'
       +'<tbody>'+rows+'</tbody>'
       +'</table></div>';
@@ -8538,7 +9607,6 @@ try{
     +'<p style="font-size:12px;color:rgba(255,255,255,0.85);font-weight:700;line-height:1.4">&#128197; '+mLabel+'</p>';
   var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Monthly Machinery</title><style>'
     +pcs()
-    
     +'table{width:100%;border-collapse:collapse}td{border-bottom:1px solid #f3f4f6}'
     +'tbody tr:nth-child(even){background:#f9fafb}'
     +'@media screen{.content{margin-top:126px}}'
@@ -8546,10 +9614,6 @@ try{
     +'<div class="bar"><button class="bb" onclick="window.close()">&#8592; Back</button><span style="flex:1;font-weight:700">Machinery &#8212; '+mLabel+'</span><button class="bp" onclick="window.print()">&#128438; Print</button><button class="bx" onclick="window.close()">&#x2715;</button></div>'
     +'<div class="content">'
     +_pdfHeader('app.sanjineer.in',p.company||'','',rightHtml)
-    +'<div style="display:flex;gap:12px;margin-bottom:16px">'
-    +'<div style="flex:1;background:#f0f4ff;border-radius:10px;padding:10px 14px;text-align:center"><p style="font-size:9px;color:#4f46e5;font-weight:700;text-transform:uppercase">Total Hours</p><p style="font-size:20px;font-weight:900;color:#1e1b4b">'+grandH.toFixed(1)+'h</p></div>'
-    +'<div style="flex:1;background:#f0fdf4;border-radius:10px;padding:10px 14px;text-align:center"><p style="font-size:9px;color:#059669;font-weight:700;text-transform:uppercase">Total Cost</p><p style="font-size:20px;font-weight:900;color:#059669">'+fc(grandC)+'</p></div>'
-    +'</div>'
     +machCards
     +_pdfFooter()+'</div></body></html>';
   opw(html);
@@ -13674,6 +14738,274 @@ function loadQuotationTab() {
   if (!document.getElementById('qt-lines-body').children.length) addQtLine();
   renderQuotationRecords();
   calcQtTotal();
+  // init measurement sub-tab
+  var msDate = document.getElementById('ms-date');
+  if(msDate && !msDate.value) msDate.value = ist();
+  var msNo = document.getElementById('ms-no');
+  if(msNo && !msNo.value){ msNo.value = 'MS-' + String((lmsheet().length+1)).padStart(3,'0'); }
+  if(!document.getElementById('ms-rows-body').children.length) addMsRow();
+  renderMsRecords();
+}
+function switchQtSubTab(tab){
+  document.getElementById('qtab-sec-quote').style.display = tab==='quote'?'':'none';
+  document.getElementById('qtab-sec-meas').style.display  = tab==='meas' ?'':'none';
+  var qb=document.getElementById('qtab-btn-quote'), mb=document.getElementById('qtab-btn-meas');
+  if(qb){ if(tab==='quote'){qb.style.background='linear-gradient(135deg,#4f46e5,#7c3aed)';qb.style.color='#fff';qb.style.border='none';}else{qb.style.background='#fff';qb.style.color='#4338ca';qb.style.border='2px solid #a5b4fc';} }
+  if(mb){ if(tab==='meas'){mb.style.background='linear-gradient(135deg,#4f46e5,#7c3aed)';mb.style.color='#fff';mb.style.border='none';}else{mb.style.background='#fff';mb.style.color='#4338ca';mb.style.border='2px solid #a5b4fc';} }
+}
+
+// ── Measurement Sheet ──────────────────────────────────────────
+var MSHEET_KEY = "cm_measurements";
+var _msRowCount = 0;
+function lmsheet(){ try{return JSON.parse(localStorage.getItem(MSHEET_KEY)||'[]');}catch(e){return[];} }
+function smsheet(arr){ try{localStorage.setItem(MSHEET_KEY,JSON.stringify(arr));}catch(e){} }
+
+// Unit definitions: {label, base (base unit type: len/area/vol/cnt), factor (to SI base)}
+var MS_UNITS = [
+  // Length
+  {g:'Length', u:'mm',   base:'len', f:0.001},
+  {g:'Length', u:'cm',   base:'len', f:0.01},
+  {g:'Length', u:'m',    base:'len', f:1},
+  {g:'Length', u:'ft',   base:'len', f:0.3048},
+  {g:'Length', u:'inch', base:'len', f:0.0254},
+  // Area
+  {g:'Area', u:'sqmm',  base:'area', f:0.000001},
+  {g:'Area', u:'sqcm',  base:'area', f:0.0001},
+  {g:'Area', u:'sqm',   base:'area', f:1},
+  {g:'Area', u:'sqft',  base:'area', f:0.092903},
+  {g:'Area', u:'sqin',  base:'area', f:0.00064516},
+  // Volume
+  {g:'Volume', u:'cucm', base:'vol', f:0.000001},
+  {g:'Volume', u:'cum',  base:'vol', f:1},
+  {g:'Volume', u:'cuft', base:'vol', f:0.0283168},
+  {g:'Volume', u:'litre',base:'vol', f:0.001},
+  // Count / Weight
+  {g:'Count',  u:'nos',  base:'cnt', f:1},
+  {g:'Count',  u:'kg',   base:'cnt', f:1},
+  {g:'Count',  u:'MT',   base:'cnt', f:1},
+  {g:'Count',  u:'RM',   base:'cnt', f:1}
+];
+
+function _msUnitDef(u){ return MS_UNITS.find(function(x){return x.u===u;})||{base:'cnt',f:1}; }
+
+function _msUnitOptions(sel){
+  var html = '';
+  var grp = '';
+  MS_UNITS.forEach(function(x){
+    if(x.g!==grp){ if(grp) html+='</optgroup>'; html+='<optgroup label="'+x.g+'">'; grp=x.g; }
+    html += '<option value="'+x.u+'"'+(x.u===sel?' selected':'')+'>'+x.u+'</option>';
+  });
+  if(grp) html+='</optgroup>';
+  return html;
+}
+
+function addMsRow(data){
+  var tbody = document.getElementById('ms-rows-body'); if(!tbody) return;
+  var id = ++_msRowCount;
+  var d = data||{};
+  var selUnit = d.unit||'m';
+  var tr = document.createElement('tr');
+  tr.id = 'ms-row-'+id;
+  tr.innerHTML =
+    '<td class="px-1 py-1 text-center text-xs text-gray-500 font-bold" id="ms-sno-'+id+'"></td>'
+   +'<td class="px-1 py-1"><input type="text" id="ms-desc-'+id+'" value="'+(d.desc||'')+'" placeholder="Description" class="w-full px-2 py-1 border border-gray-200 rounded-lg text-xs focus:outline-none"></td>'
+   +'<td class="px-1 py-1"><select id="ms-unit-'+id+'" onchange="msCvtUnit('+id+')" class="w-full px-1 py-1 border border-gray-200 rounded-lg text-xs bg-white focus:outline-none">'+_msUnitOptions(selUnit)+'</select></td>'
+   +'<td class="px-1 py-1"><input type="number" id="ms-nos-'+id+'" value="'+(d.nos||'')+'" placeholder="1" step="any" class="w-full px-1 py-1 border border-gray-200 rounded-lg text-xs text-center focus:outline-none" oninput="calcMsRow('+id+')"></td>'
+   +'<td class="px-1 py-1"><input type="number" id="ms-len-'+id+'" value="'+(d.len||'')+'" placeholder="—" step="any" class="w-full px-1 py-1 border border-gray-200 rounded-lg text-xs text-center focus:outline-none" oninput="calcMsRow('+id+')"></td>'
+   +'<td class="px-1 py-1"><input type="number" id="ms-wid-'+id+'" value="'+(d.wid||'')+'" placeholder="—" step="any" class="w-full px-1 py-1 border border-gray-200 rounded-lg text-xs text-center focus:outline-none" oninput="calcMsRow('+id+')"></td>'
+   +'<td class="px-1 py-1"><input type="number" id="ms-hgt-'+id+'" value="'+(d.hgt||'')+'" placeholder="—" step="any" class="w-full px-1 py-1 border border-gray-200 rounded-lg text-xs text-center focus:outline-none" oninput="calcMsRow('+id+')"></td>'
+   +'<td class="px-1 py-1 text-right text-xs font-bold text-indigo-700" id="ms-qty-'+id+'">—</td>'
+   +'<td class="px-1 py-1"><button onclick="removeMsRow('+id+')" class="text-red-400 text-sm font-bold">✕</button></td>';
+  tbody.appendChild(tr);
+  updateMsSnos();
+  calcMsRow(id);
+}
+function removeMsRow(id){
+  var r=document.getElementById('ms-row-'+id); if(r)r.remove();
+  updateMsSnos();
+}
+function updateMsSnos(){
+  var tbody=document.getElementById('ms-rows-body');if(!tbody)return;
+  var rows=tbody.querySelectorAll('tr');
+  rows.forEach(function(tr,i){
+    var id=tr.id.replace('ms-row-','');
+    var el=document.getElementById('ms-sno-'+id);
+    if(el) el.textContent=i+1;
+  });
+}
+function _msVal(id,field){ return parseFloat((document.getElementById('ms-'+field+'-'+id)||{}).value)||0; }
+
+// Auto-convert small units to their standard base before calculation
+// mm,cm → m | inch → ft | everything else stays as-is
+// Returns {factor, displayUnit}
+function _msBaseConv(unit){
+  if(unit==='mm')  return {f:1/1000,  d:'m'};
+  if(unit==='cm')  return {f:1/100,   d:'m'};
+  if(unit==='inch')return {f:1/12,    d:'ft'};
+  return {f:1, d:unit};
+}
+
+function calcMsRow(id){
+  var nos = _msVal(id,'nos')||1;
+  var len = _msVal(id,'len'), wid = _msVal(id,'wid'), hgt = _msVal(id,'hgt');
+  var unit = (document.getElementById('ms-unit-'+id)||{}).value||'m';
+  var cv = _msBaseConv(unit);
+
+  // Convert dimensions to base unit
+  var L = len * cv.f, W = wid * cv.f, H = hgt * cv.f;
+
+  var qty = 0, dispUnit = cv.d;
+  if(hgt>0 && wid>0 && len>0){ qty = nos*L*W*H; dispUnit = 'cu'+cv.d; }
+  else if(wid>0 && len>0)     { qty = nos*L*W;   dispUnit = 'sq'+cv.d; }
+  else if(len>0)               { qty = nos*L;      dispUnit = cv.d; }
+  else                         { qty = nos;         dispUnit = unit; }
+
+  // Clean up display unit labels
+  if(dispUnit==='cum')  dispUnit='m³';
+  if(dispUnit==='cuft') dispUnit='ft³';
+  if(dispUnit==='cum')  dispUnit='m³';
+  if(dispUnit==='sqm')  dispUnit='m²';
+  if(dispUnit==='sqft') dispUnit='ft²';
+
+  var el = document.getElementById('ms-qty-'+id);
+  if(el) el.textContent = qty.toFixed(4).replace(/\.?0+$/,'') + ' (' + dispUnit + ')';
+}
+function msCvtUnit(id){
+  // When unit changes, convert L/W/H values to new unit
+  var sel=document.getElementById('ms-unit-'+id); if(!sel) return;
+  var newUnit=sel.value;
+  var oldUnit=sel.dataset.prev||newUnit;
+  if(oldUnit===newUnit){ sel.dataset.prev=newUnit; return; }
+  var od=_msUnitDef(oldUnit), nd=_msUnitDef(newUnit);
+  // Only convert if same base type (len→len, area→area etc.)
+  if(od.base===nd.base && od.base!=='cnt'){
+    var factor = od.f / nd.f;
+    ['len','wid','hgt'].forEach(function(f){
+      var inp=document.getElementById('ms-'+f+'-'+id);
+      if(inp&&inp.value){ var v=parseFloat(inp.value); if(!isNaN(v)) inp.value=parseFloat((v*factor).toPrecision(6)); }
+    });
+  }
+  sel.dataset.prev=newUnit;
+  calcMsRow(id);
+}
+function _getMsRows(){
+  var tbody=document.getElementById('ms-rows-body');if(!tbody)return[];
+  var rows=[];
+  tbody.querySelectorAll('tr').forEach(function(tr){
+    var id=tr.id.replace('ms-row-','');
+    var desc=(document.getElementById('ms-desc-'+id)||{}).value||'';
+    var unit=(document.getElementById('ms-unit-'+id)||{}).value||'m';
+    var nos=_msVal(id,'nos')||1, len=_msVal(id,'len'), wid=_msVal(id,'wid'), hgt=_msVal(id,'hgt');
+    var cv=_msBaseConv(unit);
+    var L=len*cv.f, W=wid*cv.f, H=hgt*cv.f;
+    var qty=0, dispUnit=cv.d;
+    if(hgt>0&&wid>0&&len>0){ qty=nos*L*W*H; dispUnit='cu'+cv.d; }
+    else if(wid>0&&len>0)  { qty=nos*L*W;   dispUnit='sq'+cv.d; }
+    else if(len>0)          { qty=nos*L;      dispUnit=cv.d; }
+    else                    { qty=nos;         dispUnit=unit; }
+    if(dispUnit==='sqm')  dispUnit='m²';
+    if(dispUnit==='sqft') dispUnit='ft²';
+    if(dispUnit==='cum')  dispUnit='m³';
+    if(dispUnit==='cuft') dispUnit='ft³';
+    rows.push({desc:desc,unit:unit,nos:nos,len:len,wid:wid,hgt:hgt,qty:qty,dispUnit:dispUnit});
+  });
+  return rows;
+}
+function saveMeasurementSheet(){
+  var sheetNo=(document.getElementById('ms-no')||{}).value||'MS-001';
+  var date=(document.getElementById('ms-date')||{}).value||ist();
+  var title=(document.getElementById('ms-title')||{}).value||'';
+  var location=(document.getElementById('ms-location')||{}).value||'';
+  var rows=_getMsRows().filter(function(r){return r.desc||r.nos;});
+  if(!rows.length){toast('Add at least one row','err');return;}
+  var arr=lmsheet();
+  arr.unshift({id:Date.now().toString(36),sheetNo:sheetNo,date:date,title:title,location:location,rows:rows});
+  smsheet(arr); renderMsRecords(); toast('Sheet saved','ok');
+}
+function renderMsRecords(){
+  var el=document.getElementById('ms-records-list');if(!el)return;
+  var arr=lmsheet();
+  if(!arr.length){el.innerHTML='<p class="text-gray-400 text-center py-3 text-xs">No sheets saved yet</p>';return;}
+  el.innerHTML=arr.map(function(r){
+    return '<div style="background:#fff;border-radius:10px;border:1px solid #e5e7eb;padding:7px 10px;margin-bottom:6px;box-shadow:0 2px 6px rgba(0,0,0,0.07)">'
+     +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px">'
+     +'<p style="font-weight:800;color:#1f2937;font-size:12px">'+r.sheetNo+(r.title?' — '+r.title:'')+'</p>'
+     +'<div style="display:flex;gap:5px">'
+     +'<button onclick="reprintMsSheet(\''+r.id+'\')" style="font-size:10px;padding:0 12px;background:#e0e7ff;color:#4f46e5;border:none;border-radius:5px;cursor:pointer;font-weight:700">Print</button>'
+     +'<button onclick="deleteMsSheet(\''+r.id+'\')" style="width:20px;height:20px;display:flex;align-items:center;justify-content:center;background:#fee2e2;color:#dc2626;border:none;border-radius:5px;cursor:pointer;font-weight:800;font-size:11px">×</button>'
+     +'</div></div>'
+     +'<p style="font-size:10px;color:#9ca3af">'+fd(r.date)+(r.location?' · '+r.location:'')+'</p>'
+     +'</div>';
+  }).join('');
+}
+function deleteMsSheet(id){
+  askDel('Delete this measurement sheet?',function(){
+    smsheet(lmsheet().filter(function(r){return r.id!==id;}));
+    renderMsRecords(); toast('Deleted','ok');
+  });
+}
+function reprintMsSheet(id){
+  var r=lmsheet().find(function(x){return x.id===id;}); if(!r){toast('Not found','err');return;}
+  _printMsHtml(r);
+}
+function printMeasurementSheet(){
+  var sheetNo=(document.getElementById('ms-no')||{}).value||'MS-001';
+  var date=(document.getElementById('ms-date')||{}).value||ist();
+  var title=(document.getElementById('ms-title')||{}).value||'';
+  var location=(document.getElementById('ms-location')||{}).value||'';
+  var rows=_getMsRows().filter(function(r){return r.desc||r.nos;});
+  if(!rows.length){toast('Add at least one row','err');return;}
+  _printMsHtml({sheetNo:sheetNo,date:date,title:title,location:location,rows:rows});
+}
+function _printMsHtml(r){
+  var p=lprof()||{};
+  var hc=p.headerColor||'linear-gradient(135deg,#4f46e5,#7c3aed)';
+  var hSolid=hc.indexOf('gradient')!==-1?'#4f46e5':hc;
+  var rowsHtml=r.rows.map(function(row,i){
+    var nos=row.nos||''; var len=row.len||''; var wid=row.wid||''; var hgt=row.hgt||'';
+    var qtyDisp=parseFloat(row.qty||0).toFixed(4).replace(/\.?0+$/,'');
+    var dUnit = row.dispUnit || row.unit;
+    return '<tr style="background:'+(i%2?'#f9fafb':'white')+'">'
+     +'<td style="padding:5px 8px;text-align:center;color:#6b7280;font-weight:700">'+(i+1)+'</td>'
+     +'<td style="padding:5px 8px;font-weight:600;color:#1f2937">'+( row.desc||'—')+'</td>'
+     +'<td style="padding:5px 8px;text-align:center;color:#4f46e5;font-weight:700">'+row.unit+'</td>'
+     +'<td style="padding:5px 8px;text-align:center">'+( nos||'—')+'</td>'
+     +'<td style="padding:5px 8px;text-align:center">'+( len||'—')+'</td>'
+     +'<td style="padding:5px 8px;text-align:center">'+( wid||'—')+'</td>'
+     +'<td style="padding:5px 8px;text-align:center">'+( hgt||'—')+'</td>'
+     +'<td style="padding:5px 8px;text-align:right;font-weight:800;color:#1e1b4b">'+qtyDisp+' <span style="font-size:9px;color:#6b7280;font-weight:600">('+dUnit+')</span></td>'
+     +'</tr>';
+  }).join('');
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Measurement Sheet '+r.sheetNo+'</title><style>'+pcs()
+    +'table{width:100%;border-collapse:collapse}thead th{padding:6px 8px;text-align:left;font-size:11px;font-weight:800;background:'+hSolid+';color:white;-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+    +'tbody td{border-bottom:1px solid #f3f4f6}tbody tr:hover{background:#f0f4ff}'
+    +'</style></head><body>'
+    +'<div class="bar"><button class="bb" onclick="window.close()">&#8592; Back</button><span style="flex:1;font-weight:700">Measurement Sheet &#8212; '+r.sheetNo+'</span><button class="bp" onclick="window.print()">&#128438; Print</button><button class="bx" onclick="window.close()">&#x2715;</button></div>'
+    +'<div class="content">'
+    +_pdfHeader('app.sanjineer.in',p.company||'','',
+      '<p style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.8);text-transform:uppercase;letter-spacing:.04em">Measurement Sheet</p>'
+      +'<p style="font-size:14px;font-weight:900;color:white;margin-top:3px">'+r.sheetNo+'</p>'
+      +'<p style="font-size:10px;color:rgba(255,255,255,0.7);margin-top:2px">'+fd(r.date)+'</p>'
+    )
+    +(r.title||r.location?'<div style="background:#f0f4ff;border-radius:10px;padding:10px 14px;margin-bottom:14px;display:flex;gap:20px">'
+      +(r.title?'<div><p style="font-size:9px;color:#6b7280;font-weight:700;text-transform:uppercase">Work Item</p><p style="font-size:13px;font-weight:800;color:#1e1b4b;margin-top:2px">'+r.title+'</p></div>':'')
+      +(r.location?'<div><p style="font-size:9px;color:#6b7280;font-weight:700;text-transform:uppercase">Location / Notes</p><p style="font-size:12px;color:#374151;margin-top:2px">'+r.location+'</p></div>':'')
+      +'</div>':'')
+    +'<table><thead><tr>'
+    +'<th style="width:32px;text-align:center">S.No</th>'
+    +'<th>Description</th>'
+    +'<th style="width:52px;text-align:center">Unit</th>'
+    +'<th style="width:36px;text-align:center">Nos</th>'
+    +'<th style="width:52px;text-align:center">Length</th>'
+    +'<th style="width:52px;text-align:center">Width</th>'
+    +'<th style="width:52px;text-align:center">Height</th>'
+    +'<th style="width:90px;text-align:right">Quantity</th>'
+    +'</tr></thead><tbody>'
+    +rowsHtml
+    +'</tbody></table>'
+    +pftr()
+    +'</div></body></html>';
+  opw(html);
 }
 
 function addQtLine() {
@@ -14318,7 +15650,7 @@ document.addEventListener('DOMContentLoaded', function(){
   var modal = document.createElement('div');
   modal.id = 'sig-modal';
   var _roleOpts = '<option value="">— Select authority role —</option><option value="Site Engineer">Site Engineer</option><option value="Site Incharge">Site Incharge</option><option value="Prepared By">Prepared By</option><option value="Approved By">Approved By</option><option value="Project Manager">Project Manager</option><option value="Checked By">Checked By</option><option value="Contractor / Owner">Contractor / Owner</option><option value="Client">Client</option>';
-  modal.innerHTML = '<div style="background:linear-gradient(160deg,#1a1740,#312e81);border-radius:20px;padding:18px;width:92%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,.6)">'
+  modal.innerHTML = '<div style="background:linear-gradient(160deg,#1a1740,#312e81);border-radius:16px;padding:18px;width:92%;max-width:378px;box-shadow:0 20px 60px rgba(0,0,0,.6)">'
     +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
     +'<p style="font-size:14px;font-weight:900;color:#fff;margin:0">✍️ Add Signature</p>'
     +'<button onclick="closeSigModal()" style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:#fff;cursor:pointer">✕</button>'
@@ -14328,7 +15660,7 @@ document.addEventListener('DOMContentLoaded', function(){
     +'<p style="font-size:9px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Display Name</p>'
     +'<input id="sig-name-inp" placeholder="e.g. Ramesh Kumar" style="width:100%;padding:8px 10px;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:9px;color:#fff;font-size:12px;font-weight:600;margin-bottom:10px;box-sizing:border-box;outline:none" />'
     +'<p style="font-size:9px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Draw Signature <span style="font-weight:400;opacity:.6">(or upload photo)</span></p>'
-    +'<canvas id="sig-canvas" width="300" height="100" style="width:100%;display:block;background:rgba(255,255,255,.96);border-radius:8px;margin-bottom:8px"></canvas>'
+    +'<canvas id="sig-canvas" width="300" height="105" style="width:100%;display:block;background:rgba(255,255,255,.96);border-radius:8px;margin-bottom:8px"></canvas>'
     +'<input type="file" id="sig-photo-input" accept="image/*" style="display:none" onchange="loadSigPhoto(event)">'
     +'<div style="display:flex;gap:8px">'
     +'<button onclick="clearSigCanvas()" style="flex:1;padding:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;border-radius:9px;font-size:11px;font-weight:700;cursor:pointer">🗑 Clear</button>'
@@ -14674,6 +16006,475 @@ function toggleSwipeFromSettings(row) {
     }, 6000);
   });
 })();
+</script>
+<!-- CALCULATOR POPUP -->
+<style>
+#calc-modal{display:none;position:fixed;left:0;right:0;bottom:0;z-index:600;height:82vh;max-height:82vh;background:#f2f3f5;border-radius:22px 22px 0 0;box-shadow:0 -8px 40px rgba(0,0,0,0.28);flex-direction:column;overflow:hidden;}
+#calc-modal.show{display:flex!important;}
+#calc-overlay{display:none;position:fixed;inset:0;z-index:599;background:rgba(0,0,0,0.4);}
+#calc-overlay.show{display:block!important;}
+.calc-btn{border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:500;transition:transform .08s,filter .08s,box-shadow .08s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none;line-height:1;border-radius:50%;}
+.calc-btn:active{filter:brightness(0.78);transform:scale(0.88);box-shadow:0 0 0 4px rgba(0,0,0,0.10);}
+.cb-num{background:#fff;color:#1c1c1e;}
+.cb-op {background:#ff9500;color:#fff;}
+.cb-fn {background:#d1d1d6;color:#1c1c1e;}
+.cb-eq {background:#4f46e5;color:#fff;}
+.cb-util{background:#d1d1d6;color:#1c1c1e;}
+.cb-sci{background:#e5e5ea;color:#4f46e5;font-size:11px!important;border-radius:8px!important;}
+.cb-mem{background:#e5e5ea;color:#9333ea;font-size:11px!important;border-radius:8px!important;}
+.calc-tab-btn{flex:1;padding:6px 0;font-size:12px;font-weight:700;border:none;border-radius:8px;cursor:pointer;transition:all .15s;}
+.calc-tab-btn.on{background:#4f46e5;color:#fff;}
+.calc-tab-btn.off{background:transparent;color:#6b7280;}
+.calc-hist-btn{width:28px;height:28px;flex-shrink:0;border:none;background:transparent;cursor:pointer;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;transition:background .12s;-webkit-tap-highlight-color:transparent;}
+.calc-hist-btn:active{background:rgba(0,0,0,0.08);}
+#calc-history-panel{display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:#fff;z-index:10;flex-direction:column;border-radius:20px 20px 0 0;overflow:hidden;}
+#calc-history-panel.open{display:flex;}
+#calc-hist-list{flex:1;overflow-y:auto;padding:8px 14px;}
+.calc-hist-item{padding:8px 0;border-bottom:1px solid #f3f4f6;text-align:right;}
+.calc-hist-item .expr{font-size:11px;color:#9ca3af;}
+.calc-hist-item .res{font-size:18px;font-weight:300;color:#1c1c1e;}
+.cu-inp{background:#fff;border:1.5px solid #e5e7eb;border-radius:10px;color:#1c1c1e;font-size:18px;font-weight:400;padding:8px 12px;width:100%;box-sizing:border-box;outline:none;}
+.cu-inp:focus{border-color:#4f46e5;}
+.cu-inp.result{background:#f0f4ff;color:#4f46e5;border-color:#c7d2fe;}
+.cu-sel{background:#fff;border:1.5px solid #e5e7eb;border-radius:8px;color:#374151;padding:6px 8px;font-size:12px;outline:none;width:100%;box-sizing:border-box;}
+</style>
+
+<div id="calc-overlay" onclick="closeCalcModal()"></div>
+<div id="calc-modal">
+  <!-- Handle -->
+  <div style="flex-shrink:0;padding:8px 0 4px;text-align:center;">
+    <div style="width:36px;height:4px;background:#d1d5db;border-radius:99px;margin:0 auto;"></div>
+  </div>
+
+  <!-- Tabs + close -->
+  <div style="flex-shrink:0;display:flex;gap:5px;align-items:center;padding:4px 12px 6px;background:#f2f3f5;">
+    <button class="calc-hist-btn" onclick="_cToggleHistory()" title="Recent History">🕐</button>
+    <button id="calc-tab-std"  class="calc-tab-btn on"  onclick="calcSetMode('std')">Standard</button>
+    <button id="calc-tab-sci"  class="calc-tab-btn off" onclick="calcSetMode('sci')">Scientific</button>
+    <button id="calc-tab-unit" class="calc-tab-btn off" onclick="calcSetMode('unit')">Converter</button>
+    <button onclick="closeCalcModal()" style="width:28px;height:28px;border-radius:50%;background:#e5e7eb;border:none;color:#6b7280;font-size:13px;cursor:pointer;flex-shrink:0;">✕</button>
+  </div>
+
+  <!-- History Panel (overlays everything inside modal) -->
+  <div id="calc-history-panel">
+    <div style="flex-shrink:0;display:flex;align-items:center;padding:10px 14px 8px;border-bottom:1px solid #f3f4f6;">
+      <span style="font-size:13px;font-weight:700;color:#1c1c1e;flex:1">Recent Calculations</span>
+      <button onclick="_cClearHistory()" style="font-size:10px;color:#9ca3af;background:none;border:none;cursor:pointer;padding:2px 6px;">Clear</button>
+      <button onclick="_cToggleHistory()" style="width:24px;height:24px;border-radius:50%;background:#e5e7eb;border:none;color:#6b7280;font-size:11px;cursor:pointer;margin-left:4px;">✕</button>
+    </div>
+    <div id="calc-hist-list"><p style="text-align:center;color:#9ca3af;font-size:12px;padding:24px 0;">No history yet</p></div>
+  </div>
+
+  <!-- Display (hidden for unit converter) -->
+  <div id="calc-display-wrap" style="flex-shrink:0;padding:4px 18px 6px;background:#f2f3f5;text-align:right;">
+    <div id="calc-hist" style="font-size:12px;color:#9ca3af;min-height:18px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">&nbsp;</div>
+    <div id="calc-disp" style="font-size:46px;font-weight:300;color:#1c1c1e;letter-spacing:-1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.05;">0</div>
+    <div id="calc-mem-ind" style="font-size:10px;color:#9333ea;text-align:left;min-height:12px;"></div>
+  </div>
+
+  <!-- Scientific extra rows -->
+  <div id="calc-sci-rows" style="display:none;flex-shrink:0;padding:2px 10px 2px;background:#f2f3f5;overflow-x:auto;">
+    <div id="calc-sci-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;"></div>
+  </div>
+
+  <!-- Standard numpad -->
+  <div id="calc-std-wrap" style="flex:1;padding:6px 10px 8px;background:#f2f3f5;overflow:hidden;">
+    <div id="calc-std-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;height:100%;"></div>
+  </div>
+
+  <!-- Unit Converter (compact, with numpad) -->
+  <div id="calc-unit-wrap" style="display:none;flex:1;overflow:hidden;display:none;flex-direction:column;">
+    <!-- Compact converter inputs -->
+    <div style="flex-shrink:0;padding:8px 12px 4px;background:#f2f3f5;">
+      <select id="calc-unit-cat" class="cu-sel" onchange="calcUnitCatChange()" style="margin-bottom:8px;">
+        <option value="len">📏 Length</option>
+        <option value="area">⬛ Area</option>
+        <option value="vol">🧊 Volume</option>
+        <option value="mass">⚖️ Mass</option>
+        <option value="temp">🌡️ Temperature</option>
+        <option value="spd">💨 Speed</option>
+        <option value="time">⏱️ Time</option>
+        <option value="dig">💾 Digital</option>
+        <option value="energy">⚡ Energy</option>
+        <option value="pres">🔵 Pressure</option>
+        <option value="ang">📐 Angle</option>
+        <option value="cur">💱 Currency</option>
+      </select>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <div style="flex:1;">
+          <select id="calc-unit-from-sel" class="cu-sel" onchange="calcUnitConvert()" style="margin-bottom:5px;"></select>
+          <input id="calc-unit-from-val" class="cu-inp" type="number" placeholder="0" oninput="calcUnitConvert()" readonly>
+        </div>
+        <button onclick="calcUnitSwap()" style="width:34px;height:34px;background:#4f46e5;border:none;border-radius:50%;color:#fff;font-size:16px;cursor:pointer;flex-shrink:0;">⇅</button>
+        <div style="flex:1;">
+          <select id="calc-unit-to-sel" class="cu-sel" onchange="calcUnitConvert()" style="margin-bottom:5px;"></select>
+          <input id="calc-unit-to-val" class="cu-inp result" type="number" placeholder="0" readonly>
+        </div>
+      </div>
+      <div id="calc-unit-formula" style="text-align:center;font-size:10px;color:#9ca3af;padding:3px 0;"></div>
+    </div>
+    <!-- Numpad for unit input -->
+    <div style="flex:1;padding:4px 10px 8px;background:#f2f3f5;">
+      <div id="calc-unit-numgrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;height:100%;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  FULL CALCULATOR ENGINE
+// ══════════════════════════════════════════
+var _cMode    = 'std';
+var _cDisp    = '0';
+var _cExpr    = '';
+var _cNewNum  = true;
+var _cDot     = false;
+var _cPend    = null;
+var _cMem     = 0;
+var _cDeg     = true;
+var _cUnitActive = 'from'; // which unit field is being edited
+var _cHistLog  = []; // history log: [{expr, result}]
+
+function _cPushHistory(expr, result) {
+  if(!expr || !result || result==='Error') return;
+  _cHistLog.unshift({expr:expr, result:result});
+  if(_cHistLog.length>50) _cHistLog.pop();
+}
+function _cToggleHistory() {
+  var p = document.getElementById('calc-history-panel');
+  if(!p) return;
+  var open = p.classList.toggle('open');
+  if(open) _cRenderHistory();
+}
+function _cRenderHistory() {
+  var el = document.getElementById('calc-hist-list');
+  if(!el) return;
+  if(!_cHistLog.length){ el.innerHTML='<p style="text-align:center;color:#9ca3af;font-size:12px;padding:24px 0;">No history yet</p>'; return; }
+  el.innerHTML = _cHistLog.map(function(h){
+    return '<div class="calc-hist-item" onclick="_cUseHistory(\''+h.result+'\')">'
+      +'<div class="expr">'+h.expr+'</div>'
+      +'<div class="res">'+h.result+'</div>'
+      +'</div>';
+  }).join('');
+}
+function _cClearHistory() {
+  _cHistLog=[];
+  _cRenderHistory();
+}
+function _cUseHistory(val) {
+  _cSet(val);
+  var p=document.getElementById('calc-history-panel');
+  if(p) p.classList.remove('open');
+}
+
+function openCalcModal(){
+  var m=document.getElementById('calc-modal');
+  var ov=document.getElementById('calc-overlay');
+  if(!m) return;
+  m.style.display='flex';
+  if(ov) ov.style.display='block';
+  _cBuildStd();
+  _cBuildSci();
+  _cBuildUnitNumpad();
+  calcUnitCatChange();
+}
+function closeCalcModal(){
+  var m=document.getElementById('calc-modal');
+  var ov=document.getElementById('calc-overlay');
+  if(m) m.style.display='none';
+  if(ov) ov.style.display='none';
+}
+
+// ── Display ──
+function _cRefresh(){
+  var d=document.getElementById('calc-disp');
+  var h=document.getElementById('calc-hist');
+  var mi=document.getElementById('calc-mem-ind');
+  if(d){
+    var v=_cDisp;
+    if(v.length>14){try{v=parseFloat(v).toExponential(6);}catch(e){}}
+    d.textContent=v;
+    d.style.fontSize=v.length>12?'28px':v.length>9?'36px':'46px';
+  }
+  if(h) h.textContent=_cExpr||'\u00a0';
+  if(mi) mi.textContent=_cMem!==0?'M: '+_cMem:'';
+}
+
+// ── Calculator input ──
+function _cDigit(d){
+  if(_cNewNum){_cDisp=(d==='.'?'0.':String(d));_cNewNum=false;_cDot=(d==='.');}
+  else{
+    if(d==='.' && _cDisp.indexOf('.')!==-1) return;
+    if(d==='.') _cDot=true;
+    if(_cDisp==='0'&&d!=='.') _cDisp=String(d);
+    else _cDisp+=String(d);
+  }
+  _cRefresh();
+}
+function _cOp(op){
+  _cPend={val:parseFloat(_cDisp),op:op};
+  _cExpr=_cDisp+' '+op;
+  _cNewNum=true;_cDot=false;
+  _cRefresh();
+}
+function _cEquals(){
+  if(!_cPend){_cExpr='';_cRefresh();return;}
+  var a=_cPend.val,b=parseFloat(_cDisp),r,op=_cPend.op;
+  switch(op){
+    case '+':r=a+b;break;case '−':r=a-b;break;
+    case '×':r=a*b;break;case '÷':r=b!==0?a/b:NaN;break;
+    case 'yˣ':r=Math.pow(a,b);break;
+    case 'ˣ√y':r=Math.pow(b,1/a);break;
+    case 'EE':r=a*Math.pow(10,b);break;
+    default:r=b;
+  }
+  _cExpr=_cPend.val+' '+op+' '+b+' =';
+  _cPend=null;
+  var rStr=isNaN(r)||!isFinite(r)?'Error':_cFmt(r);
+  _cPushHistory(_cExpr, rStr);
+  _cSet(rStr);
+}
+function _cFmt(v){return String(parseFloat(v.toPrecision(12)));}
+function _cSet(v){_cDisp=String(v);_cNewNum=true;_cDot=_cDisp.indexOf('.')!==-1;_cRefresh();}
+function _cClear(){_cDisp='0';_cExpr='';_cPend=null;_cNewNum=true;_cDot=false;_cBracketExpr='';_cInBracket=0;_cRefresh();}
+function _cBack(){if(_cNewNum){_cClear();return;}_cDisp=_cDisp.slice(0,-1)||'0';_cDot=_cDisp.indexOf('.')!==-1;_cRefresh();}
+function _cSign(){_cSet(_cFmt(parseFloat(_cDisp)*-1));}
+function _cPct(){if(_cPend)_cOp('%');else _cSet(_cFmt(parseFloat(_cDisp)/100));}
+// ── bracket expression accumulator ──
+var _cBracketExpr = '';   // holds the full expr being built inside parens
+var _cInBracket   = 0;    // depth counter
+
+function _cSci(fn){
+  var v=parseFloat(_cDisp),r,toR=_cDeg?Math.PI/180:1,fromR=_cDeg?180/Math.PI:1;
+
+  // ── Bracket logic ──────────────────────────────────────────────────────────
+  if(fn==='lp'){
+    // Opening bracket: start accumulating; show current value in expr if non-zero
+    _cInBracket++;
+    if(_cBracketExpr==='' && !_cNewNum) _cBracketExpr = (_cDisp!=='0'?_cDisp:'') + '(';
+    else _cBracketExpr += '(';
+    _cExpr = _cBracketExpr;
+    _cNewNum=true; _cDot=false;
+    _cRefresh(); return;
+  }
+  if(fn==='rp'){
+    // Closing bracket: append current display value, close, try evaluate
+    if(_cInBracket<=0){ return; } // no open bracket — ignore
+    _cInBracket--;
+    _cBracketExpr += (_cNewNum?'':_cDisp) + ')';
+    // If all brackets closed → evaluate
+    if(_cInBracket===0){
+      try{
+        // safe eval: only numbers, basic ops, parens
+        var expr=_cBracketExpr.replace(/[^0-9+\-*/().eE]/g,'');
+        var res=Function('"use strict";return ('+expr+')')();
+        _cExpr=_cBracketExpr+' =';
+        _cBracketExpr='';
+        _cSet(isNaN(res)||!isFinite(res)?'Error':_cFmt(res));
+      }catch(ex){
+        _cExpr=_cBracketExpr; _cBracketExpr=''; _cInBracket=0;
+        _cSet('Error');
+      }
+    } else {
+      _cExpr=_cBracketExpr;
+      _cNewNum=true; _cDot=false;
+      _cRefresh();
+    }
+    return;
+  }
+  // While inside brackets, append typed digits to bracket expr automatically
+  if(_cInBracket>0 && fn!=='deg' && fn!=='m+' && fn!=='m-'){
+    // append the current display to bracket expr before applying fn
+    if(!_cNewNum) _cBracketExpr += _cDisp;
+  }
+  // ──────────────────────────────────────────────────────────────────────────
+
+  switch(fn){
+    case 'sin':r=Math.sin(v*toR);break;case 'cos':r=Math.cos(v*toR);break;
+    case 'tan':r=Math.tan(v*toR);break;case 'asin':r=Math.asin(v)*fromR;break;
+    case 'acos':r=Math.acos(v)*fromR;break;case 'atan':r=Math.atan(v)*fromR;break;
+    case 'sinh':r=Math.sinh(v);break;case 'cosh':r=Math.cosh(v);break;
+    case 'tanh':r=Math.tanh(v);break;
+    case 'log':r=Math.log10(v);break;case 'ln':r=Math.log(v);break;
+    case 'log2':r=Math.log2(v);break;
+    case 'sqrt':r=Math.sqrt(v);break;case 'cbrt':r=Math.cbrt(v);break;
+    case 'x2':r=v*v;break;case 'x3':r=v*v*v;break;
+    case '1/x':r=v!==0?1/v:NaN;break;
+    case '10x':r=Math.pow(10,v);break;case 'ex':r=Math.exp(v);break;
+    case '2x':r=Math.pow(2,v);break;
+    case 'abs':r=Math.abs(v);break;
+    case 'pi':r=Math.PI;break;case 'e':r=Math.E;break;
+    case 'rand':r=Math.random();break;
+    case 'fact':r=1;for(var i=2;i<=Math.round(Math.abs(v));i++)r*=i;break;
+    case 'floor':r=Math.floor(v);break;case 'ceil':r=Math.ceil(v);break;
+    case 'round':r=Math.round(v);break;
+    case 'deg':_cDeg=!_cDeg;_cBuildSci();return;
+    case 'm+':_cMem+=parseFloat(_cDisp);_cRefresh();return;
+    case 'm-':_cMem-=parseFloat(_cDisp);_cRefresh();return;
+    default:return;
+  }
+  _cExpr=fn+'('+v+')';
+  _cSet(isNaN(r)||!isFinite(r)?'Error':_cFmt(r));
+}
+
+// ── Button builder ──
+function _cBtn(label,action,type,extraStyle){
+  var bg={'num':'#fff','op':'#ff9500','fn':'#d1d1d6','eq':'#4f46e5','util':'#d1d1d6','sci':'#e5e5ea','mem':'#ede9fe'}[type]||'#fff';
+  var col={'op':'#fff','eq':'#fff','sci':'#4f46e5','mem':'#7c3aed'}[type]||'#1c1c1e';
+  var fs=label.length>4?'10px':label.length>3?'11px':label.length>2?'13px':'20px';
+  var br=(type==='sci'||type==='mem')?'8px':'50%';
+  var esc=action.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+  return '<button class="calc-btn" data-ca="'+esc+'" style="background:'+bg+';color:'+col+';font-size:'+fs+';border-radius:'+br+';'+( extraStyle||'')+'">'
+    +'<span style="pointer-events:none">'+label+'</span></button>';
+}
+
+// ── Standard pad ──
+function _cBuildStd(){
+  var rows=[
+    [{l:'AC',a:'_cClear()',t:'util'},{l:'+/−',a:'_cSign()',t:'util'},{l:'%',a:'_cPct()',t:'util'},{l:'÷',a:'_cOp("÷")',t:'op'}],
+    [{l:'7',a:'_cDigit(7)',t:'num'},{l:'8',a:'_cDigit(8)',t:'num'},{l:'9',a:'_cDigit(9)',t:'num'},{l:'×',a:'_cOp("×")',t:'op'}],
+    [{l:'4',a:'_cDigit(4)',t:'num'},{l:'5',a:'_cDigit(5)',t:'num'},{l:'6',a:'_cDigit(6)',t:'num'},{l:'−',a:'_cOp("−")',t:'op'}],
+    [{l:'1',a:'_cDigit(1)',t:'num'},{l:'2',a:'_cDigit(2)',t:'num'},{l:'3',a:'_cDigit(3)',t:'num'},{l:'+',a:'_cOp("+")',t:'op'}],
+    [{l:'⌫',a:'_cBack()',t:'fn'},{l:'0',a:'_cDigit(0)',t:'num'},{l:'.',a:"_cDigit('.')",t:'num'},{l:'=',a:'_cEquals()',t:'eq'}]
+  ];
+  var g=document.getElementById('calc-std-grid');
+  if(!g) return;
+  g.innerHTML='';
+  g.style.gridTemplateRows='repeat(5,1fr)';
+  rows.forEach(function(row){row.forEach(function(b){g.innerHTML+=_cBtn(b.l,b.a,b.t,'min-height:52px;');});});
+}
+
+// ── Scientific pad ──
+function _cBuildSci(){
+  var dl=_cDeg?'DEG':'RAD';
+  var rows=[
+    [{l:'(',a:"_cSci('lp')",t:'sci'},{l:'m+',a:"_cSci('m+')",t:'mem'},{l:'m−',a:"_cSci('m-')",t:'mem'},{l:')',a:"_cSci('rp')",t:'sci'},{l:dl,a:"_cSci('deg')",t:'sci'}],
+    [{l:'sin',a:"_cSci('sin')",t:'sci'},{l:'cos',a:"_cSci('cos')",t:'sci'},{l:'tan',a:"_cSci('tan')",t:'sci'},{l:'log',a:"_cSci('log')",t:'sci'},{l:'ln',a:"_cSci('ln')",t:'sci'}],
+    [{l:'x²',a:"_cSci('x2')",t:'sci'},{l:'x³',a:"_cSci('x3')",t:'sci'},{l:'√',a:"_cSci('sqrt')",t:'sci'},{l:'∛',a:"_cSci('cbrt')",t:'sci'},{l:'1/x',a:"_cSci('1/x')",t:'sci'}],
+    [{l:'yˣ',a:"_cOp('yˣ')",t:'sci'},{l:'eˣ',a:"_cSci('ex')",t:'sci'},{l:'π',a:"_cSci('pi')",t:'sci'},{l:'e',a:"_cSci('e')",t:'sci'},{l:'n!',a:"_cSci('fact')",t:'sci'}]
+  ];
+  var g=document.getElementById('calc-sci-grid');
+  if(!g) return;
+  g.innerHTML='';
+  rows.forEach(function(row){row.forEach(function(b){g.innerHTML+=_cBtn(b.l,b.a,b.t,'min-height:32px;');});});
+}
+
+function calcSetMode(mode){
+  _cMode=mode;
+  var isCalc=mode!=='unit';
+  document.getElementById('calc-display-wrap').style.display=isCalc?'block':'none';
+  document.getElementById('calc-sci-rows').style.display=mode==='sci'?'block':'none';
+  document.getElementById('calc-std-wrap').style.display=isCalc?'block':'none';
+  var uw=document.getElementById('calc-unit-wrap');
+  if(uw){uw.style.display=mode==='unit'?'flex':'none';}
+  ['std','sci','unit'].forEach(function(m){
+    var b=document.getElementById('calc-tab-'+m);
+    if(b){b.className='calc-tab-btn '+(m===mode?'on':'off');}
+  });
+}
+
+// ── Unit data ──
+var _cUD={
+  len:{units:['mm','cm','m','km','in','ft','yd','mi','nmi'],toBase:{'mm':0.001,'cm':0.01,'m':1,'km':1000,'in':0.0254,'ft':0.3048,'yd':0.9144,'mi':1609.344,'nmi':1852}},
+  area:{units:['mm²','cm²','m²','km²','in²','ft²','ac','ha'],toBase:{'mm²':1e-6,'cm²':1e-4,'m²':1,'km²':1e6,'in²':6.4516e-4,'ft²':0.092903,'ac':4046.86,'ha':10000}},
+  vol:{units:['mL','L','m³','in³','ft³','gal(US)','gal(UK)','cup','tbsp','tsp'],toBase:{'mL':0.001,'L':1,'m³':1000,'in³':0.016387,'ft³':28.3168,'gal(US)':3.78541,'gal(UK)':4.54609,'cup':0.236588,'tbsp':0.014787,'tsp':0.004929}},
+  mass:{units:['mg','g','kg','MT','lb','oz','stone'],toBase:{'mg':1e-6,'g':0.001,'kg':1,'MT':1000,'lb':0.453592,'oz':0.028350,'stone':6.35029}},
+  temp:{units:['°C','°F','K']},
+  spd:{units:['m/s','km/h','mph','knot','ft/s'],toBase:{'m/s':1,'km/h':0.277778,'mph':0.44704,'knot':0.514444,'ft/s':0.3048}},
+  time:{units:['ms','s','min','hr','day','wk','mo','yr'],toBase:{'ms':0.001,'s':1,'min':60,'hr':3600,'day':86400,'wk':604800,'mo':2628000,'yr':31536000}},
+  dig:{units:['bit','B','KB','MB','GB','TB'],toBase:{'bit':0.125,'B':1,'KB':1024,'MB':1048576,'GB':1073741824,'TB':1099511627776}},
+  energy:{units:['J','kJ','cal','kcal','Wh','kWh','BTU'],toBase:{'J':1,'kJ':1000,'cal':4.184,'kcal':4184,'Wh':3600,'kWh':3600000,'BTU':1055.06}},
+  pres:{units:['Pa','kPa','MPa','bar','psi','atm','mmHg'],toBase:{'Pa':1,'kPa':1000,'MPa':1e6,'bar':1e5,'psi':6894.76,'atm':101325,'mmHg':133.322}},
+  ang:{units:['°','rad','grad','turn','arcmin','arcsec'],toBase:{'°':1,'rad':57.2958,'grad':0.9,'turn':360,'arcmin':1/60,'arcsec':1/3600}},
+  cur:{units:['INR','USD','EUR','GBP','AED','JPY','CNY','SGD','AUD'],toBase:{'INR':1,'USD':83.5,'EUR':90.2,'GBP':105.3,'AED':22.7,'JPY':0.554,'CNY':11.5,'SGD':61.8,'AUD':54.2}}
+};
+
+function calcUnitCatChange(){
+  var cat=document.getElementById('calc-unit-cat').value;
+  var def=_cUD[cat];if(!def)return;
+  function fill(id,units,di){var s=document.getElementById(id);if(!s)return;s.innerHTML=units.map(function(u,i){return'<option value="'+u+'"'+(i===di?' selected':'')+'>'+u+'</option>';}).join('');}
+  fill('calc-unit-from-sel',def.units,0);fill('calc-unit-to-sel',def.units,1);
+  var fv=document.getElementById('calc-unit-from-val');var tv=document.getElementById('calc-unit-to-val');
+  if(fv)fv.value='';if(tv)tv.value='';
+  document.getElementById('calc-unit-formula').textContent='';
+  calcUnitConvert();
+}
+function calcUnitConvert(){
+  var cat=document.getElementById('calc-unit-cat').value;
+  var def=_cUD[cat];if(!def)return;
+  var fU=document.getElementById('calc-unit-from-sel').value;
+  var tU=document.getElementById('calc-unit-to-sel').value;
+  var fV=parseFloat(document.getElementById('calc-unit-from-val').value);
+  if(isNaN(fV)){document.getElementById('calc-unit-to-val').value='';return;}
+  var r;
+  if(cat==='temp'){
+    var inC;
+    if(fU==='°C')inC=fV;else if(fU==='°F')inC=(fV-32)*5/9;else inC=fV-273.15;
+    if(tU==='°C')r=inC;else if(tU==='°F')r=inC*9/5+32;else r=inC+273.15;
+  }else{var fB=def.toBase[fU]||1,tB=def.toBase[tU]||1;r=fV*fB/tB;}
+  document.getElementById('calc-unit-to-val').value=parseFloat(r.toPrecision(10));
+  var fEl=document.getElementById('calc-unit-formula');
+  if(fEl&&cat!=='temp'){fEl.textContent='1 '+fU+' = '+parseFloat(((def.toBase[fU]||1)/(def.toBase[tU]||1)).toPrecision(6))+' '+tU;}
+}
+function calcUnitSwap(){
+  var fs=document.getElementById('calc-unit-from-sel');var ts=document.getElementById('calc-unit-to-sel');
+  var fv=document.getElementById('calc-unit-from-val');var tv=document.getElementById('calc-unit-to-val');
+  if(!fs||!ts)return;
+  var tmp=fs.value;fs.value=ts.value;ts.value=tmp;
+  fv.value=tv.value||'';  calcUnitConvert();
+}
+
+// ── Unit numpad ──
+function _cUnitDigit(d){
+  var inp=document.getElementById('calc-unit-from-val');if(!inp)return;
+  var cur=inp.value;
+  if(d==='C'){inp.value='';calcUnitConvert();return;}
+  if(d==='⌫'){inp.value=cur.slice(0,-1);calcUnitConvert();return;}
+  if(d==='.' && cur.indexOf('.')!==-1)return;
+  if(d==='.' && cur==='') inp.value='0.';
+  else inp.value=cur+String(d);
+  calcUnitConvert();
+}
+function _cBuildUnitNumpad(){
+  var rows=[
+    [{l:'7',a:'_cUnitDigit(7)',t:'num'},{l:'8',a:'_cUnitDigit(8)',t:'num'},{l:'9',a:'_cUnitDigit(9)',t:'num'},{l:'C',a:"_cUnitDigit('C')",t:'util'}],
+    [{l:'4',a:'_cUnitDigit(4)',t:'num'},{l:'5',a:'_cUnitDigit(5)',t:'num'},{l:'6',a:'_cUnitDigit(6)',t:'num'},{l:'⌫',a:"_cUnitDigit('⌫')",t:'fn'}],
+    [{l:'1',a:'_cUnitDigit(1)',t:'num'},{l:'2',a:'_cUnitDigit(2)',t:'num'},{l:'3',a:'_cUnitDigit(3)',t:'num'},{l:'',a:'',t:'fn'}],
+    [{l:'-',a:"_cUnitDigit('-')",t:'fn'},{l:'0',a:'_cUnitDigit(0)',t:'num'},{l:'.',a:"_cUnitDigit('.')",t:'num'},{l:'⇅',a:'calcUnitSwap()',t:'eq'}]
+  ];
+  var g=document.getElementById('calc-unit-numgrid');if(!g)return;
+  g.innerHTML='';
+  g.style.gridTemplateRows='repeat(4,1fr)';
+  rows.forEach(function(row){row.forEach(function(b){g.innerHTML+=_cBtn(b.l,b.a,b.t,'min-height:46px;');});});
+}
+
+// ── Delegation ──
+document.addEventListener('click',function(e){
+  var btn=e.target.closest?e.target.closest('[data-ca]'):null;
+  if(!btn)return;
+  var m=document.getElementById('calc-modal');
+  if(!m||m.style.display==='none')return;
+  var action=btn.getAttribute('data-ca');
+  if(!action)return;
+  try{eval(action);}catch(ex){console.error('calc:',action,ex);}
+});
+
+// keyboard
+document.addEventListener('keydown',function(e){
+  var m=document.getElementById('calc-modal');
+  if(!m||m.style.display==='none')return;
+  if(_cMode==='unit')return;
+  var k=e.key;
+  if(k>='0'&&k<='9')_cDigit(parseInt(k));
+  else if(k==='.')_cDigit('.');
+  else if(k==='+')_cOp('+');else if(k==='-')_cOp('−');
+  else if(k==='*')_cOp('×');else if(k==='/'){e.preventDefault();_cOp('÷');}
+  else if(k==='Enter'||k==='=')_cEquals();
+  else if(k==='Backspace')_cBack();
+  else if(k==='Escape')_cClear();
+});
+
+document.addEventListener('DOMContentLoaded',function(){_cBuildStd();_cBuildSci();_cBuildUnitNumpad();calcUnitCatChange();});
 </script>
 </body>
 </html>
