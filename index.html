@@ -1732,16 +1732,16 @@ function _launchApp(){
     @keyframes proPulse{0%,100%{opacity:1}50%{opacity:.6}}
     @keyframes proBar{0%{background-position:0% 50%}100%{background-position:300% 50%}}
     @keyframes proShimmer{0%{left:-100%}100%{left:200%}}
-    .pro-feat-row{display:flex;align-items:flex-start;gap:12px;padding:11px 14px;border-radius:12px;margin-bottom:7px;background:rgba(255,255,255,0.045);border:1px solid rgba(255,255,255,0.07);}
-    .pro-feat-row .pfi{font-size:20px;flex-shrink:0;margin-top:1px;width:26px;text-align:center;}
-    .pro-feat-row .pft strong{display:block;font-size:12.5px;font-weight:700;color:#fff;margin:0 0 2px;}
-    .pro-feat-row .pft span{font-size:10.5px;color:rgba(255,255,255,0.42);line-height:1.4;}
+    .pro-feat-row{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:9px;margin-bottom:4px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);}
+    .pro-feat-row .pfi{font-size:16px;flex-shrink:0;width:22px;text-align:center;}
+    .pro-feat-row .pft strong{display:block;font-size:11.5px;font-weight:700;color:#fff;margin:0 0 1px;line-height:1.2;}
+    .pro-feat-row .pft span{font-size:9.5px;color:rgba(255,255,255,0.4);line-height:1.3;}
   </style>
 
-  <div style="position:relative;z-index:2;width:100%;max-width:420px;padding:24px 16px 40px;animation:proFadeUp .55s ease both;">
+  <div style="position:relative;z-index:2;width:100%;max-width:420px;padding:14px 14px 24px;animation:proFadeUp .55s ease both;">
 
     <!-- ── Top: logo + logged-in pill ── -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
       <div style="display:flex;align-items:center;gap:9px;">
         <div style="width:34px;height:34px;background:linear-gradient(145deg,#f97316,#fb923c);border-radius:10px;overflow:hidden;box-shadow:0 0 14px rgba(249,115,22,0.45);flex-shrink:0;">
           <img src="https://cdn.jsdelivr.net/gh/8anjeev/Sanjineer@main/assets/logo.png" style="width:34px;height:34px;object-fit:cover;" onerror="this.style.display='none'">
@@ -1755,19 +1755,19 @@ function _launchApp(){
     </div>
 
     <!-- ── PRO hero card ── -->
-    <div style="background:linear-gradient(145deg,#1a1060,#2d1880,#1a0a55);border:1.5px solid rgba(139,92,246,0.5);border-radius:22px;padding:20px 18px 18px;margin-bottom:14px;position:relative;overflow:hidden;box-shadow:0 8px 40px rgba(99,102,241,0.28),inset 0 1px 0 rgba(255,255,255,0.1);">
+    <div style="background:linear-gradient(145deg,#1a1060,#2d1880,#1a0a55);border:1.5px solid rgba(139,92,246,0.5);border-radius:18px;padding:12px 14px 10px;margin-bottom:10px;position:relative;overflow:hidden;box-shadow:0 8px 40px rgba(99,102,241,0.28),inset 0 1px 0 rgba(255,255,255,0.1);">
       <!-- Animated rainbow top bar -->
       <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#6366f1,#a855f7,#ec4899,#f59e0b,#6366f1,#a855f7);background-size:300% 100%;animation:proBar 3s linear infinite;border-radius:22px 22px 0 0;"></div>
       <!-- ⭐ BEST badge -->
       <div style="position:absolute;top:14px;right:14px;background:linear-gradient(135deg,#f59e0b,#f97316);border-radius:99px;padding:3px 10px;font-size:9px;font-weight:800;color:#fff;letter-spacing:.04em;">⭐ BEST VALUE</div>
 
       <!-- PRO label + price -->
-      <div style="margin-bottom:14px;margin-top:2px;">
-        <div style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(99,102,241,0.35),rgba(168,85,247,0.35));border:1px solid rgba(139,92,246,0.45);border-radius:99px;padding:4px 12px;margin-bottom:12px;">
+      <div style="margin-bottom:8px;margin-top:0;">
+        <div style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(99,102,241,0.35),rgba(168,85,247,0.35));border:1px solid rgba(139,92,246,0.45);border-radius:99px;padding:3px 10px;margin-bottom:7px;">
           <span style="font-size:11px;font-weight:800;color:#c4b5fd;letter-spacing:.05em;">PRO ☁️</span>
         </div>
         <div style="display:flex;align-items:baseline;gap:9px;margin-bottom:3px;">
-          <p style="font-family:'Syne',sans-serif;font-size:2.6rem;font-weight:900;color:#fff;margin:0;line-height:1;">₹30</p>
+          <p style="font-family:'Syne',sans-serif;font-size:2.1rem;font-weight:900;color:#fff;margin:0;line-height:1;">₹30</p>
           <p style="font-size:14px;font-weight:600;color:rgba(255,255,255,0.3);margin:0;text-decoration:line-through;">₹99</p>
           <div style="background:linear-gradient(135deg,#f59e0b,#f97316);border-radius:8px;padding:3px 9px;font-size:10px;font-weight:800;color:#fff;">70% OFF</div>
         </div>
@@ -1775,7 +1775,7 @@ function _launchApp(){
       </div>
 
       <!-- Divider -->
-      <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(139,92,246,0.4),transparent);margin-bottom:14px;"></div>
+      <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(139,92,246,0.4),transparent);margin-bottom:8px;"></div>
 
       <!-- Feature list -->
       <div class="pro-feat-row"><span class="pfi">☁️</span><div class="pft"><strong>Cloud Sync — Never Lose Data</strong><span>Real-time automatic backup to cloud, always</span></div></div>
@@ -1788,7 +1788,7 @@ function _launchApp(){
     </div>
 
     <!-- ── Buy Pro button ── -->
-    <button onclick="plBuyPro()" style="position:relative;overflow:hidden;width:100%;padding:16px;background:linear-gradient(135deg,#6366f1,#7c3aed,#a855f7);color:#fff;border:none;border-radius:15px;font-weight:800;font-size:1rem;cursor:pointer;box-shadow:0 8px 30px rgba(99,102,241,0.55);display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:11px;letter-spacing:.02em;" ontouchstart="this.style.transform='scale(.97)'" ontouchend="this.style.transform='scale(1)'">
+    <button onclick="plBuyPro()" style="position:relative;overflow:hidden;width:100%;padding:12px;background:linear-gradient(135deg,#6366f1,#7c3aed,#a855f7);color:#fff;border:none;border-radius:15px;font-weight:800;font-size:1rem;cursor:pointer;box-shadow:0 8px 30px rgba(99,102,241,0.55);display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:11px;letter-spacing:.02em;" ontouchstart="this.style.transform='scale(.97)'" ontouchend="this.style.transform='scale(1)'">
       <span style="position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent);animation:proShimmer 2.4s ease infinite;"></span>
       <span style="font-size:18px;">⭐</span>
       <span>Get Pro — ₹30 / month</span>
@@ -1796,14 +1796,14 @@ function _launchApp(){
     </button>
 
     <!-- Trust strip -->
-    <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;">
       <span style="font-size:9.5px;color:rgba(255,255,255,0.25);display:flex;align-items:center;gap:3px;">🔒 Secure · Razorpay</span>
       <span style="font-size:9.5px;color:rgba(255,255,255,0.25);display:flex;align-items:center;gap:3px;">⚡ Instant activation</span>
       <span style="font-size:9.5px;color:rgba(255,255,255,0.25);display:flex;align-items:center;gap:3px;">↩️ Cancel anytime</span>
     </div>
 
     <!-- ── Continue Free button ── -->
-    <button onclick="plChooseFree()" style="width:100%;padding:13px;background:transparent;border:1px solid rgba(255,255,255,0.15);border-radius:13px;color:rgba(255,255,255,0.45);font-weight:600;font-size:.88rem;cursor:pointer;letter-spacing:.02em;transition:border-color .2s,color .2s;" ontouchstart="this.style.borderColor='rgba(255,255,255,0.3)';this.style.color='rgba(255,255,255,0.65)'" ontouchend="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='rgba(255,255,255,0.45)'">
+    <button onclick="plChooseFree()" style="width:100%;padding:10px;background:transparent;border:1px solid rgba(255,255,255,0.15);border-radius:13px;color:rgba(255,255,255,0.45);font-weight:600;font-size:.88rem;cursor:pointer;letter-spacing:.02em;transition:border-color .2s,color .2s;" ontouchstart="this.style.borderColor='rgba(255,255,255,0.3)';this.style.color='rgba(255,255,255,0.65)'" ontouchend="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='rgba(255,255,255,0.45)'">
       Continue with Free Plan
     </button>
     <p style="text-align:center;font-size:9.5px;color:rgba(255,255,255,0.2);margin:8px 0 0;">Free plan · device storage only · upgrade anytime</p>
@@ -1834,49 +1834,31 @@ function _launchApp(){
     .auth-back:hover{color:rgba(255,255,255,0.6);}
   </style>
 
-  <div id="auth-inner" style="position:relative;z-index:2;width:100%;max-width:340px;display:flex;flex-direction:column;align-items:center;animation:authFUp .55s ease both;">
+  <div id="auth-inner" style="position:relative;z-index:2;width:100%;max-width:320px;display:flex;flex-direction:column;align-items:center;animation:authFUp .55s ease both;">
 
     <!-- Logo -->
-    <div style="display:flex;align-items:center;gap:9px;margin-bottom:1.8rem;">
-      <div style="width:42px;height:42px;background:linear-gradient(145deg,#f97316,#fb923c);border-radius:12px;overflow:hidden;box-shadow:0 0 22px rgba(249,115,22,0.45);flex-shrink:0;">
-        <img src="https://cdn.jsdelivr.net/gh/8anjeev/Sanjineer@main/assets/logo.png" style="width:42px;height:42px;object-fit:cover;" onerror="this.style.display='none'">
+    <div style="display:flex;align-items:center;gap:9px;margin-bottom:1.4rem;">
+      <div style="width:36px;height:36px;background:linear-gradient(145deg,#f97316,#fb923c);border-radius:10px;overflow:hidden;box-shadow:0 0 16px rgba(249,115,22,0.4);flex-shrink:0;">
+        <img src="https://cdn.jsdelivr.net/gh/8anjeev/Sanjineer@main/assets/logo.png" style="width:36px;height:36px;object-fit:cover;" onerror="this.style.display='none'">
       </div>
-      <div>
-        <p style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:#fff;margin:0;line-height:1;">Sanj<span style="background:linear-gradient(90deg,#818cf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">ineer</span></p>
-        <p style="font-size:9.5px;color:rgba(255,255,255,0.38);margin:2px 0 0;">Secure Login — No Password Needed</p>
-      </div>
-    </div>
-    <!-- FREE label -->
-    <div style="display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:99px;padding:5px 16px;margin-bottom:18px;">
-      <span style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);letter-spacing:.04em;">Account is</span>
-      <span style="font-size:12px;font-weight:800;color:#34d399;letter-spacing:.04em;">FREE</span>
-      <span style="font-size:11px;color:rgba(255,255,255,0.35);">— upgrade anytime after login</span>
+      <p style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:#fff;margin:0;">Sanj<span style="background:linear-gradient(90deg,#818cf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">ineer</span></p>
     </div>
 
     <!-- ── STEP 1: Email entry ── -->
     <div id="auth-step-email" style="width:100%;">
-      <div style="text-align:center;margin-bottom:18px;">
-        <div style="width:52px;height:52px;background:linear-gradient(135deg,#4f46e5,#7c3aed);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 10px;box-shadow:0 6px 20px rgba(79,70,229,0.35);">✉️</div>
-        <h3 style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;color:#fff;margin:0 0 5px;">Enter Your Email</h3>
-        <p style="font-size:11px;color:rgba(255,255,255,0.4);margin:0;line-height:1.5;">We'll send a 6-digit OTP code to verify you.<br><strong style="color:rgba(255,255,255,0.6);">No password — ever. Free account always.</strong></p>
-      </div>
-      <input id="auth-email-inp" class="auth-inp" type="email" placeholder="your@email.com" style="margin-bottom:10px;" oninput="document.getElementById('auth-email-err').style.display='none'">
-      <p id="auth-email-err" style="font-size:11px;color:#fca5a5;margin:0 0 10px;display:none;text-align:center;"></p>
+      <p style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.55);margin:0 0 10px;text-align:center;">Login or Create Account</p>
+      <input id="auth-email-inp" class="auth-inp" type="email" placeholder="your@email.com" style="margin-bottom:8px;" oninput="document.getElementById('auth-email-err').style.display='none'">
+      <p id="auth-email-err" style="font-size:11px;color:#fca5a5;margin:0 0 8px;display:none;text-align:center;"></p>
       <button class="auth-submit" id="auth-otp-send-btn" onclick="authSendOTP()">
-        <span id="auth-otp-send-label">Send Login Code →</span>
+        <span id="auth-otp-send-label">Send OTP →</span>
       </button>
-      <p style="text-align:center;font-size:10px;color:rgba(255,255,255,0.22);margin-top:14px;line-height:1.5;">By continuing, you agree to Sanjineer's terms.<br>Your account is free. No spam ever.</p>
     </div>
 
     <!-- ── STEP 2: OTP verification ── -->
     <div id="auth-step-otp" style="width:100%;display:none;">
-      <div style="text-align:center;margin-bottom:20px;">
-        <div style="width:52px;height:52px;background:linear-gradient(135deg,#059669,#10b981);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 10px;box-shadow:0 6px 20px rgba(5,150,105,0.35);">🔐</div>
-        <h3 style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;color:#fff;margin:0 0 5px;">Check Your Email</h3>
-        <p style="font-size:11px;color:rgba(255,255,255,0.4);margin:0;line-height:1.5;">Enter the 6-digit code we sent to<br><strong id="auth-otp-email-label" style="color:rgba(255,255,255,0.7);"></strong></p>
-      </div>
+      <p style="font-size:11px;color:rgba(255,255,255,0.45);margin:0 0 12px;text-align:center;">Enter the 6-digit code sent to<br><strong id="auth-otp-email-label" style="color:rgba(255,255,255,0.75);"></strong></p>
       <!-- 6-box OTP input -->
-      <div id="auth-otp-boxes" style="display:flex;gap:7px;justify-content:center;margin-bottom:16px;animation:otpPop .4s ease;">
+      <div id="auth-otp-boxes" style="display:flex;gap:7px;justify-content:center;margin-bottom:10px;animation:otpPop .4s ease;">
         <input class="otp-box" maxlength="1" type="tel" oninput="otpMove(this,0)" onkeydown="otpBack(event,this,0)">
         <input class="otp-box" maxlength="1" type="tel" oninput="otpMove(this,1)" onkeydown="otpBack(event,this,1)">
         <input class="otp-box" maxlength="1" type="tel" oninput="otpMove(this,2)" onkeydown="otpBack(event,this,2)">
@@ -1884,16 +1866,16 @@ function _launchApp(){
         <input class="otp-box" maxlength="1" type="tel" oninput="otpMove(this,4)" onkeydown="otpBack(event,this,4)">
         <input class="otp-box" maxlength="1" type="tel" oninput="otpMove(this,5)" onkeydown="otpBack(event,this,5)">
       </div>
-      <p id="auth-otp-err" style="font-size:11px;color:#fca5a5;margin:0 0 10px;display:none;text-align:center;"></p>
+      <p id="auth-otp-err" style="font-size:11px;color:#fca5a5;margin:0 0 8px;display:none;text-align:center;"></p>
       <button class="auth-submit" id="auth-verify-btn" onclick="authVerifyOTP()" style="background:linear-gradient(135deg,#059669,#10b981);box-shadow:0 6px 20px rgba(5,150,105,0.4);">
-        <span id="auth-verify-label">Verify &amp; Enter App ✓</span>
+        <span id="auth-verify-label">Verify &amp; Continue ✓</span>
       </button>
-      <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-top:12px;">
+      <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-top:10px;">
         <button id="auth-resend-btn" onclick="authResendOTP()" style="background:none;border:none;color:rgba(99,102,241,0.7);font-size:10.5px;cursor:pointer;font-weight:600;">Resend Code</button>
         <span style="color:rgba(255,255,255,0.2);font-size:10px;">·</span>
         <button onclick="authBackToEmail()" class="auth-back" style="width:auto;margin:0;">← Change Email</button>
       </div>
-      <div id="auth-resend-timer" style="text-align:center;font-size:10px;color:rgba(255,255,255,0.3);margin-top:6px;"></div>
+      <div id="auth-resend-timer" style="text-align:center;font-size:10px;color:rgba(255,255,255,0.3);margin-top:5px;"></div>
     </div>
 
   </div>
@@ -1907,24 +1889,24 @@ function _launchApp(){
   <div style="position:absolute;bottom:-40px;left:-30px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,#6366f1,#a855f7);filter:blur(80px);opacity:0.3;pointer-events:none;"></div>
   <style>
     @keyframes rzpFade{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
-    .rzp-feat-row{display:flex;align-items:center;gap:10px;padding:9px 12px;background:rgba(255,255,255,0.04);border-radius:10px;margin-bottom:7px;}
-    .rzp-feat-row .rzp-fi{font-size:18px;flex-shrink:0;width:26px;text-align:center;}
-    .rzp-feat-row p{margin:0;font-size:11.5px;font-weight:700;color:#fff;}
-    .rzp-feat-row span{font-size:10px;color:rgba(255,255,255,0.4);}
+    .rzp-feat-row{display:flex;align-items:center;gap:8px;padding:5px 10px;background:rgba(255,255,255,0.04);border-radius:8px;margin-bottom:4px;}
+    .rzp-feat-row .rzp-fi{font-size:15px;flex-shrink:0;width:20px;text-align:center;}
+    .rzp-feat-row p{margin:0;font-size:10.5px;font-weight:700;color:#fff;}
+    .rzp-feat-row span{font-size:9px;color:rgba(255,255,255,0.4);}
   </style>
-  <div style="position:relative;z-index:2;width:100%;max-width:380px;animation:rzpFade .5s ease both;">
+  <div style="position:relative;z-index:2;width:100%;max-width:380px;animation:rzpFade .5s ease both;padding-top:8px;">
     <button onclick="closeRazorpayLanding()" style="position:absolute;top:-8px;right:0;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:50%;width:30px;height:30px;color:rgba(255,255,255,0.55);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
-      <div style="width:44px;height:44px;background:linear-gradient(135deg,#f59e0b,#f97316);border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 18px rgba(245,158,11,0.4);">⭐</div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+      <div style="width:36px;height:36px;background:linear-gradient(135deg,#f59e0b,#f97316);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 18px rgba(245,158,11,0.4);">⭐</div>
       <div>
         <p style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;color:#fff;margin:0;line-height:1;">Upgrade to Pro</p>
         <p style="font-size:10px;color:rgba(255,255,255,0.38);margin:3px 0 0;">Unlock everything ☁️</p>
       </div>
     </div>
-    <div style="background:linear-gradient(135deg,rgba(99,102,241,0.2),rgba(168,85,247,0.15));border:1px solid rgba(99,102,241,0.35);border-radius:16px;padding:16px 18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;">
+    <div style="background:linear-gradient(135deg,rgba(99,102,241,0.2),rgba(168,85,247,0.15));border:1px solid rgba(99,102,241,0.35);border-radius:12px;padding:10px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;">
       <div>
         <div style="display:flex;align-items:baseline;gap:8px;">
-          <p style="font-size:2.2rem;font-weight:900;color:#fff;margin:0;font-family:'Syne',sans-serif;line-height:1;">₹30</p>
+          <p style="font-size:1.8rem;font-weight:900;color:#fff;margin:0;font-family:'Syne',sans-serif;line-height:1;">₹30</p>
           <p style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.35);margin:0;text-decoration:line-through;">₹99</p>
         </div>
         <p style="font-size:10px;color:rgba(255,255,255,0.4);margin:4px 0 0;">per month · billed monthly</p>
@@ -1943,7 +1925,7 @@ function _launchApp(){
       <div class="rzp-feat-row"><span class="rzp-fi">🖼️</span><div><p>Your Own Logo on PDF</p><span>Brand every report with your company logo</span></div></div>
       <div class="rzp-feat-row"><span class="rzp-fi">👥</span><div><p>Viewer Accounts for Your Team</p><span>Read-only access for workers &amp; clients</span></div></div>
     </div>
-    <button onclick="rzpDoPurchase()" id="rzp-pay-btn" style="width:100%;padding:16px;background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;border:none;border-radius:14px;font-weight:800;font-size:1rem;cursor:pointer;box-shadow:0 6px 26px rgba(245,158,11,0.45);display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .15s,box-shadow .15s;margin-bottom:10px;" ontouchstart="this.style.transform='scale(.97)'" ontouchend="this.style.transform='scale(1)'">
+    <button onclick="rzpDoPurchase()" id="rzp-pay-btn" style="width:100%;padding:12px;background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;border:none;border-radius:14px;font-weight:800;font-size:1rem;cursor:pointer;box-shadow:0 6px 26px rgba(245,158,11,0.45);display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .15s,box-shadow .15s;margin-bottom:10px;" ontouchstart="this.style.transform='scale(.97)'" ontouchend="this.style.transform='scale(1)'">
       <span>⭐</span><span id="rzp-pay-label">Pay ₹30 — Activate Pro Now</span><span>→</span>
     </button>
     <p style="text-align:center;font-size:9.5px;color:rgba(255,255,255,0.22);margin:0 0 14px;">Secure payment via Razorpay · Instant activation · Cancel anytime</p>
@@ -2004,7 +1986,7 @@ function rzpDoPurchase(){
   if(label)label.textContent='Opening payment…';
   if(btn)btn.disabled=true;
   var options={
-    key:'rzp_live_REPLACE_WITH_YOUR_KEY',
+    key:'rzp_live_SRrnyG5XusYMpE',
     amount:3000,
     currency:'INR',
     name:'Sanjineer',
@@ -2129,13 +2111,6 @@ function _authSendSupabaseOTP(email,cb){
     localStorage.setItem('_demo_otp_'+email,demoOtp);
     localStorage.setItem('_demo_otp_ts',Date.now());
     console.log('[Sanjineer Demo OTP for '+email+']: '+demoOtp);
-    setTimeout(function(){
-      var t=document.createElement('div');
-      t.textContent='Demo OTP: '+demoOtp;
-      t.style.cssText='position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:999999;background:#1e1b4b;border:1px solid #6366f1;color:#a5b4fc;padding:8px 18px;border-radius:99px;font-size:12px;font-weight:700;white-space:nowrap;box-shadow:0 4px 20px rgba(99,102,241,0.4);';
-      document.body.appendChild(t);
-      setTimeout(function(){t.remove();},8000);
-    },400);
   }catch(ex){}
   cb(null);
 }
@@ -2345,14 +2320,6 @@ function _authSendSupabaseOTP(email, cb){
     localStorage.setItem('_demo_otp_'+email, demoOtp);
     localStorage.setItem('_demo_otp_ts', Date.now());
     console.log('[Sanjineer Demo OTP for '+email+']: '+demoOtp+' (only shown in demo mode)');
-    // In demo mode, auto-show it in a toast-like way
-    setTimeout(function(){
-      var t=document.createElement('div');
-      t.textContent='Demo OTP: '+demoOtp+' (check console)';
-      t.style.cssText='position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:999999;background:#1e1b4b;border:1px solid #6366f1;color:#a5b4fc;padding:8px 18px;border-radius:99px;font-size:12px;font-weight:700;';
-      document.body.appendChild(t);
-      setTimeout(function(){t.remove();},6000);
-    },400);
   }catch(ex){}
   cb(null);
 }
@@ -5680,26 +5647,17 @@ document.addEventListener('DOMContentLoaded', function() {
       <h3 class="font-bold text-gray-800">⚙️ Profile Settings</h3>
       <button onclick="closeProfileModal()" class="text-gray-400 text-xl">✕</button>
     </div>
-    <p class="text-xs text-gray-400 mb-2">Company & address appear on all reports. Engineer name only on Daily Report.</p>
+    <p class="text-xs text-gray-400 mb-2">Company appears on all reports. Project name is set via ☁️ Cloud Settings.</p>
     <div class="space-y-3">
-      <div><label class="text-xs font-semibold text-gray-500 block mb-1">Company / Project Name</label><input id="edit-company" type="text" placeholder="e.g. Sanjeev Constructions" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400"></div>
+      <div><label class="text-xs font-semibold text-gray-500 block mb-1">Company / Owner Name</label><input id="edit-company" type="text" placeholder="e.g. Sanjeev Constructions" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400"></div>
       <div><label class="text-xs font-semibold text-gray-500 block mb-1">Engineer / Owner Name</label><input id="edit-engineer" type="text" placeholder="e.g. Er. Sanjeev Kumar" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400"></div>
-      <div><label class="text-xs font-semibold text-gray-500 block mb-1">Address <span class="font-normal text-gray-400">(Optional — shown on invoices)</span></label><input id="edit-address" type="text" placeholder="Company address" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400"></div>
+      <div><label class="text-xs font-semibold text-gray-500 block mb-1">Project Name <span class="font-normal text-gray-400">(Auto-filled from Cloud → Project)</span></label><input id="edit-address" type="text" placeholder="Select project from Cloud Settings" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400" readonly style="background:#f9fafb;color:#6b7280;cursor:default"></div>
       <div><label class="text-xs font-semibold text-gray-500 block mb-1">GST No. <span class="font-normal text-gray-400">(Optional)</span></label><input id="edit-gst" type="text" placeholder="GST number" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:border-indigo-400"></div>
-      <!-- Logo upload -->
-      <div>
-        <label class="text-xs font-semibold text-gray-500 block mb-1">Company Logo <span class="font-normal text-gray-400">(Optional — shown on PDFs)</span></label>
-        <div class="flex items-center gap-3">
-          <label class="flex-1 flex items-center gap-2 px-3 py-2 bg-indigo-50 border-2 border-dashed border-indigo-300 rounded-xl cursor-pointer active:scale-95">
-            <span style="font-size:13px">🖼️</span>
-            <span class="text-xs font-bold text-indigo-600">Upload Logo</span><span class="text-xs text-indigo-400 ml-1">PNG / JPG</span>
-            <input type="file" id="edit-logo-file" accept="image/png,image/jpeg,image/jpg,image/gif,image/webp,image/svg+xml,image/*" class="hidden" onchange="loadProfileLogo(event)">
-          </label>
-          <div id="edit-logo-preview" style="display:none;width:48px;height:48px;border-radius:8px;border:2px solid #e5e7eb;overflow:hidden;flex-shrink:0">
-            <img id="edit-logo-img" style="width:100%;height:100%;object-fit:contain">
-          </div>
-          <button id="edit-logo-clear" onclick="clearProfileLogo()" style="display:none;padding:0 12px;background:#fee2e2;color:#dc2626;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">✕</button>
-        </div>
+      <!-- Hidden logo elements kept for JS compatibility -->
+      <div style="display:none">
+        <input type="file" id="edit-logo-file" accept="image/*" class="hidden" onchange="loadProfileLogo(event)">
+        <div id="edit-logo-preview"><img id="edit-logo-img"></div>
+        <button id="edit-logo-clear" onclick="clearProfileLogo()"></button>
       </div>
       <!-- Print Header Colour -->
       <div>
@@ -6040,7 +5998,10 @@ document.addEventListener('DOMContentLoaded', function() {
             <button onclick="doAdminLogout()" style="padding:2px 10px;background:rgba(239,68,68,.2);border:1px solid rgba(239,68,68,.35);color:#fca5a5;border-radius:6px;font-size:9px;font-weight:700;cursor:pointer;height:auto;min-height:auto;">Logout</button>
           </div>
         </div>
-        <p id="cloud-sub-expiry" style="font-size:8px;color:#86efac;font-weight:600;">&mdash;</p>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:3px;">
+          <p id="cloud-sub-expiry" style="font-size:8px;color:#86efac;font-weight:600;">&mdash;</p>
+          <span id="cloud-active-proj-tag" style="font-size:8px;font-weight:700;color:#fbbf24;background:rgba(251,191,36,0.12);border:1px solid rgba(251,191,36,0.25);border-radius:5px;padding:1px 7px;display:none;">📂 —</span>
+        </div>
       </div>
 
       <!-- TAB CHIPS: Login & Create only -->
@@ -6085,6 +6046,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
         <!-- POST-LOGIN admin panel (unchanged) -->
         <div id="ctab-admin-postlogin" style="display:none;">
+
+          <!-- ── PROJECT SELECTOR ── -->
+          <div style="background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.25);border-radius:12px;padding:.65rem;margin-bottom:.65rem;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.45rem;">
+              <p style="font-size:11px;font-weight:800;color:#c7d2fe;">📂 Active Project</p>
+              <button onclick="_showAddProject()" style="padding:2px 10px;background:rgba(99,102,241,0.25);border:1px solid rgba(129,140,248,0.4);color:#c7d2fe;border-radius:6px;font-size:9px;font-weight:700;cursor:pointer;">+ New</button>
+            </div>
+            <!-- Dropdown -->
+            <select id="cloud-project-select" onchange="_onProjectChange(this.value)" style="width:100%;padding:7px 10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:9px;color:#fff;font-size:12px;font-weight:700;outline:none;cursor:pointer;margin-bottom:.5rem;">
+              <option value="" style="background:#1e1b4b;color:#fff;">— Select a project —</option>
+            </select>
+            <!-- Add new project form (hidden by default) -->
+            <div id="cloud-add-project-form" style="display:none;margin-top:.4rem;border-top:1px solid rgba(255,255,255,0.07);padding-top:.5rem;">
+              <input id="cloud-new-proj-name" type="text" placeholder="Project name e.g. Site Goa Phase 2" style="width:100%;padding:7px 10px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:9px;color:#fff;font-size:11px;outline:none;box-sizing:border-box;margin-bottom:6px;">
+              <!-- Logo upload for this project -->
+              <label style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:rgba(255,255,255,0.05);border:1.5px dashed rgba(129,140,248,0.35);border-radius:9px;cursor:pointer;margin-bottom:6px;">
+                <span style="font-size:14px;">🖼️</span>
+                <span style="font-size:11px;font-weight:700;color:#a5b4fc;">Upload Project Logo</span>
+                <span style="font-size:9.5px;color:rgba(165,180,252,0.5);">PNG / JPG</span>
+                <input type="file" id="cloud-proj-logo-file" accept="image/*" class="hidden" onchange="_previewProjLogo(event)" style="display:none;">
+              </label>
+              <div id="cloud-proj-logo-preview" style="display:none;margin-bottom:6px;text-align:center;">
+                <img id="cloud-proj-logo-img" style="max-height:50px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);object-fit:contain;">
+                <button onclick="_clearProjLogo()" style="margin-left:8px;background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.4);color:#fca5a5;border-radius:5px;font-size:10px;padding:2px 8px;cursor:pointer;">✕</button>
+              </div>
+              <div style="display:flex;gap:6px;">
+                <button onclick="_saveNewProject()" style="flex:1;padding:6px;background:linear-gradient(135deg,#059669,#10b981);color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;">✓ Save Project</button>
+                <button onclick="_hideAddProject()" style="padding:6px 12px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.5);border-radius:8px;font-size:11px;cursor:pointer;">Cancel</button>
+              </div>
+            </div>
+          </div>
+
           <!-- Firebase Rules hint - shown only when permission error occurs -->
           <div id="cloud-rules-hint" style="display:none;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:12px;padding:.75rem;margin-bottom:8px;">
             <p style="font-size:11px;font-weight:800;color:#fca5a5;margin-bottom:6px;">⚠️ Firebase Rules need updating</p>
@@ -6604,7 +6597,9 @@ function openEditProfile() {
   var p = lprof() || {};
   document.getElementById('edit-company').value = p.company || '';
   document.getElementById('edit-engineer').value = p.engineer || '';
-  document.getElementById('edit-address').value = p.address || '';
+  // Project name: prefer active project, fallback to saved
+  var _ap = localStorage.getItem('sanj_active_proj') || '';
+  document.getElementById('edit-address').value = _ap || p.address || '';
   document.getElementById('edit-gst').value = p.gst || '';
   if (p.logo) {
     var img = document.getElementById('edit-logo-img');
@@ -11632,11 +11627,26 @@ var _cloudSyncTimer = null;
 // -- Helpers --
 function isCloudActivated() { return safeLS.getItem(CLOUD_KEY) === '1'; }
 function getFbConfig() { try { return JSON.parse(safeLS.getItem(CLOUD_FB_CFG) || 'null'); } catch(e) { return null; } }
+function _slugify(str) {
+  return (str || '').toLowerCase().trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 40) || 'default';
+}
+
 function getSiteId() {
   if (_adminSBUser && _adminSBUser.id) {
-    var key = 'user-' + _adminSBUser.id.replace(/-/g,'').slice(0,12);
-    safeLS.setItem(CLOUD_SITE_ID, key);
-    return key;
+    var uid = 'user-' + _adminSBUser.id.replace(/-/g,'').slice(0,12);
+    // Check if a project is selected
+    var activeProj = localStorage.getItem(_ACTIVE_PROJ_KEY || 'sanj_active_proj') || '';
+    if (activeProj) {
+      var key = uid + '-proj-' + _slugify(activeProj);
+      safeLS.setItem(CLOUD_SITE_ID, key);
+      return key;
+    }
+    // No project selected → default site (backward compat)
+    safeLS.setItem(CLOUD_SITE_ID, uid);
+    return uid;
   }
   return safeLS.getItem(CLOUD_SITE_ID) || '';
 }
@@ -11680,6 +11690,165 @@ function openCloudModal() {
   }
 }
 function closeCloudModal() { document.getElementById('cloud-modal').classList.remove('show'); }
+
+// ════════════════════════════════════════════════════════
+//  PROJECT MANAGEMENT — Cloud Modal
+// ════════════════════════════════════════════════════════
+var _PROJ_KEY = 'sanj_projects_v1';      // localStorage key for project list
+var _ACTIVE_PROJ_KEY = 'sanj_active_proj'; // currently selected project name
+
+function _getProjects() {
+  try { return JSON.parse(localStorage.getItem(_PROJ_KEY) || '[]'); } catch(e) { return []; }
+}
+function _saveProjects(arr) {
+  try { localStorage.setItem(_PROJ_KEY, JSON.stringify(arr)); } catch(e) {}
+}
+function _getActiveProject() {
+  return localStorage.getItem(_ACTIVE_PROJ_KEY) || '';
+}
+
+/** Populate the dropdown in cloud modal */
+function _loadProjectDropdown() {
+  var sel = document.getElementById('cloud-project-select');
+  if (!sel) return;
+  var projects = _getProjects();
+  var active = _getActiveProject();
+  sel.innerHTML = '<option value="" style="background:#1e1b4b;color:#fff;">— Select a project —</option>';
+  projects.forEach(function(p) {
+    var opt = document.createElement('option');
+    opt.value = p.name;
+    opt.textContent = p.name;
+    opt.style.background = '#1e1b4b';
+    opt.style.color = '#fff';
+    if (p.name === active) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+/** Called when user picks a project from dropdown */
+function _onProjectChange(name) {
+  if (!name) return;
+
+  // 1. Backup CURRENT project data to cloud before switching (silent)
+  if (typeof cloudBackupNow === 'function' && _adminSBUser) {
+    cloudBackupNow(true);
+  }
+
+  // 2. Set new active project
+  localStorage.setItem(_ACTIVE_PROJ_KEY, name);
+
+  // 3. Auto-update profile project name field (readonly display)
+  var projInput = document.getElementById('edit-address');
+  if (projInput) projInput.value = name;
+
+  // 4. Update saved profile — set project name + logo from project
+  var prof = lprof() || {};
+  var projects = _getProjects();
+  var proj = projects.find(function(p){ return p.name === name; });
+  if (proj && proj.logo) { prof.logo = proj.logo; }
+  prof.address = name;  // project name shown in PDF headers
+  sprof(prof);
+  applyProfile && applyProfile();
+
+  // 5. Pull this project's cloud data (getSiteId() now returns new project key)
+  toast('Switching to: ' + name + ' ⏳', '');
+  if (typeof _adminCloudPull === 'function' && _adminSBUser) {
+    // Force pull — reset timestamp so pull always fires
+    _lastCloudTimestamp = 0;
+    setTimeout(function() {
+      _adminCloudPull(false); // false = show toast when data arrives
+    }, 600);
+  } else {
+    toast('Project set: ' + name + ' ✓', 'ok');
+  }
+}
+
+function _showAddProject() {
+  var f = document.getElementById('cloud-add-project-form');
+  if (f) f.style.display = 'block';
+  var inp = document.getElementById('cloud-new-proj-name');
+  if (inp) inp.focus();
+}
+function _hideAddProject() {
+  var f = document.getElementById('cloud-add-project-form');
+  if (f) f.style.display = 'none';
+  var inp = document.getElementById('cloud-new-proj-name');
+  if (inp) inp.value = '';
+  _clearProjLogo();
+}
+
+function _previewProjLogo(evt) {
+  var file = evt.target.files && evt.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = document.getElementById('cloud-proj-logo-img');
+    var prev = document.getElementById('cloud-proj-logo-preview');
+    if (img) img.src = e.target.result;
+    if (prev) prev.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+function _clearProjLogo() {
+  var img = document.getElementById('cloud-proj-logo-img');
+  var prev = document.getElementById('cloud-proj-logo-preview');
+  var file = document.getElementById('cloud-proj-logo-file');
+  if (img) img.src = '';
+  if (prev) prev.style.display = 'none';
+  if (file) file.value = '';
+}
+
+function _saveNewProject() {
+  var nameEl = document.getElementById('cloud-new-proj-name');
+  var name = nameEl ? nameEl.value.trim() : '';
+  if (!name) { toast('Enter project name', 'err'); return; }
+  var logoEl = document.getElementById('cloud-proj-logo-img');
+  var logo = (logoEl && logoEl.src && logoEl.src.indexOf('data:') === 0) ? logoEl.src : null;
+
+  var projects = _getProjects();
+  // Avoid duplicate
+  if (projects.find(function(p){ return p.name === name; })) {
+    toast('Project already exists', 'err'); return;
+  }
+  projects.push({ name: name, logo: logo, createdAt: Date.now() });
+  _saveProjects(projects);
+  _hideAddProject();
+  _loadProjectDropdown();
+  // Auto-select + switch to the new project
+  var sel = document.getElementById('cloud-project-select');
+  if (sel) { sel.value = name; }
+  // New project = blank local data first
+  _clearLocalDataForNewProject();
+  _onProjectChange(name);
+  toast('✅ Project created: ' + name, 'ok');
+}
+
+/** Wipe cm_ local data so new project starts fresh (leaves auth/settings intact) */
+function _clearLocalDataForNewProject() {
+  var KEEP = ['cm_cloud_activated','cm_site_id','cm_sub_end',
+              'sanj_dark_mode','sanj_dash_view','sanj_hidden_tabs',
+              'sanj_guide_enabled','sanj_swipe_enabled','sanj_signatures',
+              'sanj_auth_session','sanj_cloud_choice','sanj_pro',
+              '_SANJ_PROJ','sanj_active_proj','sanj_projects_v1'];
+  try {
+    var ls = window.localStorage;
+    var toDelete = [];
+    for (var i = 0; i < ls.length; i++) {
+      var k = ls.key(i);
+      if (!k) continue;
+      if (k.indexOf('cm_') === 0 || k.indexOf('sanj_signatures') === 0) {
+        if (KEEP.indexOf(k) === -1) toDelete.push(k);
+      }
+    }
+    toDelete.forEach(function(k) { ls.removeItem(k); });
+    // Re-init in-memory arrays
+    AD = [];
+    if (typeof renderDashboard === 'function') renderDashboard();
+  } catch(e) {}
+}
+// ════════════════════════════════════════════════════════
+
+
 
 // ── Tab switcher ────────────────────────────────────────────────
 function switchCloudTab(tab) {
@@ -11746,6 +11915,13 @@ function refreshCloudModalState() {
     if (postlogin) postlogin.style.display = 'block';
     if (adminPanel) adminPanel.style.display = 'block';
     loadViewerAccountsInline();
+    _loadProjectDropdown();
+    // Auto-select active project
+    setTimeout(function() {
+      var sel = document.getElementById('cloud-project-select');
+      var ap = localStorage.getItem(_ACTIVE_PROJ_KEY || 'sanj_active_proj') || '';
+      if (sel && ap) sel.value = ap;
+    }, 50);
     var fbSection = document.getElementById('cloud-firebase-section');
     if (fbSection) fbSection.style.display = 'none';
     var siteEl = document.getElementById('cloud-site-id-display');
@@ -11755,6 +11931,13 @@ function refreshCloudModalState() {
     var syncTime = document.getElementById('cloud-sync-time');
     if (syncDot)  syncDot.style.background = sbReady ? '#22c55e' : '#fbbf24';
     if (syncTime) syncTime.textContent = sbReady ? 'Connected ✓' : 'Connecting…';
+    // Show active project tag in admin bar
+    var projTag = document.getElementById('cloud-active-proj-tag');
+    if (projTag) {
+      var ap = localStorage.getItem('sanj_active_proj') || '';
+      if (ap) { projTag.textContent = '📂 ' + ap; projTag.style.display = 'inline-block'; }
+      else { projTag.textContent = '📂 Default'; projTag.style.display = 'inline-block'; }
+    }
     // Expiry warning
     if (subEnd && subEnd > Date.now() && subEnd - Date.now() < 5 * 24 * 60 * 60 * 1000) {
       var expiryEl = document.getElementById('cloud-sub-expiry');
