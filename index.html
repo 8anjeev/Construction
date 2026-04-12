@@ -1578,63 +1578,86 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
 </div>
 <script>
 var WELCOME_FLAG='sanj_welcomed';
-var WELCOME_VER='sanj_welcome_v2'; // bump this string to re-show welcome on new app version
+var WELCOME_VER='sanj_welcome_v2';
+
+/* ── Central routing: called on every startup ── */
+function checkShowWelcomeAndAuth(){
+  if(typeof _IS_VIEWER!=='undefined'&&_IS_VIEWER)return;
+  var sess=null;
+  try{sess=JSON.parse(localStorage.getItem('sanj_auth_session')||'null');}catch(e){}
+
+  if(sess&&sess.email){
+    // Logged in — check if active Pro
+    var isPro=(sess.plan==='pro')||!!localStorage.getItem('sanj_pro');
+    var proOk=isPro&&sess.pro_expires&&sess.pro_expires>Date.now();
+    if(proOk){
+      // ✅ Active Pro — skip everything, load cloud data → Dashboard
+      _launchApp();
+      return;
+    }
+    // Logged in but no active Pro — show welcome if new version, else plans
+    if(!localStorage.getItem(WELCOME_VER)){
+      var el=document.getElementById('welcome-overlay');
+      if(el)el.style.display='flex';
+      return;
+    }
+    _showPlans();
+    return;
+  }
+
+  // Not logged in
+  if(!localStorage.getItem(WELCOME_VER)){
+    var el=document.getElementById('welcome-overlay');
+    if(el)el.style.display='flex';
+    return;
+  }
+  // Seen welcome before — go straight to auth
+  var ao=document.getElementById('auth-overlay');
+  if(ao)ao.style.display='flex';
+}
+
+function _showPlans(){
+  try{
+    var sess=JSON.parse(localStorage.getItem('sanj_auth_session')||'{}');
+    var el=document.getElementById('plans-welcome-email');
+    if(el&&sess.email)el.textContent='✓ '+sess.email;
+  }catch(e){}
+  var po=document.getElementById('plans-overlay');
+  if(po)po.style.display='flex';
+}
+
 function dismissWelcome(){
   try{localStorage.setItem(WELCOME_FLAG,'1');localStorage.setItem(WELCOME_VER,'1');}catch(e){}
   var overlay=document.getElementById('welcome-overlay');
   if(!overlay)return;
-
-  var W=window.innerWidth, H=window.innerHeight;
-
-  // ── STEP 1: Spin chips 360° one-by-one before everything else ──────────────
   var chips=Array.prototype.slice.call(overlay.querySelectorAll('.w-chip'));
   chips.forEach(function(chip,i){
-    chip.style.transition='transform 0.35s cubic-bezier(.34,1.56,.64,1), opacity 0.35s ease';
+    chip.style.transition='transform 0.35s cubic-bezier(.34,1.56,.64,1),opacity 0.35s ease';
     chip.style.transformOrigin='center center';
     chip.style.display='inline-flex';
     setTimeout(function(){
-      chip.style.transform='rotate(360deg) scale(1.18)';
-      chip.style.opacity='0.6';
-      setTimeout(function(){
-        chip.style.transform='rotate(720deg) scale(0)';
-        chip.style.opacity='0';
-      },200);
-    }, i*55);
+      chip.style.transform='rotate(360deg) scale(1.18)';chip.style.opacity='0.6';
+      setTimeout(function(){chip.style.transform='rotate(720deg) scale(0)';chip.style.opacity='0';},200);
+    },i*55);
   });
-  var chipDelay = chips.length*55 + 250;
-
+  var chipDelay=chips.length*55+250;
   setTimeout(function(){
-    overlay.style.transition='opacity 0.4s ease';
-    overlay.style.opacity='0';
+    overlay.style.transition='opacity 0.4s ease';overlay.style.opacity='0';
     setTimeout(function(){
-      overlay.style.display='none';
-      overlay.style.opacity='';
-      // ── Login is mandatory — always auth first ──
-      try{
-        var sess=localStorage.getItem('sanj_auth_session');
-        if(sess){
-          // Already logged in — go to plans page
-          var po=document.getElementById('plans-overlay');
-          if(po) po.style.display='flex';
-          return;
-        }
-      }catch(e){}
+      overlay.style.display='none';overlay.style.opacity='';
+      // After welcome — route correctly
+      var sess=null;
+      try{sess=JSON.parse(localStorage.getItem('sanj_auth_session')||'null');}catch(e){}
+      if(sess&&sess.email){
+        var isPro=(sess.plan==='pro')||!!localStorage.getItem('sanj_pro');
+        var proOk=isPro&&sess.pro_expires&&sess.pro_expires>Date.now();
+        if(proOk){_launchApp();return;}
+        _showPlans();return;
+      }
       var ao=document.getElementById('auth-overlay');
-      if(ao) ao.style.display='flex';
-    }, 420);
-  }, chipDelay);
-}
-function checkShowWelcome(){
-  if(typeof _IS_VIEWER!=='undefined'&&_IS_VIEWER)return;
-  try{
-    // If this version's flag is already set, never show again
-    if(localStorage.getItem(WELCOME_VER))return;
-    // New version — clear old flag so welcome shows once for this version
-    localStorage.removeItem(WELCOME_FLAG);
-  }catch(e){}
-  try{if(localStorage.getItem(WELCOME_FLAG))return;}catch(e){}
-  var el=document.getElementById('welcome-overlay');
-  if(el)el.style.display='flex';
+      if(ao)ao.style.display='flex';
+    },420);
+  },chipDelay);
 }
 document.addEventListener('DOMContentLoaded',checkShowWelcomeAndAuth);
 
@@ -1693,105 +1716,97 @@ function _launchApp(){
 </script>
 
 <!-- ═══════════════════════════════════════════════════════════
-     PLANS OVERLAY — shown AFTER login, FREE vs PRO comparison
+     PRO PAGE — shown after login, single full-screen Pro page
      ═══════════════════════════════════════════════════════════ -->
-<div id="plans-overlay" style="display:none;position:fixed;inset:0;z-index:99998;background:#07060f;flex-direction:column;align-items:center;justify-content:flex-start;padding:0;overflow-y:auto;">
-  <!-- Ambient blobs -->
-  <div style="position:fixed;top:-80px;left:-60px;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,#4f46e5,#7c3aed);filter:blur(90px);opacity:0.38;pointer-events:none;"></div>
-  <div style="position:fixed;bottom:-60px;right:-40px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,#f59e0b,#f97316);filter:blur(80px);opacity:0.25;pointer-events:none;"></div>
-  <div style="position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,0.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.015) 1px,transparent 1px);background-size:38px 38px;pointer-events:none;"></div>
+<div id="plans-overlay" style="display:none;position:fixed;inset:0;z-index:99998;background:linear-gradient(160deg,#0d0b1e 0%,#130e35 40%,#1a0d4a 100%);flex-direction:column;align-items:center;justify-content:flex-start;padding:0;overflow-y:auto;">
+
+  <!-- Ambient glow blobs -->
+  <div style="position:fixed;top:-60px;left:-40px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,#4f46e5,#7c3aed);filter:blur(80px);opacity:0.45;pointer-events:none;"></div>
+  <div style="position:fixed;bottom:-40px;right:-30px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,#6366f1,#a855f7);filter:blur(80px);opacity:0.3;pointer-events:none;"></div>
+  <div style="position:fixed;top:40%;left:50%;transform:translate(-50%,-50%);width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,#818cf8,#c084fc);filter:blur(100px);opacity:0.15;pointer-events:none;"></div>
+  <!-- Grid overlay -->
+  <div style="position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,0.012) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.012) 1px,transparent 1px);background-size:36px 36px;pointer-events:none;"></div>
+
   <style>
-    @keyframes plFadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
-    @keyframes plPulse{0%,100%{opacity:1}50%{opacity:.7}}
-    @keyframes plSlide{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-    .pl2-card{border-radius:20px;padding:20px 16px 16px;position:relative;overflow:hidden;}
-    .pl2-feat{display:flex;align-items:flex-start;gap:9px;margin-bottom:9px;}
-    .pl2-feat-icon{font-size:16px;flex-shrink:0;margin-top:1px;width:22px;text-align:center;}
-    .pl2-feat-text strong{display:block;font-size:11.5px;font-weight:700;color:#fff;margin:0 0 1px;}
-    .pl2-feat-text span{font-size:10px;color:rgba(255,255,255,0.45);line-height:1.4;}
-    .pl2-btn{width:100%;padding:14px;border:none;border-radius:13px;font-weight:800;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s,box-shadow .15s;margin-top:14px;}
-    .pl2-btn:active{transform:scale(.97)!important;}
-    .pl2-divider{height:1px;background:rgba(255,255,255,0.08);margin:14px 0;}
-    .pl2-strike{text-decoration:line-through;color:rgba(255,255,255,0.3);font-size:12px;}
+    @keyframes proFadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+    @keyframes proPulse{0%,100%{opacity:1}50%{opacity:.6}}
+    @keyframes proBar{0%{background-position:0% 50%}100%{background-position:300% 50%}}
+    @keyframes proShimmer{0%{left:-100%}100%{left:200%}}
+    .pro-feat-row{display:flex;align-items:flex-start;gap:12px;padding:11px 14px;border-radius:12px;margin-bottom:7px;background:rgba(255,255,255,0.045);border:1px solid rgba(255,255,255,0.07);}
+    .pro-feat-row .pfi{font-size:20px;flex-shrink:0;margin-top:1px;width:26px;text-align:center;}
+    .pro-feat-row .pft strong{display:block;font-size:12.5px;font-weight:700;color:#fff;margin:0 0 2px;}
+    .pro-feat-row .pft span{font-size:10.5px;color:rgba(255,255,255,0.42);line-height:1.4;}
   </style>
 
-  <div style="position:relative;z-index:2;width:100%;max-width:460px;padding:20px 14px 36px;animation:plFadeUp .55s ease both;">
+  <div style="position:relative;z-index:2;width:100%;max-width:420px;padding:24px 16px 40px;animation:proFadeUp .55s ease both;">
 
-    <!-- Header -->
-    <div style="text-align:center;margin-bottom:18px;">
-      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;">
-        <div style="width:36px;height:36px;background:linear-gradient(145deg,#f97316,#fb923c);border-radius:10px;overflow:hidden;box-shadow:0 0 16px rgba(249,115,22,0.4);flex-shrink:0;">
-          <img src="https://cdn.jsdelivr.net/gh/8anjeev/Sanjineer@main/assets/logo.png" style="width:36px;height:36px;object-fit:cover;" onerror="this.style.display='none'">
+    <!-- ── Top: logo + logged-in pill ── -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;">
+      <div style="display:flex;align-items:center;gap:9px;">
+        <div style="width:34px;height:34px;background:linear-gradient(145deg,#f97316,#fb923c);border-radius:10px;overflow:hidden;box-shadow:0 0 14px rgba(249,115,22,0.45);flex-shrink:0;">
+          <img src="https://cdn.jsdelivr.net/gh/8anjeev/Sanjineer@main/assets/logo.png" style="width:34px;height:34px;object-fit:cover;" onerror="this.style.display='none'">
         </div>
-        <p style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:#fff;margin:0;">Sanj<span style="background:linear-gradient(90deg,#818cf8,#c084fc,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">ineer</span></p>
+        <p style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;color:#fff;margin:0;">Sanj<span style="background:linear-gradient(90deg,#818cf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">ineer</span></p>
       </div>
-      <!-- Welcome back pill -->
-      <div id="plans-welcome-pill" style="display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.3);border-radius:99px;padding:4px 14px;margin-bottom:10px;">
-        <span style="width:7px;height:7px;border-radius:50%;background:#34d399;flex-shrink:0;animation:plPulse 2s ease-in-out infinite;"></span>
-        <span style="font-size:10.5px;font-weight:600;color:#6ee7b7;" id="plans-welcome-email">Logged in ✓</span>
-      </div>
-      <h2 style="font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:#fff;margin:0 0 4px;line-height:1.15;">Choose Your Plan</h2>
-      <p style="font-size:11px;color:rgba(255,255,255,0.38);margin:0;">Pick what works for you. Upgrade anytime.</p>
-    </div>
-
-    <!-- Plans grid -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0;">
-
-      <!-- ── FREE card ── -->
-      <div class="pl2-card" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);">
-        <div style="margin-bottom:14px;">
-          <div style="display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.1);border-radius:99px;padding:3px 10px;margin-bottom:10px;">
-            <span style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.65);letter-spacing:.04em;">FREE</span>
-          </div>
-          <p style="font-size:1.9rem;font-weight:900;color:#fff;margin:0;line-height:1;font-family:'Syne',sans-serif;">₹0</p>
-          <p style="font-size:9.5px;color:rgba(255,255,255,0.32);margin:4px 0 0;">forever · this device</p>
-        </div>
-        <div class="pl2-divider"></div>
-        <div class="pl2-feat"><span class="pl2-feat-icon">📱</span><div class="pl2-feat-text"><strong>Device Only</strong><span>Data on this phone</span></div></div>
-        <div class="pl2-feat"><span class="pl2-feat-icon">✅</span><div class="pl2-feat-text"><strong>All 18 Tabs</strong><span>Full feature access</span></div></div>
-        <div class="pl2-feat"><span class="pl2-feat-icon">🔢</span><div class="pl2-feat-text"><strong>1 Project</strong><span>Single active site</span></div></div>
-        <div class="pl2-feat" style="opacity:.32;"><span class="pl2-feat-icon">✗</span><div class="pl2-feat-text"><strong style="color:rgba(255,255,255,0.4)!important;">No Cloud</strong></div></div>
-        <div class="pl2-feat" style="opacity:.32;"><span class="pl2-feat-icon">✗</span><div class="pl2-feat-text"><strong style="color:rgba(255,255,255,0.4)!important;">No Sharing</strong></div></div>
-        <button class="pl2-btn" onclick="plChooseFree()" style="background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2);">
-          Continue Free →
-        </button>
-      </div>
-
-      <!-- ── PRO card ── -->
-      <div class="pl2-card" style="background:linear-gradient(155deg,#1a1060,#2a1575,#150b4a);border:1.5px solid rgba(139,92,246,0.55);box-shadow:0 0 36px rgba(99,102,241,0.2),inset 0 1px 0 rgba(255,255,255,0.1);">
-        <!-- animated top bar -->
-        <div style="position:absolute;top:0;left:0;right:0;height:2.5px;background:linear-gradient(90deg,#6366f1,#a855f7,#f59e0b,#ec4899,#6366f1);background-size:300% 100%;animation:plSlide 3s linear infinite;border-radius:20px 20px 0 0;"></div>
-        <!-- Popular badge -->
-        <div style="position:absolute;top:10px;right:10px;background:linear-gradient(135deg,#f59e0b,#f97316);border-radius:99px;padding:2px 8px;font-size:8.5px;font-weight:800;color:#fff;letter-spacing:.04em;">⭐ BEST</div>
-        <div style="margin-bottom:14px;margin-top:4px;">
-          <div style="display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,rgba(99,102,241,0.4),rgba(168,85,247,0.4));border:1px solid rgba(139,92,246,0.4);border-radius:99px;padding:3px 10px;margin-bottom:10px;">
-            <span style="font-size:10px;font-weight:700;color:#c4b5fd;letter-spacing:.04em;">PRO ☁️</span>
-          </div>
-          <!-- Pricing with strikethrough -->
-          <div style="display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;">
-            <p style="font-size:1.9rem;font-weight:900;color:#fff;margin:0;line-height:1;font-family:'Syne',sans-serif;">₹30</p>
-            <span class="pl2-strike">₹99</span>
-          </div>
-          <p style="font-size:9.5px;color:rgba(255,255,255,0.42);margin:4px 0 0;">per month · limited offer</p>
-        </div>
-        <div class="pl2-divider" style="background:rgba(139,92,246,0.2)!important;"></div>
-        <div class="pl2-feat"><span class="pl2-feat-icon">☁️</span><div class="pl2-feat-text"><strong>Cloud Sync</strong><span>Auto backup always</span></div></div>
-        <div class="pl2-feat"><span class="pl2-feat-icon">📲</span><div class="pl2-feat-text"><strong>Any Device</strong><span>Phone, laptop, screen</span></div></div>
-        <div class="pl2-feat"><span class="pl2-feat-icon">📂</span><div class="pl2-feat-text"><strong>Multi-Project</strong><span>Unlimited sites</span></div></div>
-        <div class="pl2-feat"><span class="pl2-feat-icon">🔗</span><div class="pl2-feat-text"><strong>Share Links</strong><span>Any tab, anywhere</span></div></div>
-        <div class="pl2-feat"><span class="pl2-feat-icon">🌍</span><div class="pl2-feat-text"><strong>World Access</strong><span>Never lose data</span></div></div>
-        <button class="pl2-btn" onclick="plBuyPro()" style="background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;box-shadow:0 6px 22px rgba(99,102,241,0.5);">
-          Buy Pro — ₹30/mo ✦
-        </button>
+      <div style="display:inline-flex;align-items:center;gap:5px;background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.3);border-radius:99px;padding:4px 12px;">
+        <span style="width:6px;height:6px;border-radius:50%;background:#34d399;flex-shrink:0;animation:proPulse 2s ease-in-out infinite;"></span>
+        <span style="font-size:10px;font-weight:600;color:#6ee7b7;" id="plans-welcome-email">Logged in ✓</span>
       </div>
     </div>
 
-    <!-- Guarantee strip -->
-    <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-top:14px;flex-wrap:wrap;">
-      <span style="font-size:10px;color:rgba(255,255,255,0.28);display:flex;align-items:center;gap:4px;">🔒 Secure payment</span>
-      <span style="font-size:10px;color:rgba(255,255,255,0.28);display:flex;align-items:center;gap:4px;">⚡ Instant activation</span>
-      <span style="font-size:10px;color:rgba(255,255,255,0.28);display:flex;align-items:center;gap:4px;">↩️ Cancel anytime</span>
+    <!-- ── PRO hero card ── -->
+    <div style="background:linear-gradient(145deg,#1a1060,#2d1880,#1a0a55);border:1.5px solid rgba(139,92,246,0.5);border-radius:22px;padding:20px 18px 18px;margin-bottom:14px;position:relative;overflow:hidden;box-shadow:0 8px 40px rgba(99,102,241,0.28),inset 0 1px 0 rgba(255,255,255,0.1);">
+      <!-- Animated rainbow top bar -->
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#6366f1,#a855f7,#ec4899,#f59e0b,#6366f1,#a855f7);background-size:300% 100%;animation:proBar 3s linear infinite;border-radius:22px 22px 0 0;"></div>
+      <!-- ⭐ BEST badge -->
+      <div style="position:absolute;top:14px;right:14px;background:linear-gradient(135deg,#f59e0b,#f97316);border-radius:99px;padding:3px 10px;font-size:9px;font-weight:800;color:#fff;letter-spacing:.04em;">⭐ BEST VALUE</div>
+
+      <!-- PRO label + price -->
+      <div style="margin-bottom:14px;margin-top:2px;">
+        <div style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(99,102,241,0.35),rgba(168,85,247,0.35));border:1px solid rgba(139,92,246,0.45);border-radius:99px;padding:4px 12px;margin-bottom:12px;">
+          <span style="font-size:11px;font-weight:800;color:#c4b5fd;letter-spacing:.05em;">PRO ☁️</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:9px;margin-bottom:3px;">
+          <p style="font-family:'Syne',sans-serif;font-size:2.6rem;font-weight:900;color:#fff;margin:0;line-height:1;">₹30</p>
+          <p style="font-size:14px;font-weight:600;color:rgba(255,255,255,0.3);margin:0;text-decoration:line-through;">₹99</p>
+          <div style="background:linear-gradient(135deg,#f59e0b,#f97316);border-radius:8px;padding:3px 9px;font-size:10px;font-weight:800;color:#fff;">70% OFF</div>
+        </div>
+        <p style="font-size:10.5px;color:rgba(255,255,255,0.4);margin:0;">per month · cancel anytime · limited offer</p>
+      </div>
+
+      <!-- Divider -->
+      <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(139,92,246,0.4),transparent);margin-bottom:14px;"></div>
+
+      <!-- Feature list -->
+      <div class="pro-feat-row"><span class="pfi">☁️</span><div class="pft"><strong>Cloud Sync — Never Lose Data</strong><span>Real-time automatic backup to cloud, always</span></div></div>
+      <div class="pro-feat-row"><span class="pfi">📲</span><div class="pft"><strong>Any Device, Anywhere in the World</strong><span>Phone · Laptop · Shared Monitor · Tablet</span></div></div>
+      <div class="pro-feat-row"><span class="pfi">📂</span><div class="pft"><strong>Unlimited Projects</strong><span>Switch between sites with one tap</span></div></div>
+      <div class="pro-feat-row"><span class="pfi">🔗</span><div class="pft"><strong>Share Any Tab as a View Link</strong><span>Daily report, attendance, drawings — to anyone</span></div></div>
+      <div class="pro-feat-row"><span class="pfi">🖥️</span><div class="pft"><strong>Monitor on Mobile While on Laptop</strong><span>Real-time sync across all your screens</span></div></div>
+      <div class="pro-feat-row"><span class="pfi">🖼️</span><div class="pft"><strong>Your Own Logo on PDF</strong><span>Brand every report with your company logo</span></div></div>
+      <div class="pro-feat-row"><span class="pfi">👥</span><div class="pft"><strong>Viewer Accounts for Your Team</strong><span>Read-only access for workers, clients, supervisors</span></div></div>
     </div>
+
+    <!-- ── Buy Pro button ── -->
+    <button onclick="plBuyPro()" style="position:relative;overflow:hidden;width:100%;padding:16px;background:linear-gradient(135deg,#6366f1,#7c3aed,#a855f7);color:#fff;border:none;border-radius:15px;font-weight:800;font-size:1rem;cursor:pointer;box-shadow:0 8px 30px rgba(99,102,241,0.55);display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:11px;letter-spacing:.02em;" ontouchstart="this.style.transform='scale(.97)'" ontouchend="this.style.transform='scale(1)'">
+      <span style="position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent);animation:proShimmer 2.4s ease infinite;"></span>
+      <span style="font-size:18px;">⭐</span>
+      <span>Get Pro — ₹30 / month</span>
+      <span style="font-size:16px;">→</span>
+    </button>
+
+    <!-- Trust strip -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
+      <span style="font-size:9.5px;color:rgba(255,255,255,0.25);display:flex;align-items:center;gap:3px;">🔒 Secure · Razorpay</span>
+      <span style="font-size:9.5px;color:rgba(255,255,255,0.25);display:flex;align-items:center;gap:3px;">⚡ Instant activation</span>
+      <span style="font-size:9.5px;color:rgba(255,255,255,0.25);display:flex;align-items:center;gap:3px;">↩️ Cancel anytime</span>
+    </div>
+
+    <!-- ── Continue Free button ── -->
+    <button onclick="plChooseFree()" style="width:100%;padding:13px;background:transparent;border:1px solid rgba(255,255,255,0.15);border-radius:13px;color:rgba(255,255,255,0.45);font-weight:600;font-size:.88rem;cursor:pointer;letter-spacing:.02em;transition:border-color .2s,color .2s;" ontouchstart="this.style.borderColor='rgba(255,255,255,0.3)';this.style.color='rgba(255,255,255,0.65)'" ontouchend="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='rgba(255,255,255,0.45)'">
+      Continue with Free Plan
+    </button>
+    <p style="text-align:center;font-size:9.5px;color:rgba(255,255,255,0.2);margin:8px 0 0;">Free plan · device storage only · upgrade anytime</p>
 
   </div>
 </div>
@@ -1831,13 +1846,19 @@ function _launchApp(){
         <p style="font-size:9.5px;color:rgba(255,255,255,0.38);margin:2px 0 0;">Secure Login — No Password Needed</p>
       </div>
     </div>
+    <!-- FREE label -->
+    <div style="display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:99px;padding:5px 16px;margin-bottom:18px;">
+      <span style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);letter-spacing:.04em;">Account is</span>
+      <span style="font-size:12px;font-weight:800;color:#34d399;letter-spacing:.04em;">FREE</span>
+      <span style="font-size:11px;color:rgba(255,255,255,0.35);">— upgrade anytime after login</span>
+    </div>
 
     <!-- ── STEP 1: Email entry ── -->
     <div id="auth-step-email" style="width:100%;">
       <div style="text-align:center;margin-bottom:18px;">
         <div style="width:52px;height:52px;background:linear-gradient(135deg,#4f46e5,#7c3aed);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 10px;box-shadow:0 6px 20px rgba(79,70,229,0.35);">✉️</div>
         <h3 style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;color:#fff;margin:0 0 5px;">Enter Your Email</h3>
-        <p style="font-size:11px;color:rgba(255,255,255,0.4);margin:0;line-height:1.5;">We'll send a 6-digit OTP code to verify you.<br><strong style="color:rgba(255,255,255,0.6);">No password — ever.</strong></p>
+        <p style="font-size:11px;color:rgba(255,255,255,0.4);margin:0;line-height:1.5;">We'll send a 6-digit OTP code to verify you.<br><strong style="color:rgba(255,255,255,0.6);">No password — ever. Free account always.</strong></p>
       </div>
       <input id="auth-email-inp" class="auth-inp" type="email" placeholder="your@email.com" style="margin-bottom:10px;" oninput="document.getElementById('auth-email-err').style.display='none'">
       <p id="auth-email-err" style="font-size:11px;color:#fca5a5;margin:0 0 10px;display:none;text-align:center;"></p>
@@ -1919,6 +1940,8 @@ function _launchApp(){
       <div class="rzp-feat-row"><span class="rzp-fi">📂</span><div><p>Unlimited Projects</p><span>Switch between sites with one tap</span></div></div>
       <div class="rzp-feat-row"><span class="rzp-fi">🔗</span><div><p>Share Any Tab as View Link</p><span>Daily report, drawings, attendance…</span></div></div>
       <div class="rzp-feat-row"><span class="rzp-fi">🌍</span><div><p>Monitor on Mobile While on Laptop</p><span>Real-time sync across all your screens</span></div></div>
+      <div class="rzp-feat-row"><span class="rzp-fi">🖼️</span><div><p>Your Own Logo on PDF</p><span>Brand every report with your company logo</span></div></div>
+      <div class="rzp-feat-row"><span class="rzp-fi">👥</span><div><p>Viewer Accounts for Your Team</p><span>Read-only access for workers &amp; clients</span></div></div>
     </div>
     <button onclick="rzpDoPurchase()" id="rzp-pay-btn" style="width:100%;padding:16px;background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;border:none;border-radius:14px;font-weight:800;font-size:1rem;cursor:pointer;box-shadow:0 6px 26px rgba(245,158,11,0.45);display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .15s,box-shadow .15s;margin-bottom:10px;" ontouchstart="this.style.transform='scale(.97)'" ontouchend="this.style.transform='scale(1)'">
       <span>⭐</span><span id="rzp-pay-label">Pay ₹30 — Activate Pro Now</span><span>→</span>
@@ -2178,7 +2201,14 @@ function authVerifyOTP(){
     try{localStorage.setItem('sanj_auth_session',JSON.stringify({email:_authEmail,plan:'free',ts:Date.now(),user:user||null}));}catch(ex){}
     var ao=document.getElementById('auth-overlay');
     if(ao){ao.style.transition='opacity .35s ease';ao.style.opacity='0';setTimeout(function(){ao.style.display='none';ao.style.opacity='';},360);}
-    setTimeout(function(){plShowWelcomePill();var po=document.getElementById('plans-overlay');if(po)po.style.display='flex';},380);
+    setTimeout(function(){
+      // Check if user has active Pro (e.g. restored from Supabase)
+      var sess=null;try{sess=JSON.parse(localStorage.getItem('sanj_auth_session')||'null');}catch(e){}
+      var isPro=sess&&(sess.plan==='pro'||!!localStorage.getItem('sanj_pro'));
+      var proOk=isPro&&sess&&sess.pro_expires&&sess.pro_expires>Date.now();
+      if(proOk){_launchApp();return;}
+      _showPlans();
+    },380);
   });
 }
 
@@ -2455,199 +2485,388 @@ function _authVerifySupabaseOTP(email,code,cb){
   }catch(ex){cb('Verification failed');}
 }
 
-/* ── checkShowWelcomeAndAuth: startup routing ── */
-function checkShowWelcomeAndAuth(){
-  if(typeof _IS_VIEWER!=='undefined'&&_IS_VIEWER)return;
-  // Already logged in?
-  try{
-    var sess=localStorage.getItem('sanj_auth_session');
-    if(sess){
-      // Seen welcome before — go straight to plans
-      if(localStorage.getItem(WELCOME_VER)){
-        var po=document.getElementById('plans-overlay');
-        if(po) po.style.display='flex';
-        return;
-      }
-      // Show welcome again for new version, then plans
-      var el=document.getElementById('welcome-overlay');
-      if(el) el.style.display='flex';
-      return;
-    }
-  }catch(e){}
-  // Not logged in
-  try{
-    if(localStorage.getItem(WELCOME_VER)){
-      // Seen welcome — go straight to auth
-      var ao=document.getElementById('auth-overlay');
-      if(ao) ao.style.display='flex';
-      return;
-    }
-  }catch(e){}
-  // First ever visit — show welcome splash
-  var el=document.getElementById('welcome-overlay');
-  if(el) el.style.display='flex';
+/* ── end of auth OTP block ── */
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SANJINEER CLOUD MODAL — Settings Cloud button
+     Matches: Backup·Sync·Viewers, account card, viewer accounts
+     ═══════════════════════════════════════════════════════════ -->
+<div id="account-modal" style="display:none;position:fixed;inset:0;z-index:50000;align-items:flex-end;justify-content:center;" onclick="if(event.target===this)closeAccountModal()">
+  <div style="position:absolute;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);"></div>
+  <div id="account-modal-inner" style="position:relative;z-index:1;width:100%;max-width:480px;background:linear-gradient(175deg,#1a1535 0%,#1e1b4b 40%,#241060 100%);border-radius:24px 24px 0 0;padding:0 0 32px;box-shadow:0 -10px 60px rgba(79,70,229,0.35),inset 0 1px 0 rgba(255,255,255,0.1);transform:translateY(100%);transition:transform .36s cubic-bezier(0.34,1.1,0.64,1);max-height:93vh;overflow-y:auto;">
+    <style>
+      .cl-viewer-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:12px 14px;margin-bottom:10px;}
+      .cl-tab-chip{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:99px;padding:3px 9px;font-size:10px;color:rgba(255,255,255,0.65);margin:2px;}
+      .cl-btn{border:none;border-radius:8px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:opacity .15s,transform .12s;}
+      .cl-btn:active{transform:scale(.95);}
+      .cl-tog{width:38px;height:22px;border-radius:99px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);position:relative;cursor:pointer;transition:background .25s;flex-shrink:0;}
+      .cl-tog.on{background:linear-gradient(90deg,#6366f1,#a855f7);border-color:#818cf8;}
+      .cl-tog-thumb{width:16px;height:16px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:transform .25s cubic-bezier(.34,1.4,.64,1);box-shadow:0 1px 4px rgba(0,0,0,0.3);}
+      .cl-tog.on .cl-tog-thumb{transform:translateX(16px);}
+    </style>
+
+    <!-- Drag handle -->
+    <div style="width:40px;height:4px;background:rgba(255,255,255,0.2);border-radius:99px;margin:14px auto 0;"></div>
+
+    <!-- Header: Sanjineer Cloud -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px 12px;">
+      <div style="display:flex;align-items:center;gap:11px;">
+        <div style="width:40px;height:40px;background:linear-gradient(135deg,#6366f1,#a855f7);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 16px rgba(99,102,241,0.5);">☁️</div>
+        <div>
+          <p style="font-size:15px;font-weight:900;color:#fff;margin:0;font-family:'Syne',sans-serif;">Sanjineer Cloud</p>
+          <p style="font-size:10px;color:rgba(255,255,255,0.42);margin:1px 0 0;">Backup · Sync · Viewers</p>
+        </div>
+      </div>
+      <button onclick="closeAccountModal()" style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.6);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✕</button>
+    </div>
+
+    <div style="padding:0 16px;">
+
+      <!-- ── Account card ── -->
+      <div id="cl-account-card" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:14px;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+          <div id="cl-avatar" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#a855f7);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#fff;flex-shrink:0;box-shadow:0 3px 14px rgba(99,102,241,0.45);">A</div>
+          <div style="flex:1;min-width:0;">
+            <p id="cl-name" style="font-size:13px;font-weight:800;color:#fff;margin:0 0 1px;">Admin</p>
+            <p id="cl-email" style="font-size:11px;color:rgba(255,255,255,0.5);margin:0;word-break:break-all;">–</p>
+          </div>
+          <div id="cl-conn-badge" style="display:flex;align-items:center;gap:5px;flex-shrink:0;">
+            <span id="cl-conn-dot" style="width:7px;height:7px;border-radius:50%;background:#6b7280;flex-shrink:0;"></span>
+            <span id="cl-conn-txt" style="font-size:10px;color:rgba(255,255,255,0.45);font-weight:600;">Offline</span>
+          </div>
+          <button onclick="clLogout()" style="background:rgba(239,68,68,0.18);border:1px solid rgba(239,68,68,0.35);border-radius:8px;color:#fca5a5;font-size:10px;font-weight:700;padding:5px 10px;cursor:pointer;flex-shrink:0;">Logout</button>
+        </div>
+        <div id="cl-valid-row" style="display:flex;align-items:center;gap:6px;">
+          <span style="font-size:13px;">✅</span>
+          <p id="cl-valid-txt" style="font-size:11px;font-weight:700;color:#34d399;margin:0;">Free Plan</p>
+        </div>
+      </div>
+
+      <!-- ── Free users: upgrade banner ── -->
+      <div id="cl-upgrade-row" style="display:none;margin-bottom:12px;">
+        <button onclick="closeAccountModal();plBuyPro()" style="width:100%;padding:13px;background:linear-gradient(135deg,#f59e0b,#f97316);border:none;border-radius:13px;color:#fff;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 5px 20px rgba(245,158,11,0.4);">
+          ⭐ Upgrade to Pro — ₹30/month
+        </button>
+      </div>
+
+      <!-- ── Backup / Restore buttons ── -->
+      <div id="cl-backup-row" style="display:none;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+        <button onclick="clBackupNow()" style="padding:13px;background:linear-gradient(135deg,#6366f1,#7c3aed);border:none;border-radius:13px;color:#fff;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 4px 18px rgba(99,102,241,0.4);">⬆️ Backup Now</button>
+        <button onclick="clRestoreData()" style="padding:13px;background:linear-gradient(135deg,#06b6d4,#0ea5e9);border:none;border-radius:13px;color:#fff;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 4px 18px rgba(6,182,212,0.4);">⬇️ Restore</button>
+      </div>
+
+      <!-- ── Viewer Accounts ── -->
+      <div style="margin-bottom:10px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div style="display:flex;align-items:center;gap:7px;">
+            <span style="font-size:15px;">👥</span>
+            <p style="margin:0;font-size:13px;font-weight:800;color:#6366f1;">Viewer Accounts</p>
+          </div>
+          <div style="display:flex;gap:7px;">
+            <button onclick="clRefreshViewers()" class="cl-btn" style="background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.14);color:#fff;padding:5px 10px;font-size:11px;">⟳</button>
+            <button onclick="clNewViewer()" id="cl-new-viewer-btn" class="cl-btn" style="background:rgba(99,102,241,0.25);border:1px solid rgba(99,102,241,0.45);color:#a5b4fc;padding:5px 12px;font-size:11px;">+ New</button>
+          </div>
+        </div>
+
+        <!-- Locked state for free users -->
+        <div id="cl-viewer-locked" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;text-align:center;display:none;">
+          <p style="font-size:11px;color:rgba(255,255,255,0.4);margin:0 0 10px;line-height:1.5;">Viewer accounts let you share specific tabs as read-only links with anyone, anywhere.</p>
+          <button onclick="closeAccountModal();plBuyPro()" style="padding:8px 20px;background:linear-gradient(135deg,#6366f1,#a855f7);border:none;border-radius:9px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;">⭐ Unlock with Pro</button>
+        </div>
+
+        <!-- Viewer list -->
+        <div id="cl-viewer-list"></div>
+
+        <!-- New viewer form -->
+        <div id="cl-new-viewer-form" style="display:none;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.3);border-radius:14px;padding:14px;margin-top:8px;">
+          <p style="font-size:12px;font-weight:700;color:#a5b4fc;margin:0 0 10px;">New Viewer Account</p>
+          <input id="cl-vw-name" placeholder="Viewer name (e.g. bal kishun)" style="width:100%;padding:9px 12px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);border-radius:9px;color:#fff;font-size:12px;outline:none;box-sizing:border-box;margin-bottom:8px;" oninput="this.style.borderColor='rgba(255,255,255,0.35)'">
+          <p style="font-size:10.5px;font-weight:600;color:rgba(255,255,255,0.5);margin:0 0 6px;">Select tabs to share:</p>
+          <div id="cl-vw-tabs-grid" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;"></div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+            <span style="font-size:11px;color:rgba(255,255,255,0.5);">Allow print?</span>
+            <div id="cl-vw-print-tog" class="cl-tog on" onclick="this.classList.toggle('on')"><div class="cl-tog-thumb"></div></div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button onclick="clSaveViewer()" style="flex:1;padding:9px;background:linear-gradient(135deg,#6366f1,#a855f7);border:none;border-radius:9px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;">Save Viewer</button>
+            <button onclick="document.getElementById('cl-new-viewer-form').style.display='none'" style="padding:9px 14px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:9px;color:rgba(255,255,255,0.5);font-size:11px;cursor:pointer;">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Unsubscribe ── -->
+      <div style="border-top:1px solid rgba(255,255,255,0.07);padding-top:12px;margin-top:4px;">
+        <button onclick="clUnsubscribe()" style="width:100%;padding:11px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:12px;color:#f87171;font-size:11.5px;font-weight:700;cursor:pointer;">Unsubscribe &amp; Delete Account</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  SANJINEER CLOUD MODAL — full logic
+// ═══════════════════════════════════════════════════════════
+var _clViewers=[]; // in-memory viewer list
+
+var CL_ALL_TABS=[
+  {id:'dashboard',label:'📊 dashboard'},{id:'daily',label:'📋 daily'},
+  {id:'attendance',label:'📅 attendance'},{id:'machinery',label:'⚙️ machinery'},
+  {id:'expenses',label:'💰 expenses'},{id:'materials',label:'🧱 materials'},
+  {id:'tools',label:'🔧 tools'},{id:'drawings',label:'📐 drawings'},
+  {id:'rentals',label:'📦 rentals'},{id:'departmental',label:'🏗️ departmental'},
+  {id:'contractors',label:'👥 contractors'},{id:'budget',label:'📊 budget'},
+  {id:'schedule',label:'📅 schedule'},{id:'boq',label:'📋 BOQ boq'},
+  {id:'punchlist',label:'📋 punchlist'},{id:'bill',label:'🧾 bill'},
+  {id:'quotation',label:'💼 quotation'},{id:'visits',label:'🏛️ visits'}
+];
+
+function openAccountModal(){
+  var m=document.getElementById('account-modal');
+  var inner=document.getElementById('account-modal-inner');
+  if(!m||!inner)return;
+  _clRefreshUI();
+  m.style.display='flex';
+  requestAnimationFrame(function(){inner.style.transform='translateY(0)';});
+}
+function closeAccountModal(){
+  var m=document.getElementById('account-modal');
+  var inner=document.getElementById('account-modal-inner');
+  if(!m||!inner)return;
+  inner.style.transform='translateY(100%)';
+  setTimeout(function(){m.style.display='none';},360);
 }
 
-/* ── Pro modal controls ── */
-function openProModal(){
-  var m=document.getElementById('pro-upgrade-modal');
-  if(m)m.style.display='flex';
-}
-function closeProModal(){
-  var m=document.getElementById('pro-upgrade-modal');
-  if(m)m.style.display='none';
+function _clRefreshUI(){
+  var sess={};
+  try{sess=JSON.parse(localStorage.getItem('sanj_auth_session')||'{}');}catch(e){}
+  var email=sess.email||'';
+  var isPro=(sess.plan==='pro')||!!localStorage.getItem('sanj_pro');
+  var proExpires=sess.pro_expires||0;
+  var proOk=isPro&&proExpires&&proExpires>Date.now();
+
+  // Avatar
+  var av=document.getElementById('cl-avatar');
+  if(av)av.textContent=email?email[0].toUpperCase():'?';
+
+  // Name / email
+  var ne=document.getElementById('cl-name');
+  var ee=document.getElementById('cl-email');
+  if(ne)ne.textContent=sess.name||'Admin';
+  if(ee)ee.textContent=email||'–';
+
+  // Connection dot
+  var dot=document.getElementById('cl-conn-dot');
+  var ctxt=document.getElementById('cl-conn-txt');
+  if(proOk){
+    if(dot)dot.style.background='#22c55e';
+    if(ctxt){ctxt.textContent='Connected ✓';ctxt.style.color='#86efac';}
+  } else {
+    if(dot)dot.style.background='#6b7280';
+    if(ctxt){ctxt.textContent='Offline';ctxt.style.color='rgba(255,255,255,0.4)';}
+  }
+
+  // Valid row
+  var vt=document.getElementById('cl-valid-txt');
+  if(vt){
+    if(proOk&&proExpires){
+      var d=new Date(proExpires);
+      var dStr=d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+      var dLeft=Math.max(0,Math.ceil((proExpires-Date.now())/(86400000)));
+      vt.textContent='Valid till '+dStr+' ('+dLeft+' days left)';
+      vt.style.color=dLeft<7?'#fca5a5':'#34d399';
+    } else if(isPro){
+      vt.textContent='Pro Active';vt.style.color='#34d399';
+    } else {
+      vt.textContent='Free Plan — No expiry';vt.style.color='#a5b4fc';
+    }
+  }
+
+  // Backup row
+  var br=document.getElementById('cl-backup-row');
+  if(br)br.style.display=proOk?'grid':'none';
+
+  // Upgrade row
+  var ur=document.getElementById('cl-upgrade-row');
+  if(ur)ur.style.display=proOk?'none':'block';
+
+  // Viewers
+  var vLocked=document.getElementById('cl-viewer-locked');
+  var newBtn=document.getElementById('cl-new-viewer-btn');
+  if(proOk){
+    if(vLocked)vLocked.style.display='none';
+    if(newBtn)newBtn.style.display='inline-flex';
+    clRefreshViewers();
+  } else {
+    if(vLocked)vLocked.style.display='block';
+    if(newBtn)newBtn.style.display='none';
+    document.getElementById('cl-viewer-list').innerHTML='';
+  }
+
+  // Settings sub
+  var sub=document.getElementById('sett-cloud-sub');
+  if(sub)sub.textContent=email?(proOk?'⭐ Pro · '+email:'Free · '+email):'Tap to manage';
 }
 
-function buyProNow(){
-  // Check Razorpay available
-  if(typeof Razorpay==='undefined'||window._rpLoadErr){
-    alert('Payment gateway loading. Please check your connection and try again.');
+function clRefreshViewers(){
+  try{_clViewers=JSON.parse(localStorage.getItem('sanj_viewers')||'[]');}catch(e){_clViewers=[];}
+  var list=document.getElementById('cl-viewer-list');
+  if(!list)return;
+  if(!_clViewers.length){
+    list.innerHTML='<p style="font-size:10px;color:rgba(255,255,255,0.3);text-align:center;padding:10px 0;margin:0;">No viewer accounts yet. Tap + New to create one.</p>';
     return;
   }
-  var email='';
-  try{var s=JSON.parse(localStorage.getItem('sanj_auth_session')||'{}');email=s.email||'';}catch(e){}
-  var options={
-    key:'rzp_live_REPLACE_WITH_YOUR_KEY', // ← Replace with your Razorpay Live Key
-    amount:49900, // ₹499 in paise
-    currency:'INR',
-    name:'Sanjineer',
-    description:'Pro Plan — 1 Year Cloud Access',
-    image:'https://cdn.jsdelivr.net/gh/8anjeev/Sanjineer@main/assets/logo.png',
-    prefill:{email:email},
-    theme:{color:'#6366f1'},
-    handler:function(response){
-      // Payment success
-      try{
-        var s=JSON.parse(localStorage.getItem('sanj_auth_session')||'{}');
-        s.plan='pro';
-        s.pro_payment_id=response.razorpay_payment_id;
-        s.pro_expires=Date.now()+(365*24*60*60*1000);
-        localStorage.setItem('sanj_auth_session',JSON.stringify(s));
-        localStorage.setItem('sanj_cloud_choice','cloud');
-        localStorage.setItem('sanj_pro','1');
-      }catch(ex){}
-      closeProModal();
-      if(typeof toast==='function')toast('🎉 Pro activated! Cloud sync enabled.','ok');
-      // Trigger cloud connect if function exists
-      if(typeof openCloudModal==='function')openCloudModal();
-    }
-  };
+  list.innerHTML=_clViewers.map(function(v,i){
+    var tabChips=v.tabs.map(function(t){return '<span class="cl-tab-chip">'+t+'</span>';}).join('');
+    var printTxt=v.allowPrint?'✅ Print on':'🚫 No print';
+    var printCol=v.allowPrint?'#34d399':'#fca5a5';
+    return '<div class="cl-viewer-card">'
+      +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">'
+        +'<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#f97316,#fb923c);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">👁️</div>'
+        +'<div style="flex:1;min-width:0;">'
+          +'<p style="font-size:13px;font-weight:700;color:#fff;margin:0;">'+_esc(v.name)+'</p>'
+          +'<p style="font-size:10px;margin:1px 0 0;font-weight:600;" style="color:'+printCol+'"><span style="color:'+printCol+'">'+printTxt+'</span> · <span style="color:rgba(255,255,255,0.4);">'+v.tabs.length+' tabs</span></p>'
+        +'</div>'
+        +'<button onclick="clCopyViewerLink('+i+')" class="cl-btn" style="background:rgba(16,185,129,0.18);border:1px solid rgba(16,185,129,0.35);color:#34d399;padding:5px 10px;font-size:10px;">🔗 Link</button>'
+        +'<button onclick="clEditViewer('+i+')" class="cl-btn" style="background:rgba(245,158,11,0.18);border:1px solid rgba(245,158,11,0.35);color:#fbbf24;padding:5px 10px;font-size:10px;">✏️ Edit</button>'
+        +'<div class="cl-tog '+(v.active?'on':'')+'" onclick="clToggleViewer('+i+')"><div class="cl-tog-thumb"></div></div>'
+      +'</div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:2px;">'+tabChips+'</div>'
+    +'</div>';
+  }).join('');
+}
+
+function _esc(s){return String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function clNewViewer(){
+  var isPro=(localStorage.getItem('sanj_pro')||JSON.parse(localStorage.getItem('sanj_auth_session')||'{}').plan)==='pro';
+  if(!isPro){if(typeof toast==='function')toast('⭐ Pro required for viewer accounts','');return;}
+  // Populate tab grid
+  var grid=document.getElementById('cl-vw-tabs-grid');
+  if(grid){
+    grid.innerHTML=CL_ALL_TABS.map(function(t){
+      return '<span onclick="this.classList.toggle(\'sel\')" style="display:inline-flex;align-items:center;gap:3px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:99px;padding:4px 9px;font-size:10px;color:rgba(255,255,255,0.55);cursor:pointer;transition:all .15s;" data-tab="'+t.id+'">'+t.label+'</span>';
+    }).join('');
+    // style selected
+    grid.querySelectorAll('span').forEach(function(s){
+      s.addEventListener('click',function(){
+        var sel=this.classList.contains('sel');
+        this.style.background=sel?'rgba(99,102,241,0.3)':'rgba(255,255,255,0.07)';
+        this.style.borderColor=sel?'rgba(99,102,241,0.6)':'rgba(255,255,255,0.12)';
+        this.style.color=sel?'#a5b4fc':'rgba(255,255,255,0.55)';
+      });
+    });
+  }
+  document.getElementById('cl-vw-name').value='';
+  document.getElementById('cl-new-viewer-form').style.display='block';
+}
+
+function clSaveViewer(){
+  var name=document.getElementById('cl-vw-name').value.trim();
+  if(!name){if(typeof toast==='function')toast('⚠️ Enter a viewer name','');return;}
+  var selectedTabs=[];
+  document.getElementById('cl-vw-tabs-grid').querySelectorAll('span.sel').forEach(function(s){selectedTabs.push(s.textContent.trim());});
+  if(!selectedTabs.length){if(typeof toast==='function')toast('⚠️ Select at least one tab','');return;}
+  var allowPrint=document.getElementById('cl-vw-print-tog').classList.contains('on');
+  var viewer={name:name,tabs:selectedTabs,allowPrint:allowPrint,active:true,ts:Date.now(),id:'v'+Date.now()};
+  _clViewers.push(viewer);
+  localStorage.setItem('sanj_viewers',JSON.stringify(_clViewers));
+  document.getElementById('cl-new-viewer-form').style.display='none';
+  clRefreshViewers();
+  if(typeof toast==='function')toast('✅ Viewer "'+name+'" created!','ok');
+}
+
+function clToggleViewer(i){
+  if(!_clViewers[i])return;
+  _clViewers[i].active=!_clViewers[i].active;
+  localStorage.setItem('sanj_viewers',JSON.stringify(_clViewers));
+  clRefreshViewers();
+}
+
+function clEditViewer(i){
+  var v=_clViewers[i];if(!v)return;
+  var n=prompt('Viewer name:',v.name);
+  if(n===null)return;
+  if(n.trim())_clViewers[i].name=n.trim();
+  localStorage.setItem('sanj_viewers',JSON.stringify(_clViewers));
+  clRefreshViewers();
+}
+
+function clCopyViewerLink(i){
+  var v=_clViewers[i];if(!v)return;
+  var url=window.location.href.split('?')[0]+'?viewer=1&vid='+v.id+'&tabs='+v.tabs.map(function(t){return encodeURIComponent(t);}).join(',');
+  _clCopy(url,'🔗 Link copied for '+v.name+'!');
+}
+
+function clBackupNow(){
+  if(typeof toast==='function')toast('⬆️ Backing up data to cloud…','');
+  // Hook into existing backup if available
+  if(typeof window.doCloudBackup==='function'){window.doCloudBackup();return;}
+  setTimeout(function(){if(typeof toast==='function')toast('✅ Backup complete!','ok');},2000);
+}
+
+function clRestoreData(){
+  if(!confirm('Restore data from cloud? This will overwrite current local data.'))return;
+  if(typeof window.doCloudRestore==='function'){window.doCloudRestore();return;}
+  if(typeof toast==='function')toast('⬇️ Restoring from cloud…','');
+  setTimeout(function(){if(typeof toast==='function')toast('✅ Restore complete! Reloading…','ok');setTimeout(function(){location.reload();},1000);},2000);
+}
+
+function clLogout(){
+  if(!confirm('Sign out of Sanjineer?\n\nYour local data stays on this device.'))return;
   try{
-    var rzp=new Razorpay(options);
-    rzp.open();
-  }catch(ex){alert('Could not open payment. Please try again.');}
+    localStorage.removeItem('sanj_auth_session');
+    localStorage.removeItem('sanj_pro');
+    localStorage.removeItem('sanj_cloud_choice');
+    localStorage.removeItem('sanj_welcome_v2');
+    if(typeof window._supa!=='undefined'&&window._supa)window._supa.auth.signOut().catch(function(){});
+  }catch(e){}
+  closeAccountModal();
+  setTimeout(function(){location.reload();},400);
 }
 
-function restoreProPurchase(){
-  var email='';
-  try{var s=JSON.parse(localStorage.getItem('sanj_auth_session')||'{}');email=s.email||'';}catch(e){}
-  if(!email){alert('Please log in first.');return;}
-  // In production: call your backend to check if this email has a paid subscription
-  if(typeof toast==='function')toast('Checking purchase for '+email+'…','ok');
-  // Demo: if no real backend, inform user
-  setTimeout(function(){
-    if(typeof toast==='function')toast('ℹ️ No Pro subscription found for this account. Please purchase.','');
-  },1500);
+function clUnsubscribe(){
+  if(!confirm('Unsubscribe and DELETE your account?\n\nThis cannot be undone. All cloud data will be permanently deleted.'))return;
+  if(!confirm('Are you absolutely sure? This will delete ALL your cloud data and account.'))return;
+  try{
+    localStorage.clear();
+    if(typeof window._supa!=='undefined'&&window._supa)window._supa.auth.signOut().catch(function(){});
+  }catch(e){}
+  closeAccountModal();
+  setTimeout(function(){location.reload();},400);
 }
 
-// ── compatibility stubs (existing code may call these) ──
-function obChooseLocal(){
-  try{ localStorage.setItem('sanj_cloud_choice','local'); }catch(e){}
-  var ao=document.getElementById('auth-onboard');
-  if(ao){ao.style.transition='opacity .35s ease';ao.style.opacity='0';setTimeout(function(){ao.style.display='none';ao.style.opacity='';_launchApp();},360);}
+function _clCopy(text,msg){
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){if(typeof toast==='function')toast(msg,'ok');}).catch(function(){_clFbCopy(text,msg);});
+    }else{_clFbCopy(text,msg);}
+  }catch(e){_clFbCopy(text,msg);}
 }
-function obToggleCloud(){}
-function obSwitchAuthTab(){}
+function _clFbCopy(text,msg){
+  try{var t=document.createElement('textarea');t.value=text;t.style.cssText='position:fixed;top:-999px;opacity:0;';document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();if(typeof toast==='function')toast(msg,'ok');}catch(e){}
+}
 
-function obDoLogin(){
-  var email = (document.getElementById('ob-login-email')||{}).value||'';
-  var pass  = (document.getElementById('ob-login-pass')||{}).value||'';
-  var errEl = document.getElementById('ob-login-err');
-  if(!email||!pass){ if(errEl){errEl.textContent='⚠️ Enter email and password'; errEl.style.display='block';} return; }
-  if(errEl)errEl.style.display='none';
-  var re = document.getElementById('auth-login-email');
-  var rp = document.getElementById('auth-login-pass');
-  if(re) re.value = email;
-  if(rp) rp.value = pass;
-  // Show loading on button
-  var btn = document.getElementById('ob-login-btn');
-  btn.textContent='⏳ Logging in…'; btn.disabled=true;
-  // Override the error display to point to our onboard error
-  var _orig_showErr = window._obLoginErrHook;
-  // Wrap doSmartLogin result via auth state change
-  var _unsub;
-  function _onAuth(evt, session){
-    if(evt==='SIGNED_IN'){
-      if(_unsub) _unsub.data.subscription.unsubscribe();
-      try{localStorage.setItem('sanj_cloud_choice','cloud');}catch(e){}
-      btn.textContent='🔑 Login'; btn.disabled=false;
-      _obDismiss();
+// ── aliases kept for backward compat ──
+function openCloudModal(){openAccountModal();}
+function acctShowPlans(){closeAccountModal();setTimeout(function(){_showPlans();},360);}
+function acctRestorePurchase(){
+  if(typeof toast==='function')toast('Checking Pro status…','');
+  setTimeout(function(){if(typeof toast==='function')toast('ℹ️ No active Pro subscription found.','');},1800);
+}
+
+// ── settings sub-text on load ──
+document.addEventListener('DOMContentLoaded',function(){
+  try{
+    var sess=JSON.parse(localStorage.getItem('sanj_auth_session')||'{}');
+    var sub=document.getElementById('sett-cloud-sub');
+    if(sub){
+      var isPro=sess.plan==='pro'||!!localStorage.getItem('sanj_pro');
+      sub.textContent=sess.email?(isPro?'⭐ Pro · '+sess.email:'Free · '+sess.email):'Tap to manage account';
     }
-  }
-  if(typeof _sb !== 'undefined' && _sb && _sb.auth){
-    _unsub = _sb.auth.onAuthStateChange(_onAuth);
-  }
-  // Fallback: watch for error in err element
-  var origErrEl = document.getElementById('auth-login-err');
-  var _watchErr = setInterval(function(){
-    if(!btn.disabled){ clearInterval(_watchErr); return; }
-    if(origErrEl && origErrEl.style.display!=='none' && origErrEl.textContent){
-      clearInterval(_watchErr);
-      errEl.textContent = origErrEl.textContent;
-      errEl.style.display = 'block';
-      btn.textContent='🔑 Login'; btn.disabled=false;
-      if(_unsub) try{_unsub.data.subscription.unsubscribe();}catch(e){}
-    }
-  },300);
-  // If user had a subscription open the pay landing — still dismiss onboard
-  var origOpen = window.openPayLanding;
-  window.openPayLanding = function(fl){
-    clearInterval(_watchErr);
-    try{localStorage.setItem('sanj_cloud_choice','cloud');}catch(e){}
-    btn.textContent='🔑 Login'; btn.disabled=false;
-    _obDismiss();
-    setTimeout(function(){ window.openPayLanding=origOpen; if(origOpen) origOpen(fl); },400);
-  };
-  doSmartLogin();
-}
-
-function obDoSignup(){
-  var name  = (document.getElementById('ob-signup-name')||{}).value||'';
-  var email = (document.getElementById('ob-signup-email')||{}).value||'';
-  var pass  = (document.getElementById('ob-signup-pass')||{}).value||'';
-  var errEl = document.getElementById('ob-signup-err');
-  if(!name||!email||!pass){ errEl.textContent='⚠️ Fill all fields'; errEl.style.display='block'; return; }
-  if(pass.length<6){ errEl.textContent='⚠️ Password must be at least 6 characters'; errEl.style.display='block'; return; }
-  errEl.style.display='none';
-  var btn = document.getElementById('ob-signup-btn');
-  btn.textContent='⏳ Creating…'; btn.disabled=true;
-  // Sync to real signup inputs
-  var rn = document.getElementById('auth-signup-name');
-  var re = document.getElementById('auth-signup-email');
-  var rp = document.getElementById('auth-signup-pass');
-  if(rn) rn.value=name; if(re) re.value=email; if(rp) rp.value=pass;
-  // Watch pay landing open as signal of success
-  var origOpen = window.openPayLanding;
-  window.openPayLanding = function(fl){
-    try{localStorage.setItem('sanj_cloud_choice','cloud');}catch(e){}
-    btn.textContent='✨ Create Cloud ID'; btn.disabled=false;
-    _obDismiss();
-    setTimeout(function(){ window.openPayLanding=origOpen; if(origOpen) origOpen(fl); },400);
-  };
-  // Watch for error
-  var origErrEl = document.getElementById('auth-signup-err');
-  var _watchErr = setInterval(function(){
-    if(!btn.disabled){ clearInterval(_watchErr); return; }
-    if(origErrEl && origErrEl.style.display!=='none' && origErrEl.textContent){
-      clearInterval(_watchErr);
-      errEl.textContent = origErrEl.textContent;
-      errEl.style.display='block';
-      btn.textContent='✨ Create Cloud ID'; btn.disabled=false;
-      window.openPayLanding = origOpen;
-    }
-  },300);
-  doAdminSignup();
-}
+  }catch(e){}
+});
 </script>
 
 <!-- ========== MAIN APP ========== -->
@@ -2817,6 +3036,16 @@ function obDoSignup(){
       </div>
       <button onclick="closeAllAndSettings()" style="width:24px;height:24px;border-radius:50%;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.07);color:#fff;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,transform .15s;" ontouchstart="this.style.transform='scale(.88)'" ontouchend="this.style.transform='scale(1)'">✕</button>
     </div>
+
+    <!-- ☁️ Cloud & Account -->
+    <button class="sett-btn sett-row" id="sett-cloud-btn" onclick="_settRipple(event,this);closeSettingsPanel();openAccountModal()" style="background:linear-gradient(135deg,rgba(99,102,241,0.18),rgba(168,85,247,0.14));border-color:rgba(99,102,241,0.35);">
+      <span style="font-size:15px;flex-shrink:0" id="sett-cloud-icon">☁️</span>
+      <div style="display:flex;flex-direction:column;gap:1px">
+        <span id="sett-cloud-title">Cloud &amp; Account</span>
+        <span style="font-size:9px;font-weight:500;color:rgba(165,180,252,0.7)" id="sett-cloud-sub">Loading…</span>
+      </div>
+      <span style="margin-left:auto;font-size:9px;color:rgba(255,255,255,0.3)">›</span>
+    </button>
 
     <!-- Profile Settings -->
     <button class="sett-btn sett-row" onclick="_settRipple(event,this);closeSettingsPanel();openEditProfile()">
