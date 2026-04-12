@@ -628,6 +628,7 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
     if (_sb) return;
     if (!window.supabase) { setTimeout(_initSB, 100); return; }
     _sb = window.supabase.createClient(_SB_URL, _SB_ANON);
+    window._supa = _sb; // alias so OTP auth functions can find the client
     // Restore session
     _sb.auth.getSession().then(function(r) {
       if (r.data && r.data.session) { _onSBAuthReady(r.data.session.user); }
@@ -1540,7 +1541,19 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
 <body>
 
 <!-- ========== WELCOME OVERLAY (first-time only, before any data) ========== -->
-<div id="welcome-overlay" style="display:none;position:fixed;inset:0;z-index:99999;overflow:hidden;background:#0a0818;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem;">
+<!-- ═══ SHARED ONBOARDING SHELL — single BG, panels slide ═══ -->
+<div id="onboard-shell" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;z-index:2147483647;overflow:hidden;background:#0a0818;">
+  <!-- Shared ambient blobs (stay fixed behind all panels) -->
+  <div style="position:absolute;top:-120px;left:-80px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,#4f46e5,#7c3aed);filter:blur(80px);opacity:0.55;animation:wBlob 14s ease-in-out infinite;pointer-events:none;"></div>
+  <div style="position:absolute;bottom:-80px;right:-60px;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,#9333ea,#4f46e5);filter:blur(80px);opacity:0.55;animation:wBlob 10s ease-in-out infinite reverse;pointer-events:none;"></div>
+  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;"></div>
+  <div style="position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#4f46e5,#9333ea,#f59e0b,transparent);opacity:0.6;pointer-events:none;"></div>
+
+  <!-- PANELS — each is absolute full-screen, shown/hidden with slide animation -->
+  
+    <!-- ── PANEL 0: Welcome ── -->
+    <div class="ob-panel" id="panel-welcome" style="position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem;overflow-y:auto;background:#0a0818;">
+<div id="welcome-overlay" style="display:contents">
   <div style="position:absolute;top:-120px;left:-80px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,#4f46e5,#7c3aed);filter:blur(80px);opacity:0.55;animation:wBlob 14s ease-in-out infinite;pointer-events:none;"></div>
   <div style="position:absolute;bottom:-80px;right:-60px;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,#9333ea,#4f46e5);filter:blur(80px);opacity:0.55;animation:wBlob 10s ease-in-out infinite reverse;pointer-events:none;"></div>
   <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;"></div>
@@ -1548,6 +1561,9 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap');
     @keyframes wBlob{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-28px) scale(1.06);}}
+    @keyframes obPanelIn{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+    .ob-panel{box-sizing:border-box;overflow-y:auto;}
+    /* onboard panels are position:absolute inside the shell, no track needed */
     @keyframes wFUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
     @keyframes wPls{0%,100%{box-shadow:0 0 4px #6366f1;}50%{box-shadow:0 0 12px #6366f1,0 0 22px #6366f1aa;}}
     .wa1{opacity:0;animation:wFUp .7s ease .1s forwards;}.wa2{opacity:0;animation:wFUp .7s ease .25s forwards;}
@@ -1580,50 +1596,10 @@ var supabase=function(e){function t(e,t){var r={};for(var s in e)Object.prototyp
 var WELCOME_FLAG='sanj_welcomed';
 var WELCOME_VER='sanj_welcome_v2';
 
-/* ── Central routing: called on every startup ── */
-function checkShowWelcomeAndAuth(){
-  if(typeof _IS_VIEWER!=='undefined'&&_IS_VIEWER)return;
-  var sess=null;
-  try{sess=JSON.parse(localStorage.getItem('sanj_auth_session')||'null');}catch(e){}
-
-  if(sess&&sess.email){
-    // Logged in — check if active Pro
-    var isPro=(sess.plan==='pro')||!!localStorage.getItem('sanj_pro');
-    var proOk=isPro&&sess.pro_expires&&sess.pro_expires>Date.now();
-    if(proOk){
-      // ✅ Active Pro — skip everything, load cloud data → Dashboard
-      _launchApp();
-      return;
-    }
-    // Logged in but no active Pro — show welcome if new version, else plans
-    if(!localStorage.getItem(WELCOME_VER)){
-      var el=document.getElementById('welcome-overlay');
-      if(el)el.style.display='flex';
-      return;
-    }
-    _showPlans();
-    return;
-  }
-
-  // Not logged in
-  if(!localStorage.getItem(WELCOME_VER)){
-    var el=document.getElementById('welcome-overlay');
-    if(el)el.style.display='flex';
-    return;
-  }
-  // Seen welcome before — go straight to auth
-  var ao=document.getElementById('auth-overlay');
-  if(ao)ao.style.display='flex';
-}
+/* ── startup routing defined later in the script ── */
 
 function _showPlans(){
-  try{
-    var sess=JSON.parse(localStorage.getItem('sanj_auth_session')||'{}');
-    var el=document.getElementById('plans-welcome-email');
-    if(el&&sess.email)el.textContent='✓ '+sess.email;
-  }catch(e){}
-  var po=document.getElementById('plans-overlay');
-  if(po)po.style.display='flex';
+  _showPlansOverlay();
 }
 
 function dismissWelcome(){
@@ -1645,24 +1621,38 @@ function dismissWelcome(){
     overlay.style.transition='opacity 0.4s ease';overlay.style.opacity='0';
     setTimeout(function(){
       overlay.style.display='none';overlay.style.opacity='';
-      // After welcome — route correctly
+      // After welcome dismissal — always go to Login page first (with slide animation)
       var sess=null;
       try{sess=JSON.parse(localStorage.getItem('sanj_auth_session')||'null');}catch(e){}
       if(sess&&sess.email){
         var isPro=(sess.plan==='pro')||!!localStorage.getItem('sanj_pro');
-        var proOk=isPro&&sess.pro_expires&&sess.pro_expires>Date.now();
+        var proOk=isPro&&(!sess.pro_expires||sess.pro_expires>Date.now());
         if(proOk){_launchApp();return;}
-        _showPlans();return;
       }
-      var ao=document.getElementById('auth-overlay');
-      if(ao)ao.style.display='flex';
+      // New user or non-pro: slide to Login (animate=true → gallery slide left)
+      _obGo(1, true);
     },420);
   },chipDelay);
 }
-document.addEventListener('DOMContentLoaded',checkShowWelcomeAndAuth);
+document.addEventListener('DOMContentLoaded', function() {
+  checkShowWelcomeAndAuth();
+});
+window.addEventListener('resize', function() {
+  // Nothing needed — panels are position:absolute and fill the shell automatically
+});
 
-// ── Launch app (3D card animation then show main) ──────────────────────────
+// ── Launch app — hides onboard shell then shows dashboard with animation ──
 function _launchApp(){
+  // Always hide the onboarding shell cleanly before showing the app
+  var shell = document.getElementById('onboard-shell');
+  if (shell && shell.style.display !== 'none') {
+    _obHideShell();
+    setTimeout(function(){ _launchApp_animate(); }, 380);
+  } else {
+    _launchApp_animate();
+  }
+}
+function _launchApp_animate(){
   var styleTag=document.createElement('style');
   styleTag.id='_dash3d_style';
   styleTag.textContent='@keyframes _dci{from{opacity:0;transform:perspective(600px) rotateX(-40deg) translateY(55px) scale(.86);}to{opacity:1;transform:perspective(600px) rotateX(0deg) translateY(0) scale(1);}}#tab-dashboard .rounded-2xl{animation:_dci .5s cubic-bezier(.34,1.1,.64,1) both;}';
@@ -1715,17 +1705,80 @@ function _launchApp(){
 
 </script>
 
-<!-- ═══════════════════════════════════════════════════════════
-     PRO PAGE — shown after login, single full-screen Pro page
-     ═══════════════════════════════════════════════════════════ -->
-<div id="plans-overlay" style="display:none;position:fixed;inset:0;z-index:99998;background:linear-gradient(160deg,#0d0b1e 0%,#130e35 40%,#1a0d4a 100%);flex-direction:column;align-items:center;justify-content:flex-start;padding:0;overflow-y:auto;">
+    </div><!-- /panel-welcome -->
 
-  <!-- Ambient glow blobs -->
-  <div style="position:fixed;top:-60px;left:-40px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,#4f46e5,#7c3aed);filter:blur(80px);opacity:0.45;pointer-events:none;"></div>
-  <div style="position:fixed;bottom:-40px;right:-30px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,#6366f1,#a855f7);filter:blur(80px);opacity:0.3;pointer-events:none;"></div>
-  <div style="position:fixed;top:40%;left:50%;transform:translate(-50%,-50%);width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,#818cf8,#c084fc);filter:blur(100px);opacity:0.15;pointer-events:none;"></div>
-  <!-- Grid overlay -->
-  <div style="position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,0.012) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.012) 1px,transparent 1px);background-size:36px 36px;pointer-events:none;"></div>
+    <div class="ob-panel" id="panel-auth" style="position:absolute;top:0;left:0;width:100%;height:100%;display:none;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;overflow-y:auto;background:#0a0818;">
+<div id="auth-overlay" style="display:contents">
+  <style>
+    @keyframes authFUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+    @keyframes authSpin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+    @keyframes otpPop{0%{transform:scale(0.8);opacity:0}100%{transform:scale(1);opacity:1}}
+    .auth-inp{width:100%;padding:11px 14px;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.14);border-radius:12px;color:#fff;font-size:13px;outline:none;box-sizing:border-box;transition:border-color .2s;}
+    .auth-inp:focus{border-color:rgba(99,102,241,0.7);background:rgba(99,102,241,0.08);}
+    .auth-inp::placeholder{color:rgba(255,255,255,0.3);}
+    .otp-box{width:46px;height:54px;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.18);border-radius:12px;color:#fff;font-size:1.4rem;font-weight:700;text-align:center;outline:none;caret-color:#6366f1;transition:border-color .2s,background .2s;}
+    .otp-box:focus{border-color:#6366f1;background:rgba(99,102,241,0.15);}
+    .auth-submit{width:100%;padding:14px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;border-radius:13px;font-weight:800;font-size:.92rem;cursor:pointer;box-shadow:0 6px 20px rgba(79,70,229,0.4);display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s,box-shadow .15s;}
+    .auth-submit:active{transform:scale(.97);}
+    .auth-submit:disabled{opacity:0.6;cursor:not-allowed;}
+    .auth-back{background:none;border:none;color:rgba(255,255,255,0.35);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;display:block;width:100%;text-align:center;padding:5px 0;}
+    .auth-back:hover{color:rgba(255,255,255,0.6);}
+  </style>
+
+  <div id="auth-inner" style="position:relative;z-index:2;width:100%;max-width:320px;display:flex;flex-direction:column;align-items:center;animation:authFUp .55s ease both;">
+
+    <!-- Logo -->
+    <div style="display:flex;align-items:center;gap:9px;margin-bottom:1.4rem;">
+      <div style="width:36px;height:36px;background:linear-gradient(145deg,#f97316,#fb923c);border-radius:10px;overflow:hidden;box-shadow:0 0 16px rgba(249,115,22,0.4);flex-shrink:0;">
+        <img src="https://cdn.jsdelivr.net/gh/8anjeev/Sanjineer@main/assets/logo.png" style="width:36px;height:36px;object-fit:cover;" onerror="this.style.display='none'">
+      </div>
+      <p style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:#fff;margin:0;">Sanj<span style="background:linear-gradient(90deg,#818cf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">ineer</span></p>
+    </div>
+
+    <!-- ── STEP 1: Email entry ── -->
+    <div id="auth-step-email" style="width:100%;">
+      <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.28);border-radius:99px;padding:4px 14px;margin-bottom:12px;">
+        <span style="width:5px;height:5px;border-radius:50%;background:#34d399;flex-shrink:0;animation:wPls 2s ease-in-out infinite;"></span>
+        <span style="font-size:11px;font-weight:600;color:#6ee7b7;letter-spacing:.03em;">Free to login</span>
+      </div>
+      <input id="auth-email-inp" class="auth-inp" type="email" placeholder="your@email.com" style="margin-bottom:8px;" oninput="document.getElementById('auth-email-err').style.display='none'">
+      <p id="auth-email-err" style="font-size:11px;color:#fca5a5;margin:0 0 8px;display:none;text-align:center;"></p>
+      <button class="auth-submit" id="auth-otp-send-btn" onclick="authSendOTP()">
+        <span id="auth-otp-send-label">Send OTP →</span>
+      </button>
+    </div>
+
+    <!-- ── STEP 2: OTP verification ── -->
+    <div id="auth-step-otp" style="width:100%;display:none;">
+      <p style="font-size:11px;color:rgba(255,255,255,0.45);margin:0 0 12px;text-align:center;">Enter the 6-digit code sent to<br><strong id="auth-otp-email-label" style="color:rgba(255,255,255,0.75);"></strong></p>
+      <!-- 6-box OTP input -->
+      <div id="auth-otp-boxes" style="display:flex;gap:7px;justify-content:center;margin-bottom:10px;animation:otpPop .4s ease;">
+        <input class="otp-box" maxlength="1" type="tel" oninput="otpMove(this,0)" onkeydown="otpBack(event,this,0)">
+        <input class="otp-box" maxlength="1" type="tel" oninput="otpMove(this,1)" onkeydown="otpBack(event,this,1)">
+        <input class="otp-box" maxlength="1" type="tel" oninput="otpMove(this,2)" onkeydown="otpBack(event,this,2)">
+        <input class="otp-box" maxlength="1" type="tel" oninput="otpMove(this,3)" onkeydown="otpBack(event,this,3)">
+        <input class="otp-box" maxlength="1" type="tel" oninput="otpMove(this,4)" onkeydown="otpBack(event,this,4)">
+        <input class="otp-box" maxlength="1" type="tel" oninput="otpMove(this,5)" onkeydown="otpBack(event,this,5)">
+      </div>
+      <p id="auth-otp-err" style="font-size:11px;color:#fca5a5;margin:0 0 8px;display:none;text-align:center;"></p>
+      <button class="auth-submit" id="auth-verify-btn" onclick="authVerifyOTP()" style="background:linear-gradient(135deg,#059669,#10b981);box-shadow:0 6px 20px rgba(5,150,105,0.4);">
+        <span id="auth-verify-label">Verify &amp; Continue ✓</span>
+      </button>
+      <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-top:10px;">
+        <button id="auth-resend-btn" onclick="authResendOTP()" style="background:none;border:none;color:rgba(99,102,241,0.7);font-size:10.5px;cursor:pointer;font-weight:600;">Resend Code</button>
+        <span style="color:rgba(255,255,255,0.2);font-size:10px;">·</span>
+        <button onclick="authBackToEmail()" class="auth-back" style="width:auto;margin:0;">← Change Email</button>
+      </div>
+      <div id="auth-resend-timer" style="text-align:center;font-size:10px;color:rgba(255,255,255,0.3);margin-top:5px;"></div>
+    </div>
+
+  </div>
+</div>
+
+    </div><!-- /panel-auth -->
+
+    <div class="ob-panel" id="panel-plans" style="position:absolute;top:0;left:0;width:100%;height:100%;display:none;flex-direction:column;align-items:center;justify-content:flex-start;padding:0;overflow-y:auto;background:#0a0818;">
+<div id="plans-overlay" style="display:contents">
 
   <style>
     @keyframes proFadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
@@ -1738,7 +1791,7 @@ function _launchApp(){
     .pro-feat-row .pft span{font-size:9.5px;color:rgba(255,255,255,0.4);line-height:1.3;}
   </style>
 
-  <div style="position:relative;z-index:2;width:100%;max-width:420px;padding:14px 14px 24px;animation:proFadeUp .55s ease both;">
+  <div style="position:relative;z-index:2;width:100%;max-width:420px;padding:14px 14px 24px;">
 
     <!-- ── Top: logo + logged-in pill ── -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
@@ -1803,90 +1856,20 @@ function _launchApp(){
     </div>
 
     <!-- ── Continue Free button ── -->
-    <button onclick="plChooseFree()" style="width:100%;padding:10px;background:transparent;border:1px solid rgba(255,255,255,0.15);border-radius:13px;color:rgba(255,255,255,0.45);font-weight:600;font-size:.88rem;cursor:pointer;letter-spacing:.02em;transition:border-color .2s,color .2s;" ontouchstart="this.style.borderColor='rgba(255,255,255,0.3)';this.style.color='rgba(255,255,255,0.65)'" ontouchend="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='rgba(255,255,255,0.45)'">
-      Continue with Free Plan
+    <button onclick="plChooseFree()" style="position:relative;overflow:hidden;width:100%;padding:12px;background:linear-gradient(135deg,#06b6d4,#0ea5e9,#6366f1);color:#fff;border:none;border-radius:13px;font-weight:800;font-size:.88rem;cursor:pointer;letter-spacing:.02em;box-shadow:0 6px 22px rgba(6,182,212,0.38);display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s,box-shadow .15s;" ontouchstart="this.style.transform='scale(.97)'" ontouchend="this.style.transform='scale(1)'">
+      <span style="position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);animation:proShimmer 2.8s ease infinite;"></span>
+      <span style="font-size:15px;">⚡</span>
+      <span>Continue Free — Upgrade Anytime</span>
     </button>
-    <p style="text-align:center;font-size:9.5px;color:rgba(255,255,255,0.2);margin:8px 0 0;">Free plan · device storage only · upgrade anytime</p>
+    <p style="text-align:center;font-size:9.5px;color:rgba(255,255,255,0.25);margin:8px 0 0;">Local storage only · no cloud sync · upgrade anytime</p>
 
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════
-     AUTH OVERLAY — mandatory email OTP login (no skip)
-     ═══════════════════════════════════════════════════════════ -->
-<div id="auth-overlay" style="display:none;position:fixed;inset:0;z-index:99999;background:#07060f;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;overflow-y:auto;">
-  <div style="position:absolute;top:-80px;right:-60px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,#4f46e5,#7c3aed);filter:blur(70px);opacity:0.45;pointer-events:none;"></div>
-  <div style="position:absolute;bottom:-60px;left:-40px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,#059669,#0d9488);filter:blur(70px);opacity:0.35;pointer-events:none;"></div>
-  <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.018) 1px,transparent 1px);background-size:36px 36px;pointer-events:none;"></div>
-  <style>
-    @keyframes authFUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
-    @keyframes authSpin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-    @keyframes otpPop{0%{transform:scale(0.8);opacity:0}100%{transform:scale(1);opacity:1}}
-    .auth-inp{width:100%;padding:11px 14px;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.14);border-radius:12px;color:#fff;font-size:13px;outline:none;box-sizing:border-box;transition:border-color .2s;}
-    .auth-inp:focus{border-color:rgba(99,102,241,0.7);background:rgba(99,102,241,0.08);}
-    .auth-inp::placeholder{color:rgba(255,255,255,0.3);}
-    .otp-box{width:46px;height:54px;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.18);border-radius:12px;color:#fff;font-size:1.4rem;font-weight:700;text-align:center;outline:none;caret-color:#6366f1;transition:border-color .2s,background .2s;}
-    .otp-box:focus{border-color:#6366f1;background:rgba(99,102,241,0.15);}
-    .auth-submit{width:100%;padding:14px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;border-radius:13px;font-weight:800;font-size:.92rem;cursor:pointer;box-shadow:0 6px 20px rgba(79,70,229,0.4);display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s,box-shadow .15s;}
-    .auth-submit:active{transform:scale(.97);}
-    .auth-submit:disabled{opacity:0.6;cursor:not-allowed;}
-    .auth-back{background:none;border:none;color:rgba(255,255,255,0.35);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;display:block;width:100%;text-align:center;padding:5px 0;}
-    .auth-back:hover{color:rgba(255,255,255,0.6);}
-  </style>
+    </div><!-- /panel-plans -->
 
-  <div id="auth-inner" style="position:relative;z-index:2;width:100%;max-width:320px;display:flex;flex-direction:column;align-items:center;animation:authFUp .55s ease both;">
-
-    <!-- Logo -->
-    <div style="display:flex;align-items:center;gap:9px;margin-bottom:1.4rem;">
-      <div style="width:36px;height:36px;background:linear-gradient(145deg,#f97316,#fb923c);border-radius:10px;overflow:hidden;box-shadow:0 0 16px rgba(249,115,22,0.4);flex-shrink:0;">
-        <img src="https://cdn.jsdelivr.net/gh/8anjeev/Sanjineer@main/assets/logo.png" style="width:36px;height:36px;object-fit:cover;" onerror="this.style.display='none'">
-      </div>
-      <p style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:#fff;margin:0;">Sanj<span style="background:linear-gradient(90deg,#818cf8,#c084fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">ineer</span></p>
-    </div>
-
-    <!-- ── STEP 1: Email entry ── -->
-    <div id="auth-step-email" style="width:100%;">
-      <p style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.55);margin:0 0 10px;text-align:center;">Login or Create Account</p>
-      <input id="auth-email-inp" class="auth-inp" type="email" placeholder="your@email.com" style="margin-bottom:8px;" oninput="document.getElementById('auth-email-err').style.display='none'">
-      <p id="auth-email-err" style="font-size:11px;color:#fca5a5;margin:0 0 8px;display:none;text-align:center;"></p>
-      <button class="auth-submit" id="auth-otp-send-btn" onclick="authSendOTP()">
-        <span id="auth-otp-send-label">Send OTP →</span>
-      </button>
-    </div>
-
-    <!-- ── STEP 2: OTP verification ── -->
-    <div id="auth-step-otp" style="width:100%;display:none;">
-      <p style="font-size:11px;color:rgba(255,255,255,0.45);margin:0 0 12px;text-align:center;">Enter the 6-digit code sent to<br><strong id="auth-otp-email-label" style="color:rgba(255,255,255,0.75);"></strong></p>
-      <!-- 6-box OTP input -->
-      <div id="auth-otp-boxes" style="display:flex;gap:7px;justify-content:center;margin-bottom:10px;animation:otpPop .4s ease;">
-        <input class="otp-box" maxlength="1" type="tel" oninput="otpMove(this,0)" onkeydown="otpBack(event,this,0)">
-        <input class="otp-box" maxlength="1" type="tel" oninput="otpMove(this,1)" onkeydown="otpBack(event,this,1)">
-        <input class="otp-box" maxlength="1" type="tel" oninput="otpMove(this,2)" onkeydown="otpBack(event,this,2)">
-        <input class="otp-box" maxlength="1" type="tel" oninput="otpMove(this,3)" onkeydown="otpBack(event,this,3)">
-        <input class="otp-box" maxlength="1" type="tel" oninput="otpMove(this,4)" onkeydown="otpBack(event,this,4)">
-        <input class="otp-box" maxlength="1" type="tel" oninput="otpMove(this,5)" onkeydown="otpBack(event,this,5)">
-      </div>
-      <p id="auth-otp-err" style="font-size:11px;color:#fca5a5;margin:0 0 8px;display:none;text-align:center;"></p>
-      <button class="auth-submit" id="auth-verify-btn" onclick="authVerifyOTP()" style="background:linear-gradient(135deg,#059669,#10b981);box-shadow:0 6px 20px rgba(5,150,105,0.4);">
-        <span id="auth-verify-label">Verify &amp; Continue ✓</span>
-      </button>
-      <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-top:10px;">
-        <button id="auth-resend-btn" onclick="authResendOTP()" style="background:none;border:none;color:rgba(99,102,241,0.7);font-size:10.5px;cursor:pointer;font-weight:600;">Resend Code</button>
-        <span style="color:rgba(255,255,255,0.2);font-size:10px;">·</span>
-        <button onclick="authBackToEmail()" class="auth-back" style="width:auto;margin:0;">← Change Email</button>
-      </div>
-      <div id="auth-resend-timer" style="text-align:center;font-size:10px;color:rgba(255,255,255,0.3);margin-top:5px;"></div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════
-     RAZORPAY PRO PURCHASE LANDING — full-screen payment page
-     ═══════════════════════════════════════════════════════════ -->
-<div id="razorpay-landing" style="display:none;position:fixed;inset:0;z-index:100001;background:#06050e;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;overflow-y:auto;">
-  <div style="position:absolute;top:-60px;right:-40px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,#f59e0b,#f97316);filter:blur(80px);opacity:0.3;pointer-events:none;"></div>
-  <div style="position:absolute;bottom:-40px;left:-30px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,#6366f1,#a855f7);filter:blur(80px);opacity:0.3;pointer-events:none;"></div>
+    <div class="ob-panel" id="panel-payment" style="position:absolute;top:0;left:0;width:100%;height:100%;display:none;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;overflow-y:auto;background:#0a0818;">
+<div id="razorpay-landing" style="display:contents">
   <style>
     @keyframes rzpFade{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
     .rzp-feat-row{display:flex;align-items:center;gap:8px;padding:5px 10px;background:rgba(255,255,255,0.04);border-radius:8px;margin-bottom:4px;}
@@ -1934,7 +1917,10 @@ function _launchApp(){
       <button onclick="restoreProPurchase()" style="padding:7px 18px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:9px;color:rgba(255,255,255,0.5);font-size:10.5px;font-weight:700;cursor:pointer;">🔄 Restore Purchase</button>
     </div>
   </div>
-</div>
+    </div><!-- /panel-payment -->
+  </div><!-- fixes shell balance -->
+</div><!-- /onboard-shell -->
+
 
 <script>
 // ═══════════════════════════════════════════════════════════
@@ -1953,25 +1939,22 @@ function plShowWelcomePill(){
 
 /* ── Plans buttons ── */
 function plChooseFree(){
-  try{localStorage.setItem('sanj_cloud_choice','local');}catch(e){}
-  var po=document.getElementById('plans-overlay');
-  if(po){po.style.transition='opacity .35s ease';po.style.opacity='0';setTimeout(function(){po.style.display='none';po.style.opacity='';_launchApp();},350);}
+  try{
+    localStorage.setItem('sanj_cloud_choice','local');
+    // Stamp plan:'free' so next startup routes correctly
+    var s=JSON.parse(localStorage.getItem('sanj_auth_session')||'{}');
+    s.plan='free';
+    localStorage.setItem('sanj_auth_session',JSON.stringify(s));
+  }catch(e){}
+  _launchApp();
 }
 
 function plBuyPro(){
-  var po=document.getElementById('plans-overlay');
-  var rl=document.getElementById('razorpay-landing');
-  if(po){po.style.transition='opacity .3s ease';po.style.opacity='0';setTimeout(function(){po.style.display='none';po.style.opacity='';},300);}
-  setTimeout(function(){if(rl)rl.style.display='flex';},320);
+  _showPaymentPanel();
 }
 
 function closeRazorpayLanding(){
-  var rl=document.getElementById('razorpay-landing');
-  if(rl){rl.style.transition='opacity .3s ease';rl.style.opacity='0';setTimeout(function(){rl.style.display='none';rl.style.opacity='';},300);}
-  setTimeout(function(){
-    var po=document.getElementById('plans-overlay');
-    if(po){po.style.opacity='0';po.style.display='flex';setTimeout(function(){po.style.transition='opacity .3s';po.style.opacity='1';},10);}
-  },320);
+  _backToPlans();
 }
 
 function rzpDoPurchase(){
@@ -2009,12 +1992,8 @@ function rzpDoPurchase(){
         localStorage.setItem('sanj_cloud_choice','cloud');
         localStorage.setItem('sanj_pro','1');
       }catch(ex){}
-      var rl=document.getElementById('razorpay-landing');
-      if(rl){rl.style.transition='opacity .3s ease';rl.style.opacity='0';setTimeout(function(){rl.style.display='none';rl.style.opacity='';},300);}
-      setTimeout(function(){
-        _launchApp();
-        setTimeout(function(){if(typeof toast==='function')toast('🎉 Pro activated! Cloud sync enabled.','ok');},800);
-      },350);
+      _launchApp();  // _launchApp now hides shell + launches dashboard
+      setTimeout(function(){if(typeof toast==='function')toast('🎉 Pro activated! Cloud sync enabled.','ok');},800);
     }
   };
   try{var rzp=new Razorpay(options);rzp.open();}
@@ -2028,9 +2007,53 @@ function rzpDoPurchase(){
 function restoreProPurchase(){
   var email='';
   try{var s=JSON.parse(localStorage.getItem('sanj_auth_session')||'{}');email=s.email||'';}catch(e){}
-  if(!email){alert('Please log in first.');return;}
-  if(typeof toast==='function')toast('Checking purchase for '+email+'…','');
-  setTimeout(function(){if(typeof toast==='function')toast('ℹ️ No active Pro subscription found. Please purchase.','');},1500);
+  if(!email){
+    if(typeof toast==='function') toast('⚠️ Please log in first to restore your purchase.','');
+    return;
+  }
+  if(typeof toast==='function') toast('🔄 Checking subscription for '+email+'…','');
+  // Check if sanj_pro is already stored locally (e.g. different session on same device)
+  if(localStorage.getItem('sanj_pro')==='1'){
+    try{
+      var s2=JSON.parse(localStorage.getItem('sanj_auth_session')||'{}');
+      s2.plan='pro';
+      if(!s2.pro_expires) s2.pro_expires=Date.now()+(30*24*60*60*1000);
+      localStorage.setItem('sanj_auth_session',JSON.stringify(s2));
+    }catch(e){}
+    setTimeout(function(){
+      if(typeof toast==='function') toast('✅ Pro restored! Launching…','ok');
+      setTimeout(_launchApp, 800);
+    },600);
+    return;
+  }
+  // Check Supabase session for pro metadata
+  try{
+    if(typeof window._supa!=='undefined'&&window._supa){
+      window._supa.auth.getUser().then(function(res){
+        var meta=(res&&res.data&&res.data.user&&res.data.user.user_metadata)||{};
+        if(meta.plan==='pro'||meta.is_pro){
+          try{
+            var s3=JSON.parse(localStorage.getItem('sanj_auth_session')||'{}');
+            s3.plan='pro';
+            s3.pro_expires=Date.now()+(30*24*60*60*1000);
+            localStorage.setItem('sanj_auth_session',JSON.stringify(s3));
+            localStorage.setItem('sanj_pro','1');
+          }catch(e){}
+          if(typeof toast==='function') toast('✅ Pro restored! Launching…','ok');
+          setTimeout(_launchApp, 800);
+        } else {
+          if(typeof toast==='function') toast('ℹ️ No active Pro subscription found for '+email+'. Please purchase.','');
+        }
+      }).catch(function(){
+        if(typeof toast==='function') toast('ℹ️ No active Pro subscription found. Please purchase.','');
+      });
+      return;
+    }
+  }catch(ex){}
+  // Fallback
+  setTimeout(function(){
+    if(typeof toast==='function') toast('ℹ️ No active Pro subscription found. Please purchase.','');
+  },1000);
 }
 
 /* ── Pro modal alias ── */
@@ -2040,29 +2063,27 @@ function closeProModal(){closeRazorpayLanding();}
 /* ── Startup routing ── */
 function checkShowWelcomeAndAuth(){
   if(typeof _IS_VIEWER!=='undefined'&&_IS_VIEWER)return;
-  try{
-    var sess=localStorage.getItem('sanj_auth_session');
-    if(sess){
-      plShowWelcomePill();
-      if(!localStorage.getItem(WELCOME_VER)){
-        var el2=document.getElementById('welcome-overlay');
-        if(el2)el2.style.display='flex';
-        return;
-      }
-      var po=document.getElementById('plans-overlay');
-      if(po)po.style.display='flex';
-      return;
-    }
-  }catch(e){}
-  try{
-    if(localStorage.getItem(WELCOME_VER)){
-      var ao=document.getElementById('auth-overlay');
-      if(ao)ao.style.display='flex';
-      return;
-    }
-  }catch(e){}
-  var el=document.getElementById('welcome-overlay');
-  if(el)el.style.display='flex';
+  var sess=null;
+  try{sess=JSON.parse(localStorage.getItem('sanj_auth_session')||'null');}catch(e){}
+
+  // EXISTING USER (has a saved session)
+  if(sess&&sess.email){
+    var isPro=(sess.plan==='pro')||!!localStorage.getItem('sanj_pro');
+    var proOk=isPro&&(!sess.pro_expires||sess.pro_expires>Date.now());
+    if(proOk){ _launchApp(); return; }  // Pro subscriber → launch app directly
+    // Non-pro existing user: skip Welcome, go straight to Login page
+    plShowWelcomePill();
+    _obShowShell();
+    _obGo(1, false);  // false = instant, no slide animation on first show
+    return;
+  }
+
+  // NEW USER (no session at all)
+  _obShowShell();
+  if(!localStorage.getItem(WELCOME_VER)){
+    _obGo(0, false); return;  // First time ever → show Welcome page instantly
+  }
+  _obGo(1, false);  // Has seen welcome before → go directly to Login instantly
 }
 
 /* ── Stubs ── */
@@ -2070,193 +2091,6 @@ function obChooseLocal(){try{localStorage.setItem('sanj_cloud_choice','local');}
 function obToggleCloud(){}
 function obSwitchAuthTab(){}
 
-/* ── Auth OTP ── */
-function authSendOTP(){
-  var inp=document.getElementById('auth-email-inp');
-  var err=document.getElementById('auth-email-err');
-  var email=(inp||{}).value||'';
-  email=email.trim().toLowerCase();
-  var emailRx=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if(!emailRx.test(email)){err.textContent='⚠️ Please enter a valid email address';err.style.display='block';inp.style.borderColor='rgba(248,113,113,0.7)';return;}
-  _authEmail=email;
-  var label=document.getElementById('auth-otp-send-label');
-  var btn=document.getElementById('auth-otp-send-btn');
-  if(label)label.textContent='Sending…';
-  if(btn)btn.disabled=true;
-  _authSendSupabaseOTP(email,function(err2){
-    if(label)label.textContent='Send Login Code →';
-    if(btn)btn.disabled=false;
-    if(err2){err.textContent='⚠️ '+err2;err.style.display='block';return;}
-    document.getElementById('auth-step-email').style.display='none';
-    document.getElementById('auth-step-otp').style.display='block';
-    var lbl=document.getElementById('auth-otp-email-label');
-    if(lbl)lbl.textContent=email;
-    var boxes=document.querySelectorAll('.otp-box');
-    if(boxes[0])boxes[0].focus();
-    _startResendTimer();
-  });
-}
-
-function _authSendSupabaseOTP(email,cb){
-  try{
-    if(typeof window._supa!=='undefined'&&window._supa){
-      window._supa.auth.signInWithOtp({email:email,options:{shouldCreateUser:true}})
-        .then(function(res){if(res&&res.error){cb(res.error.message||'Failed to send code');}else{cb(null);}})
-        .catch(function(e){cb(e&&e.message||'Network error');});
-      return;
-    }
-  }catch(ex){}
-  try{
-    var demoOtp=String(Math.floor(100000+Math.random()*900000));
-    localStorage.setItem('_demo_otp_'+email,demoOtp);
-    localStorage.setItem('_demo_otp_ts',Date.now());
-    console.log('[Sanjineer Demo OTP for '+email+']: '+demoOtp);
-  }catch(ex){}
-  cb(null);
-}
-
-function _startResendTimer(){
-  var timerEl=document.getElementById('auth-resend-timer');
-  var resendBtn=document.getElementById('auth-resend-btn');
-  var secs=60;
-  if(resendBtn){resendBtn.style.opacity='0.4';resendBtn.style.pointerEvents='none';}
-  clearInterval(_otpResendTimer);
-  _otpResendTimer=setInterval(function(){
-    secs--;
-    if(timerEl)timerEl.textContent='Resend available in '+secs+'s';
-    if(secs<=0){clearInterval(_otpResendTimer);if(timerEl)timerEl.textContent='';if(resendBtn){resendBtn.style.opacity='1';resendBtn.style.pointerEvents='auto';}}
-  },1000);
-}
-
-function authResendOTP(){authBackToEmail();setTimeout(function(){authSendOTP();},200);}
-
-function authBackToEmail(){
-  document.getElementById('auth-step-email').style.display='block';
-  document.getElementById('auth-step-otp').style.display='none';
-  document.querySelectorAll('.otp-box').forEach(function(b){b.value='';});
-  var err=document.getElementById('auth-otp-err');
-  if(err)err.style.display='none';
-}
-
-function otpMove(el,idx){
-  var boxes=document.querySelectorAll('.otp-box');
-  var val=el.value.replace(/\D/g,'');
-  if(val.length>1){
-    for(var i=0;i<val.length&&(idx+i)<boxes.length;i++)boxes[idx+i].value=val[i];
-    var next=idx+val.length;
-    if(next<boxes.length)boxes[next].focus();else boxes[boxes.length-1].focus();
-    el.value=val[0]||'';return;
-  }
-  el.value=val;
-  if(val&&idx<boxes.length-1)boxes[idx+1].focus();
-  var full=true;
-  boxes.forEach(function(b){if(!b.value)full=false;});
-  if(full)authVerifyOTP();
-}
-function otpBack(e,el,idx){
-  if(e.key==='Backspace'&&!el.value){
-    var boxes=document.querySelectorAll('.otp-box');
-    if(idx>0){boxes[idx-1].focus();boxes[idx-1].value='';}
-  }
-}
-
-function authVerifyOTP(){
-  var boxes=document.querySelectorAll('.otp-box');
-  var code='';
-  boxes.forEach(function(b){code+=b.value||'';});
-  if(code.length<6){var e=document.getElementById('auth-otp-err');e.textContent='⚠️ Enter all 6 digits';e.style.display='block';return;}
-  var label=document.getElementById('auth-verify-label');
-  var btn=document.getElementById('auth-verify-btn');
-  if(label)label.textContent='Verifying…';
-  if(btn)btn.disabled=true;
-  _authVerifySupabaseOTP(_authEmail,code,function(err,user){
-    if(label)label.textContent='Verify & Continue ✓';
-    if(btn)btn.disabled=false;
-    if(err){var e=document.getElementById('auth-otp-err');e.textContent='⚠️ '+err;e.style.display='block';return;}
-    try{localStorage.setItem('sanj_auth_session',JSON.stringify({email:_authEmail,plan:'free',ts:Date.now(),user:user||null}));}catch(ex){}
-    var ao=document.getElementById('auth-overlay');
-    if(ao){ao.style.transition='opacity .35s ease';ao.style.opacity='0';setTimeout(function(){ao.style.display='none';ao.style.opacity='';},360);}
-    setTimeout(function(){
-      // Check if user has active Pro (e.g. restored from Supabase)
-      var sess=null;try{sess=JSON.parse(localStorage.getItem('sanj_auth_session')||'null');}catch(e){}
-      var isPro=sess&&(sess.plan==='pro'||!!localStorage.getItem('sanj_pro'));
-      var proOk=isPro&&sess&&sess.pro_expires&&sess.pro_expires>Date.now();
-      if(proOk){_launchApp();return;}
-      _showPlans();
-    },380);
-  });
-}
-
-function _authVerifySupabaseOTP(email,code,cb){
-  try{
-    if(typeof window._supa!=='undefined'&&window._supa){
-      window._supa.auth.verifyOtp({email:email,token:code,type:'email'})
-        .then(function(res){if(res&&res.error){cb(res.error.message||'Invalid code');}else{cb(null,res&&res.data&&res.data.user?res.data.user:null);}})
-        .catch(function(e){cb(e&&e.message||'Network error');});
-      return;
-    }
-  }catch(ex){}
-  try{
-    var stored=localStorage.getItem('_demo_otp_'+email);
-    var ts=parseInt(localStorage.getItem('_demo_otp_ts')||'0');
-    if(stored&&stored===code&&(Date.now()-ts)<600000){localStorage.removeItem('_demo_otp_'+email);cb(null,{email:email,id:'demo-'+email});}
-    else cb('Incorrect code. Please try again.');
-  }catch(ex){cb('Verification failed');}
-}
-
-function obDoLogin(){
-  var email=(document.getElementById('ob-login-email')||{}).value||'';
-  var pass=(document.getElementById('ob-login-pass')||{}).value||'';
-  var errEl=document.getElementById('ob-login-err');
-  if(!email||!pass){if(errEl){errEl.textContent='⚠️ Enter email and password';errEl.style.display='block';}return;}
-  if(errEl)errEl.style.display='none';
-  var re=document.getElementById('auth-login-email');
-  var rp=document.getElementById('auth-login-pass');
-  if(re)re.value=email;
-  if(rp)rp.value=pass;
-  var _plSelectPlan_dummy = function(plan){ /* noop */ };
-  // Update auth badge
-  var icon = document.getElementById('auth-plan-icon');
-  var text = document.getElementById('auth-plan-text');
-  var sub  = document.getElementById('auth-plan-sub');
-  if(plan==='pro'){
-    if(icon) icon.textContent='☁️';
-    if(text) text.textContent='Pro Plan Selected';
-    if(sub)  sub.textContent='Cloud sync · unlimited projects';
-  } else {
-    if(icon) icon.textContent='📱';
-    if(text) text.textContent='Free Plan Selected';
-    if(sub)  sub.textContent='Device storage · 1 project';
-  }
-  // Animate plan card selection
-  var fBtn=document.getElementById('pl-free-btn');
-  var pBtn=document.getElementById('pl-pro-btn');
-  if(plan==='pro'){
-    if(fBtn){fBtn.style.background='rgba(255,255,255,0.08)';fBtn.textContent='Start Free';}
-    if(pBtn){pBtn.style.boxShadow='0 0 0 3px rgba(99,102,241,0.6),0 6px 20px rgba(99,102,241,0.5)';}
-  } else {
-    if(pBtn){pBtn.style.boxShadow='0 6px 20px rgba(99,102,241,0.45)';}
-    if(fBtn){fBtn.style.background='rgba(99,102,241,0.25)';fBtn.textContent='✓ Free Selected';}
-  }
-  // Slide to auth
-  var po=document.getElementById('plans-overlay');
-  var ao=document.getElementById('auth-overlay');
-  if(!po||!ao)return;
-  po.style.transition='opacity .35s ease';
-  po.style.opacity='0';
-  setTimeout(function(){
-    po.style.display='none'; po.style.opacity='';
-    ao.style.display='flex';
-    // If pro chosen, immediately show pro modal after email login
-  },350);
-}
-
-function _plBack(){
-  var ao=document.getElementById('auth-overlay');
-  var po=document.getElementById('plans-overlay');
-  if(ao) ao.style.display='none';
-  if(po){ po.style.opacity='0'; po.style.display='flex'; setTimeout(function(){po.style.transition='opacity .3s';po.style.opacity='1';},10); }
-}
 
 /* ── Auth: Send OTP ── */
 function authSendOTP(){
@@ -2414,13 +2248,8 @@ function authVerifyOTP(){
     try{
       localStorage.setItem('sanj_auth_session', JSON.stringify({email:_authEmail,plan:'free',ts:Date.now(),user:user||null}));
     }catch(ex){}
-    // Dismiss auth overlay → show plans
-    var ao=document.getElementById('auth-overlay');
-    if(ao){ao.style.transition='opacity .35s ease';ao.style.opacity='0';setTimeout(function(){ao.style.display='none';ao.style.opacity='';},360);}
-    setTimeout(function(){
-      var po=document.getElementById('plans-overlay');
-      if(po) po.style.display='flex';
-    },380);
+    // Slide to plans panel
+    setTimeout(function(){ _showPlansOverlay(); }, 200);
   });
 }
 
@@ -11691,6 +11520,125 @@ function openCloudModal() {
 }
 function closeCloudModal() { document.getElementById('cloud-modal').classList.remove('show'); }
 
+
+// ════════════════════════════════════════════════════════════
+//  ONBOARDING PANEL SYSTEM — horizontal slide navigation
+// ════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════
+//  ONBOARDING NAVIGATION ENGINE
+//  Panels: 0=Welcome, 1=Auth, 2=Plans, 3=Payment
+//  Each panel is position:absolute inside the shell.
+//  Gallery slide: forward→ exit left, enter right
+//                 backward← exit right, enter left
+// ═══════════════════════════════════════════════════
+var _obCurrent = 0;
+var _OB_PANELS = ['panel-welcome','panel-auth','panel-plans','panel-payment'];
+
+function _obShowShell() {
+  var shell = document.getElementById('onboard-shell');
+  if (!shell) return;
+  shell.style.display = 'block';
+  shell.style.opacity  = '1';
+  // Prevent app body from scrolling / bleeding through
+  document.body.style.overflow             = 'hidden';
+  document.body.style.position             = 'fixed';
+  document.body.style.width                = '100%';
+  document.documentElement.style.overflow  = 'hidden';
+}
+
+function _obHideShell() {
+  var shell = document.getElementById('onboard-shell');
+  if (!shell) return;
+  shell.style.transition = 'opacity .35s ease';
+  shell.style.opacity    = '0';
+  setTimeout(function() {
+    shell.style.display    = 'none';
+    shell.style.opacity    = '';
+    shell.style.transition = '';
+    // Restore body scroll
+    document.body.style.overflow  = '';
+    document.body.style.position  = '';
+    document.body.style.width     = '';
+    document.documentElement.style.overflow = '';
+  }, 360);
+}
+
+// _obGo(targetIdx, animate)
+//   animate=false → instant show, no slide (for first appearance)
+//   animate=true  → gallery slide (current exits, new enters from side)
+function _obGo(targetIdx, animate) {
+  var shell = document.getElementById('onboard-shell');
+  if (!shell) return;
+  _obShowShell();
+
+  var prevIdx  = _obCurrent;
+  _obCurrent   = targetIdx;
+
+  var prevId   = _OB_PANELS[prevIdx];
+  var nextId   = _OB_PANELS[targetIdx];
+  var prevPanel = document.getElementById(prevId);
+  var nextPanel = document.getElementById(nextId);
+  if (!nextPanel) return;
+
+  // ── Instant (no animation) ──────────────────────────────
+  if (animate === false || prevIdx === targetIdx) {
+    _OB_PANELS.forEach(function(pid) {
+      var p = document.getElementById(pid);
+      if (!p) return;
+      p.style.transition = 'none';
+      p.style.transform  = '';
+      p.style.display    = (pid === nextId) ? 'flex' : 'none';
+    });
+    return;
+  }
+
+  // ── Directional slide ───────────────────────────────────
+  var isForward = targetIdx > prevIdx;
+  var EASE = 'transform 0.42s cubic-bezier(0.77,0,0.175,1)';
+
+  // Prep: place next panel off-screen (right if forward, left if backward)
+  nextPanel.style.transition = 'none';
+  nextPanel.style.transform  = isForward ? 'translateX(100%)' : 'translateX(-100%)';
+  nextPanel.style.display    = 'flex';
+
+  // Double-rAF so the browser registers the starting position before animating
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      // Slide new panel into view
+      nextPanel.style.transition = EASE;
+      nextPanel.style.transform  = 'translateX(0)';
+      // Slide old panel out
+      if (prevPanel && prevPanel.style.display !== 'none') {
+        prevPanel.style.transition = EASE;
+        prevPanel.style.transform  = isForward ? 'translateX(-100%)' : 'translateX(100%)';
+      }
+      // After animation: clean up old panel
+      setTimeout(function() {
+        if (prevPanel) {
+          prevPanel.style.display    = 'none';
+          prevPanel.style.transform  = '';
+          prevPanel.style.transition = '';
+        }
+      }, 450);
+    });
+  });
+}
+
+// Override old overlay show/hide functions to use panel system
+function _showAuthOverlay() { _obGo(1, true); }
+function _showPlansOverlay() {
+  try {
+    var sess = JSON.parse(localStorage.getItem('sanj_auth_session') || '{}');
+    var el = document.getElementById('plans-welcome-email');
+    if (el && sess.email) el.textContent = '✓ ' + sess.email;
+  } catch(e) {}
+  _obGo(2, true);  // Slide: login → plans (current left, plans from right)
+}
+function _showPaymentPanel() { _obGo(3, true); }  // Slide: plans → payment
+function _backToPlans() { _obGo(2, true); }        // Slide back: payment → plans
+
+// ════════════════════════════════════════════════════════════
 // ════════════════════════════════════════════════════════
 //  PROJECT MANAGEMENT — Cloud Modal
 // ════════════════════════════════════════════════════════
